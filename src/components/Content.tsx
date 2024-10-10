@@ -52,6 +52,10 @@ const Content = (props: Props) => {
     </div>
   </div>
 </div>
+
+<div className="khonggian">
+  
+</div>
     </>
   );
 };
