@@ -18,7 +18,7 @@ const Header = () => {
 		<>
 		<div className='container mx-auto w-full'>
 		  
-		  <div className='up py-[15px] flex justify-between font-medium'>
+		  <div className='up py-[15px] flex justify-between font-medium pr-[10px]'>
 			<div className='trái flex'>
 			  <p className='border-r-2 border-black px-[20px]'>Phone Number: 0344357227</p>
 			  <p className='px-[20px]'>Email:Beautifullhouse@gmail.com</p>
@@ -72,7 +72,7 @@ const Header = () => {
 	
 	
 	
-		  <div className='down flex justify-between  border-y-2 py-[12px] border-black'>
+		  <div className='down flex justify-between  border-y-2 py-[12px] border-black  pr-[10px]'>
 			<img className="h-24 pl-[40px]"  src={logo} alt=""/>
 			<div className='right flex pl-[30px]'>
 			  <div className="text flex gap-14 pt-[25px] pr-[100px] text-lg">
@@ -83,9 +83,9 @@ const Header = () => {
 					</li> */}
 				
 			  
-				<p className='hover:border-b-2 border-black'>Products</p>
-				<p className='hover:border-b-2 border-black'>About Us</p>
-				<p className='hover:border-b-2 border-black'>Contact</p>
+				<p className='hover:border-b-2 border-black'>Sảm phẩm</p>
+				<p className='hover:border-b-2 border-black'>Tin tức</p>
+				<p className='hover:border-b-2 border-black'>Giới thiệu</p>
 			  </div>
 	
 	

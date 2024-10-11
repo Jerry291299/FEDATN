@@ -10,7 +10,7 @@ type Props = {};
 const Content = (props: Props) => {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 ">
   <div className="">
     <div className="box1 relative text-center">
       <img src={Sofa} alt="" className="h-full object-cover" />
