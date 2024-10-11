@@ -1,19 +1,4 @@
-// import React from "react";
-// import heart from "./icons/heart.png";
-// import location from "./icons/location.png";
-// import cart from "./icons/shopping-cart.png";
-// type Props = {};
 
-// const Header = (props: Props) => {
-//   return (
-//     <>
-     
-
-//     </>
-//   );
-// };
-
-// export default Header;
 import { Link } from "react-router-dom";
 import Facebook from '../anh/Facebook.png'
 
