@@ -120,7 +120,7 @@ const Add = (props: Props) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input your Coffee price!",
+                    message: "Please input your product price!",
                   },
                 ]}
               >
@@ -139,7 +139,7 @@ const Add = (props: Props) => {
                 rules={[
                   {
                     required: false,
-                    message: "Please input your Coffee image!",
+                    message: "Please input your product image!",
                   },
                 ]}
               >
@@ -147,7 +147,7 @@ const Add = (props: Props) => {
                 type="file"
                 onChange={(e:any)=>{setTailen(e.target.files[0])}}
                   className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                  placeholder="Enter Coffee image"
+                  placeholder="Enter product image"
                 />
               </Form.Item>
               <div className="absolute left-4"></div>

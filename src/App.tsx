@@ -6,6 +6,7 @@ import Home from './layout/Home';
 import Admin from './layout/Admin';
 import Add from './components/admin/add';
 import Dashboard from './components/admin/Dashboard';
+import Update from './components/admin/update';
 function App() {
   return (
     <>
@@ -25,7 +26,7 @@ function App() {
 <Route path='/admin' element={<Admin/>} >
 <Route path='add' element={<Add/>} />
 <Route path='dashboard' element={<Dashboard/>} />
-
+<Route path="dashboard/update/:id" Component={Update}></Route>
 
 </Route>
 

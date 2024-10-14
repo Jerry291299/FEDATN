@@ -108,7 +108,13 @@ const Dashboard = (props: Props) => {
               <img className='w-[100px]' src={product?.img} alt="" />
               </td>
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                <button className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Sửa</button> 
+              <button
+                      onClick={() => updateProduct(product._id)}
+                      type="button"
+                      className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+                    >
+                      Edit
+                    </button>
                 <Popconfirm
                       title="Delete the task"
                       description="Are you sure to delete this task?"
