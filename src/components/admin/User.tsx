@@ -4,6 +4,7 @@ import { DeleteProduct, getAllproducts } from '../../service/products';
 import { Iproduct } from '../../interface/products';
 import { Popconfirm } from 'antd';
 import { getAllusers } from '../../service/user';
+import { IUser } from '../../interface/user';
 
 type Props = {}
 
@@ -30,18 +31,18 @@ const Users = (props: Props) => {
     
   }, []);
 
-  const delProduct = async (id: string) => {
-    await DeleteProduct(id);
-    const newproduct = products.filter(
-      (product: Iproduct) => product._id !== id
-    );
-    console.log(id);
-    setProduct(newproduct);
-  };
+  // const delProduct = async (id: string) => {
+  //   await DeleteProduct(id);
+  //   const newusers = users.filter(
+  //     (user: IUser) => user.id !== id
+  //   );
+  //   console.log(id);
+  //   getAllusers(newusers);
+  // };
 
-  const updateProduct = (id: string) => {
-    navigate(`update/${id}`);
-  };
+  // const updateProduct = (id: string) => {
+  //   navigate(`update/${id}`);
+  // };
   return (
     <>
     <div className="flex flex-col w-full">
@@ -85,26 +86,24 @@ const Users = (props: Props) => {
             </tr>
           </thead>
           <tbody>
-          {products.map((product: Iproduct, index: number) => (
+          {users.map((user: IUser, index: number) => (
             <tr  className="bg-gray-100 border-b">
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
               {index + 1}
               </td>
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                {product.name}
+                {user.name}
               </td>
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-              {product.price}
+              {user.email}
               </td>
-              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-              {product?.category?.name}
-              </td>
-              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-              <img className='w-[100px]' src={product?.img} alt="" />
-              </td>
+             
+              {/* <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+              <img className='w-[100px]' src={user?.img} alt="" />
+              </td> */}
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
               <button
-                      onClick={() => updateProduct(product._id)}
+                      // onClick={() => updateProduct(user._id)}
                       type="button"
                       className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
                     >
@@ -114,7 +113,7 @@ const Users = (props: Props) => {
                       title="Delete the task"
                       description="Are you sure to delete this task?"
                       onConfirm={() => {
-                        delProduct(product._id);
+                        // delProduct(product._id);
                       }}
                       okText="Yes"
                       cancelText="No"

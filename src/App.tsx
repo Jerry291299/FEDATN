@@ -8,6 +8,7 @@ import Add from './components/admin/add';
 import Dashboard from './components/admin/Dashboard';
 import Register from './components/user/register';
 import Update from './components/admin/update';
+import Users from './components/admin/User';
 function App() {
   return (
     <>
@@ -24,9 +25,12 @@ function App() {
 
 
 <Route path='/register' element={<Register/>}/>
+
 <Route path='/admin' element={<Admin/>} >
+
 <Route path='add' element={<Add/>} />
 <Route path='dashboard' element={<Dashboard/>} />
+<Route path='users' element={<Users/>} />
 <Route path="dashboard/update/:id" Component={Update}></Route>
 
 </Route>
