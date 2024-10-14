@@ -47,11 +47,11 @@ const Update = (props: Props) => {
       } catch (error) {}
     };
 
-    // Fetch categories here (assuming you have a function for this)
+    
     const fetchCategories = async () => {
       try {
         const categories = await getAllCategories();
-        setCategory(categories); // Set the fetched categories to state
+        setCategory(categories); 
       } catch (error) {
         console.error(error);
       }

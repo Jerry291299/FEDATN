@@ -6,7 +6,6 @@ import Home from './layout/Home';
 import Admin from './layout/Admin';
 import Add from './components/admin/add';
 import Dashboard from './components/admin/Dashboard';
-
 import Register from './components/user/register';
 import Update from './components/admin/update';
 function App() {

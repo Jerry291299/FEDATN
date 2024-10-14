@@ -148,7 +148,7 @@ const Navbar = (props: Props) => {
             < NavLink to={"/admin/dashboard"}
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
-                Products
+                Products list
               </NavLink>
             </span>
           </div>
