@@ -27,7 +27,7 @@ const Content = (props: Props) => {
   <div className="">
     <div className="box1 relative text-center">
       <img src={Sofa} alt="" className=" object-cover" />
-      <div className="w-full absolute top-0 left-0 text-center mt-[210px]">
+      <div className="w-full absolute pt-0 left-0 text-center mt-[210px]">
         <p className="text-white text-[40px]">Sofa</p>
       </div>
     </div>
@@ -37,13 +37,13 @@ const Content = (props: Props) => {
     <div className="flex gap-2">
       <div className="box2 relative text-center flex-1">
         <img src={banan} alt="" className="h-full object-cover" />
-        <div className="w-full absolute top-0 left-0 text-center mt-[110px]">
+        <div className="w-full absolute pt-0 left-0 text-center mt-[110px]">
           <p className="text-white text-[20px]">Bàn ăn</p>
         </div>
       </div>
       <div className="box2 relative text-center flex-1">
         <img src={giuong} alt="" className="h-full object-cover" />
-        <div className="w-full absolute top-0 left-0 text-center mt-[110px]">
+        <div className="w-full absolute pt-0 left-0 text-center mt-[110px]">
           <p className="text-white text-[20px]">Giường</p>
         </div>
       </div>
@@ -52,13 +52,13 @@ const Content = (props: Props) => {
     <div className="flex gap-2">
       <div className="box3 relative text-center flex-1">
         <img src={armchair} alt="" className="h-full object-cover" />
-        <div className="w-full absolute top-0 left-0 text-center mt-[110px]">
+        <div className="w-full absolute pt-0 left-0 text-center mt-[110px]">
           <p className="text-white text-[20px]">Armchair</p>
         </div>
       </div>
       <div className="box3 relative text-center flex-1">
         <img src={ghean} alt="" className="h-full object-cover" />
-        <div className="w-full absolute top-0 left-0 text-center mt-[110px]">
+        <div className="w-full absolute pt-0 left-0 text-center mt-[110px]">
           <p className="text-white text-[20px]">Ghế ăn</p>
         </div>
       </div>
@@ -69,10 +69,10 @@ const Content = (props: Props) => {
   <div className="">
     <div className="box1 relative text-center">
       <img src={phongkhach} alt="" className="w-full object-cover h-[95%] " />
-      <div className="w-full top-0 left-0 text-center mt-[10px]">
+      <div className="w-full pt-0 left-0 text-center mt-[10px]">
       <h2 className="text-3xl font-bold mb-4">Không gian phòng khách</h2>
       <p className="text-gray-600 mb-6">Phòng khách là không gian chính của ngôi nhà, là nơi sum họp gia đình.</p>
-      <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold top-[10px]">Mẫu thiết kế &rarr;</a>
+      <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]">Mẫu thiết kế &rarr;</a>
       </div>
     </div>
     <div className="">
@@ -81,7 +81,7 @@ const Content = (props: Props) => {
       <div className="">
       <h2 className="text-[20px] font-bold">Không gian phòng ngủ</h2>
             <p className="text-gray-600 mb-6">Những mẫu phòng ngủ của Nhà Xinh mang đến cảm giác ấm cúng, gần gũi và thoải mái</p>
-            <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold top-[10px]">Mẫu phòng ngủ &rarr;</a>
+            <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]">Mẫu phòng ngủ &rarr;</a>
       </div>
     </div>
   </div>
@@ -89,15 +89,15 @@ const Content = (props: Props) => {
   <div className="">
     <div className="box1 relative text-center">
       <img src={trangtri} alt="" className="h-full object-cover w-[55%] float-right" />
-      <div className="w-full top-0 left-0 text-center mt-[10px] ">
+      <div className="w-full pt-0 left-0 text-center mt-[10px] ">
             <h2 className="text-[20px] font-bold">Đồ trang trí</h2>
             <p className="text-gray-600 mb-6">Mang lại những nguồn cảm hứng và nét sinh động cho không gian.</p>
-            <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold top-[10px]">Khám phá &rarr;</a>
+            <a href="#" className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]">Khám phá &rarr;</a>
         </div>
     </div>
     <div className="">
     <div className="">
-      <img src={phongan} alt="" className="h-full object-cover top-[40px]" />
+      <img src={phongan} alt="" className="h-full object-cover pt-[40px]" />
       <div className="">
       <h2 className="text-[20px] font-bold">Không gian phòng ăn</h2>
             <p className="text-gray-600 mb-6">Một bữa ăn ngon luôn là mong ước của mỗi gia đình. Không gian phòng ăn đóng vai trò rất quan trọng trong văn hóa Việt</p>
@@ -109,12 +109,12 @@ const Content = (props: Props) => {
   </div>
   <div className="grid grid-cols-2  ">
   
-  <div className="">
+  <div className="pt-[100px]">
       <h2 className="font-bold text-[35px] text-center pt-[35px]">Nội thất tinh tế</h2>
-      <p className="text-center text-[25px]">
+      <p className="text-center text-[25px] mb-[40px]">
       Với kinh nghiệm hơn 24 năm trong hoàn thiện nội thất, Nhà Xinh mang đến giải pháp toàn diện trong bao gồm thiết kế, trang trí và cung cấp nội thất trọn gói. Sở hữu đội ngũ chuyên nghiệp và hệ thống 10 cửa hàng, Nhà Xinh là lựa chọn cho không gian tinh tế và hiện đại.
       </p>
-      <a href="#" className="font-semibold text-blue border-2 border-black hover:bg-blue-700 ">Xem Thêm</a>
+      <a href="#" className="px-[30px] py-[20px] text-[20px] my-[20px] ml-[380px] font-semibold text-blue border-2 border-black hover:bg-blue-700 ">Xem Thêm</a>
     </div>
     <div className="">
       <div className="">
@@ -187,12 +187,12 @@ const Content = (props: Props) => {
 </div>
 <div className="grid grid-cols-2 border-t-2 border-black bg-gray ">
   
-  <div className="bg-gray-200">
+  <div className="bg-gray-200 pt-[100px]">
       <h2 className="font-bold text-[35px] text-center pt-[35px] ">Tổ ấm của người tinh tế</h2>
-      <p className="text-center text-[25px]">
+      <p className="text-center text-[25px] mb-[40px]">
       Trong suốt hơn 24 năm qua, cảm hứng từ gu thẩm mỹ tinh tế và tinh thần “Việt” đã giúp Nhà Xinh tạo ra những thiết kế độc đáo, hợp thời và chất lượng. Nhà Xinh hiện đã mở 10 cửa hàng tại Việt Nam.
       </p>
-      <a href="#" className="font-semibold text-blue border-2 border-black hover:bg-blue-700 ">Xem Thêm</a>
+      <a href="#" className="px-[30px] py-[20px] text-[20px] my-[20px] ml-[380px] font-semibold text-blue border-2 border-black hover:bg-blue-700 ">Xem Thêm</a>
     </div>
     <div className="">
       <div className="">
