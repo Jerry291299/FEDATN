@@ -56,6 +56,8 @@ const Add = (props: Props) => {
     const formdata = new FormData()
     formdata.append('images', files)
     const upImage = await upload (formdata)
+    console.log(upImage, "url img");
+    
     console.log(upImage.payload[0].url);
     return upImage.payload[0].url
     

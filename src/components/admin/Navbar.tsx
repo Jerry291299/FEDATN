@@ -27,7 +27,7 @@ const Navbar = (props: Props) => {
           </div>
           <div className="mr-2 ">
             <a
-              href="javascript:void(0)"
+              // href="javascript:void(0)"
               className="dark:hover:text-primary hover:text-primary transition-colors duration-200 ease-in-out text-[1.075rem] font-medium dark:text-neutral-400/90 text-secondary-inverse"
             >
               Robert Jason
@@ -39,7 +39,7 @@ const Navbar = (props: Props) => {
         </div>
         <a
           className="inline-flex relative items-center group justify-end text-base font-medium leading-normal text-center align-middle cursor-pointer rounded-[.95rem] transition-colors duration-150 ease-in-out text-dark bg-transparent shadow-none border-0"
-          href="javascript:void(0)"
+          // href="javascript:void(0)"
         >
           <span className="leading-none transition-colors duration-200 ease-in-out peer shrink-0 group-hover:text-primary text-secondary-dark">
             <svg
@@ -71,7 +71,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Sales
@@ -82,7 +82,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Profile
@@ -93,7 +93,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Settings
@@ -112,7 +112,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Users
@@ -123,7 +123,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Orders
@@ -134,7 +134,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Track Order
@@ -145,7 +145,7 @@ const Navbar = (props: Props) => {
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
               <a
-                href="javascript:;"
+                // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
                 Products
