@@ -110,7 +110,7 @@ const Content = (props: Props) => {
   <div className="grid grid-cols-2  ">
   
   <div className="">
-      <h2 className="font-bold text-[35px] text-center pt-[35px]">Nội thất tinh tế</h2>
+      <h2 className="font-bold text-[36px] text-center pt-[35px]">Nội thất tinh tế</h2>
       <p className="text-center text-[25px]">
       Với kinh nghiệm hơn 24 năm trong hoàn thiện nội thất, Nhà Xinh mang đến giải pháp toàn diện trong bao gồm thiết kế, trang trí và cung cấp nội thất trọn gói. Sở hữu đội ngũ chuyên nghiệp và hệ thống 10 cửa hàng, Nhà Xinh là lựa chọn cho không gian tinh tế và hiện đại.
       </p>
