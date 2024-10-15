@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import { DeleteProduct, getAllproducts } from '../../service/products';
 import { Iproduct } from '../../interface/products';
 import { Icategory } from '../../interface/category';
@@ -44,6 +44,8 @@ const Dashboard = (props: Props) => {
   };
   return (
     <>
+    <NavLink to={'/admin/add'}><button className=''>thêm mới</button></NavLink>
+    
     <div className="flex flex-col w-full">
   <div className="overflow-x-auto">
     <div className="py-2 inline-block w-full px-0">
