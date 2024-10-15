@@ -4,12 +4,12 @@ import {
   addProduct,
   getProductByID,
   updateProduct,
-} from "../../service/products";
-import { IProductLite, Iproduct } from "../../interface/products";
+} from "../../../service/products";
+import { IProductLite, Iproduct } from "../../../interface/products";
 import { useNavigate, useParams } from "react-router-dom";
-import { upload } from "../../service/upload";
-import { Icategory } from "../../interface/category";
-import { getAllCategories } from "../../service/category";
+import { upload } from "../../../service/upload";
+import { Icategory } from "../../../interface/category";
+import { getAllCategories } from "../../../service/category";
 
 type Props = {};
 
@@ -47,11 +47,10 @@ const Update = (props: Props) => {
       } catch (error) {}
     };
 
-    
     const fetchCategories = async () => {
       try {
         const categories = await getAllCategories();
-        setCategory(categories); 
+        setCategory(categories);
       } catch (error) {
         console.error(error);
       }
@@ -114,27 +113,26 @@ const Update = (props: Props) => {
                   placeholder="Enter Price $$$"
                 />
               </Form.Item>
-              
             </div>
             <div className="pt-[20px]">
-                <Form.Item
-                  name="category"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your Category!",
-                    },
-                  ]}
-                >
-                  <Select labelRender={labelRender} style={{ width: "100%" }}>
-                    {category.map((categoryID: Icategory, index: number) => (
-                      <Select.Option key={categoryID._id} value={categoryID._id}>
-                        {categoryID.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </div>
+              <Form.Item
+                name="category"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Category!",
+                  },
+                ]}
+              >
+                <Select labelRender={labelRender} style={{ width: "100%" }}>
+                  {category.map((categoryID: Icategory, index: number) => (
+                    <Select.Option key={categoryID._id} value={categoryID._id}>
+                      {categoryID.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
           </div>
           <button
             type="submit"

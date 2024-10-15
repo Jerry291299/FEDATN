@@ -1,14 +1,14 @@
 import { Form, FormProps, Input, Select, SelectProps } from "antd";
 import React, { useEffect, useState } from "react";
-import { addProduct } from "../../service/products";
-import { Iproduct } from "../../interface/products";
+import { addProduct } from "../../../service/products";
+import { Iproduct } from "../../../interface/products";
 import { useNavigate } from "react-router-dom";
 import { Button, message } from "antd";
-import { upload } from "../../service/upload";
+import { upload } from "../../../service/upload";
 import { url } from "inspector";
 
-import { Icategory } from "../../interface/category";
-import { getAllCategories } from "../../service/category";
+import { Icategory } from "../../../interface/category";
+import { getAllCategories } from "../../../service/category";
 type Props = {};
 type LabelRender = SelectProps["labelRender"];
 const Add = (props: Props) => {
@@ -18,7 +18,7 @@ const Add = (props: Props) => {
   const [category, setCategory] = useState<Icategory[]>([]);
   const [products, setProducts] = useState<Iproduct[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const [tailen, setTailen] = useState<any>(null)
+  const [tailen, setTailen] = useState<any>(null);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
@@ -29,20 +29,18 @@ const Add = (props: Props) => {
     });
   };
 
-    useEffect(() => {
-      const fetchCategories = async () => {
-        try {
-          const data = await getAllCategories();
-          setCategory(data);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      fetchCategories();
-    }, []);
-  
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategory(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  
   const labelRender: LabelRender = (props) => {
     const { label, value } = props;
 
@@ -52,29 +50,26 @@ const Add = (props: Props) => {
     return <span>Please choose the category: </span>;
   };
 
-  const uploadImage = async (files:any) => {
-    const formdata = new FormData()
-    formdata.append('images', files)
-    const upImage = await upload (formdata)
+  const uploadImage = async (files: any) => {
+    const formdata = new FormData();
+    formdata.append("images", files);
+    const upImage = await upload(formdata);
     console.log(upImage, "url img");
-    
+
     console.log(upImage.payload[0].url);
-    return upImage.payload[0].url
-    
-  }
-
-
+    return upImage.payload[0].url;
+  };
 
   const onFinish = async (values: any) => {
     console.log("Success:", values);
-     const fileResult = await uploadImage(tailen)
-    const payload =  {
+    const fileResult = await uploadImage(tailen);
+    const payload = {
       ...values,
-      img : fileResult,
-      categoryID : values.category
-    }
+      img: fileResult,
+      categoryID: values.category,
+    };
     console.log(values);
-    
+
     const product = await addProduct(payload);
     console.log(product);
 
@@ -87,7 +82,6 @@ const Add = (props: Props) => {
     info();
 
     form.resetFields();
-
   };
   return (
     <>
@@ -144,8 +138,10 @@ const Add = (props: Props) => {
                 ]}
               >
                 <Input
-                type="file"
-                onChange={(e:any)=>{setTailen(e.target.files[0])}}
+                  type="file"
+                  onChange={(e: any) => {
+                    setTailen(e.target.files[0]);
+                  }}
                   className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
                   placeholder="Enter product image"
                 />
@@ -164,7 +160,7 @@ const Add = (props: Props) => {
                 ]}
               >
                 <Select labelRender={labelRender} style={{ width: "100%" }}>
-                  {category.map((categoryID:Icategory, index:number) => (
+                  {category.map((categoryID: Icategory, index: number) => (
                     <Select.Option key={categoryID._id} value={categoryID._id}>
                       {categoryID.name}
                     </Select.Option>
