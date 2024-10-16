@@ -4,7 +4,7 @@ import { DeleteProduct, getAllproducts } from '../../service/products';
 import { Iproduct } from '../../interface/products';
 import { Icategory, IcategoryLite } from '../../interface/category';
 import { Popconfirm } from 'antd';
-import { delCategory, getAllCategories } from '../../service/category';
+import { delCategory, getAllCategories, updateCategory } from '../../service/category';
 
 type Props = {}
 
@@ -39,8 +39,8 @@ const Listcategory = (props: Props) => {
     }
   };
 
-  const updateProduct = (id: string) => {
-    navigate(`update/${id}`);
+  const updateCategory = (id: string) => {
+    navigate(`updatecategory/${id}`);
   };
 
   return (
@@ -76,7 +76,7 @@ const Listcategory = (props: Props) => {
                         <button
                           type="button"
                           className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                          onClick={() => updateProduct(category._id)}
+                          onClick={() => updateCategory(category._id)}
                         >
                           Edit
                         </button>

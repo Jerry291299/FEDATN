@@ -104,7 +104,7 @@ const Update = (props: Props) => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input your Coffee price!",
+                    message: "Please input your product price!",
                   },
                 ]}
               >

@@ -38,12 +38,12 @@ return data;
   }
 }
 
-export const updateCategory = async(id?:string,   category?: IcategoryLite) => {
+export const updateCategory = async (id?: string, category?: IcategoryLite) => {
   try {
-    const {data} = await axiosservice.put(`/updatecategory/${id}`, category)
-    return data
-  } catch (error) {
-    console.log(error);
-    
+    const { data } = await axiosservice.put(`/updatecategory/${id}`, category);
+    return data;
+  } catch (error: any) {
+    console.log("Error updating category:", error.response?.data || error.message);
+    throw error;  
   }
-}
+};

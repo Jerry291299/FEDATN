@@ -12,6 +12,7 @@ import Users from "./components/admin/User";
 import Listcategory from "./components/admin/listcategory";
 import Addcategory from "./components/admin/modaladd/addcategory";
 import Login from "./components/user/login";
+import Updatecategory from "./components/admin/modaladd/updatecategory";
 function App() {
   return (
     <>
@@ -29,6 +30,8 @@ function App() {
             <Route path="addcategory" element={<Addcategory />} />
             <Route path="users" element={<Users />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
+            <Route path="Listcategory/updatecategory/:id" Component={Updatecategory}></Route>
+
           </Route>
         </Routes>
       </BrowserRouter>
