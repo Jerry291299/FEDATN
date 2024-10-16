@@ -37,3 +37,13 @@ return data;
     
   }
 }
+
+export const updateCategory = async(id?:string,   category?: IcategoryLite) => {
+  try {
+    const {data} = await axiosservice.put(`/updatecategory/${id}`, category)
+    return data
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
