@@ -9,6 +9,8 @@ import { url } from "inspector";
 
 import { Icategory } from "../../../interface/category";
 import { getAllCategories } from "../../../service/category";
+import LoadingComponent from "../../Loading";
+
 type Props = {};
 type LabelRender = SelectProps["labelRender"];
 const Add = (props: Props) => {
@@ -21,7 +23,11 @@ const Add = (props: Props) => {
   const [tailen, setTailen] = useState<any>(null);
   const navigate = useNavigate();
   const [form] = Form.useForm();
-
+  const [loading, setLoading] = useState<boolean>(false)
+  
+  
+  
+  
   const info = () => {
     messageApi.open({
       type: "success",
@@ -62,6 +68,7 @@ const Add = (props: Props) => {
 
   const onFinish = async (values: any) => {
     console.log("Success:", values);
+    setLoading(true)
     const fileResult = await uploadImage(tailen);
     const payload = {
       ...values,
@@ -79,12 +86,16 @@ const Add = (props: Props) => {
     setImg("");
     setPrice(0);
     setCategory([]);
-    info();
+    info()
 
     form.resetFields();
+    setLoading(false)
   };
+
   return (
     <>
+    
+    {loading && <LoadingComponent/>}
       {contextHolder}
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
         <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>
