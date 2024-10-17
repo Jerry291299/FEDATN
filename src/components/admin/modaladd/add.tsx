@@ -95,7 +95,7 @@ const Add = (props: Props) => {
   return (
     <>
     
-    {loading && <LoadingComponent/>}
+    {loading && <LoadingComponent />}
       {contextHolder}
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
         <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>

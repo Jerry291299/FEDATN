@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Facebook from '../anh/Facebook.png'
 
 import heart from '../anh/heart.png'
@@ -82,8 +82,10 @@ const Header = () => {
 					<Link to="/admin" className='hover:border-b-2 border-black'>Admin</Link>
 					</li> */}
 				
-			  
-				<p className='hover:border-b-2 border-black'>Sảm phẩm</p>
+			  <NavLink to={"/products"}>
+			  <button className='hover:border-b-2 border-black'>Sảm phẩm</button>
+			  </NavLink>
+				
 				<p className='hover:border-b-2 border-black'>Tin tức</p>
 				<p className='hover:border-b-2 border-black'>Giới thiệu</p>
 			  </div>

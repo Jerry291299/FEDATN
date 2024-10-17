@@ -13,12 +13,15 @@ import Listcategory from "./components/admin/listcategory";
 import Addcategory from "./components/admin/modaladd/addcategory";
 import Login from "./components/user/login";
 import Updatecategory from "./components/admin/modaladd/updatecategory";
+import Productspage from "./components/Productspage";
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />}></Route>
+
+          <Route path="/products" element={<Productspage />}/>
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

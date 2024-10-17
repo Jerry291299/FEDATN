@@ -5,6 +5,7 @@ import { Iproduct } from '../../interface/products';
 import { Popconfirm } from 'antd';
 import { getAllusers } from '../../service/user';
 import { IUser } from '../../interface/user';
+import LoadingComponent from '../Loading';
 
 type Props = {}
 
@@ -13,17 +14,20 @@ const Users = (props: Props) => {
   const [users, setUser] = useState([]);
   const param = useParams();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState<boolean>(false)
   console.log(param);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const data = await getAllusers();
         setUser(data);
         console.log(data,  "data");
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -45,6 +49,7 @@ const Users = (props: Props) => {
   // };
   return (
     <>
+    {loading && <LoadingComponent/>}
     <div className="flex flex-col w-full">
   <div className="overflow-x-auto">
     <div className="py-2 inline-block w-full px-0">

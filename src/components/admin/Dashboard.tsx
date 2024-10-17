@@ -4,6 +4,7 @@ import { DeleteProduct, getAllproducts } from '../../service/products';
 import { Iproduct } from '../../interface/products';
 import { Icategory } from '../../interface/category';
 import { Popconfirm } from 'antd';
+import LoadingComponent from '../Loading';
 
 type Props = {}
 
@@ -12,22 +13,23 @@ const Dashboard = (props: Props) => {
   const [products, setProduct] = useState([]);
   const param = useParams();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState<boolean>(false)
   console.log(param);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true); 
         const data = await getAllproducts();
         setProduct(data);
-        console.log(data,  "data");
+        console.log(data, "data");
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false); 
       }
     };
     fetchData();
-    
-    
   }, []);
 
   const delProduct = async (id: string) => {
@@ -44,6 +46,7 @@ const Dashboard = (props: Props) => {
   };
   return (
     <>
+    {loading && <LoadingComponent />}
     <NavLink to={'/admin/add'}><button className=''>thêm mới</button></NavLink>
     
     <div className="flex flex-col w-full">
