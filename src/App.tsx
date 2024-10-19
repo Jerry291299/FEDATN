@@ -14,6 +14,7 @@ import Addcategory from "./components/admin/modaladd/addcategory";
 import Login from "./components/user/login";
 import Updatecategory from "./components/admin/modaladd/updatecategory";
 import Productspage from "./components/Productspage";
+import { ProductDetail } from "./components/ProductDetail";
 function App() {
   return (
     <>
@@ -22,10 +23,10 @@ function App() {
           <Route path="/" element={<Home />}></Route>
 
           <Route path="/products" element={<Productspage />}/>
-
+          <Route path="details/:id" element={<ProductDetail/>}/>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-
+          
           <Route path="/admin" element={<Admin />}>
             <Route path="add" element={<Add />} />
             <Route path="dashboard" element={<Dashboard />} />
