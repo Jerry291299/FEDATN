@@ -20,73 +20,63 @@ export const ProductDetail = () => {
         <div className='ml-[40px]'>
             <img className='w-[650px] object-cover' src={anh1} alt="" />
         </div>
-        <div className='ml-[70px]'>
-            <h1 className='text-3xl font-bold pb-[20px]'>Tên sp</h1>
+        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-xl font-bold text-black-800">RG 1/144 MSN-04 SAZABI</h1>
+      <p className="font-bold text-gray-500">SKU: (ĐANG CẬP NHẬT...)</p>
+      
+      <div className="my-4">
+        <div className="flex items-baseline">
+          <span className="text-2xl font-semibold text-black-600">950.000₫</span>
+         <p className=" text-gray-500 m-[15px]">Giá thị trường:<span className="text-gray-400 line-through ml-2">1.000.000₫</span></p>
+        </div>
+        <p className="font-bold text-gray-600">Tiết kiệm: <span className="text-red-600">50.000₫</span></p>
+        <p className="font-bold text-gray-500 mt-2">Tình trạng: <span className="font-semibold text-red-600">Hết hàng</span></p>
+      </div>
+
+      <div className="flex items-center my-4">
+        <p className="font-bold">Số Lượng</p>
+        <button 
+   
+          className="px-2 py-1 bg-gray-300 rounded-l hover:bg-gray-400"
+        >
+          -
+        </button>
+        <input 
+          type="text" 
+      
+          readOnly 
+          className="w-12 text-center border border-gray-300"
+        />
+        <button 
         
-            <p className='pt-[20px] text-[30px] pb-[20px]'>Gia sp</p>
-            <p className='pb-[30px]'>PlayStation 5 Controller Skin High quality vinyl with air<br/> channel adhesive for easy bubble free install & mess<br/> free removal Pressure sensitive.</p>
+          className="px-2 py-1 bg-gray-300 rounded-r hover:bg-gray-400"
+        >
+          +
+        </button>
+      </div>
+
+      <button 
+        className="w-full py-2 bg-gray-500 text-white font-semibold rounded-lg cursor-not-allowed"
+        disabled
+      >
+        HẾT HÀNG
+      </button>
+
+      <div className="my-4 font-bold">
+        <p className="text-gray-700">Gọi đặt mua: 
+          <a href="tel:0829721097" className="text-blue-600"> 0829721097</a> 
+          <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
+        </p>
+      </div>
+
+      <ul className="list-disc pl-5 space-y-2 text-gray-700">
+        <li>MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG <a className='font-bold'>từ 10.000.000Đ</a></li>
+        <li>BẢO HÀNH  <a className='font-bold'>1 đổi 1</a> DO LỖI NHÀ SẢN XUẤT</li>
+        <li>CAM KẾT  <a className='font-bold'>100% chính hãng</a></li>
+      </ul>
+ 
             <div className='foot pt-[100px] mb-[10px] border-t-2 border-black justify-between flex'>
-            <form
-                className='mt-[1px]'
-                style={{
-                  border: "1px solid grey",
-                  width: "max-content",
-                  borderRadius: "9px",
-                }}>
-                <div className='relative flex items-center max-w-[8rem] '>
-                  <button
-                    type='button'
-                    id='decrement-button'
-                    data-input-counter-decrement='quantity-input'
-                    className='bg-white-100 dark:bg-white-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none'>
-                    <svg
-                      className='w-3 h-3 text-gray-900 dark:text-black'
-                      aria-hidden='true'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 18 2'>
-                      <path
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M1 1h16'
-                      />
-                    </svg>
-                  </button>
-                  <input
-                    value={1}
-                    type='text'
-                    id='quantity-input'
-                    data-input-counter=''
-                    aria-describedby='helper-text-explanation'
-                    className='bg-white-50 border-x-0 border-gray-300 h-11 text-center text-black-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-white-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                  />
-                  <button
-                    type='button'
-                    id='increment-button'
-                    data-input-counter-increment='quantity-input'
-                    className='bg-[#DB4444] dark:bg-red-700 dark:hover:bg-gray-600 dark:border-red-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none'>
-                    <svg
-                      className='w-3 h-3 text-white dark:text-white'
-                      aria-hidden='true'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 18 18'>
-                      <path
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 1v16M1 9h16'
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </form>
-              <button className='border-2 border-red bg-red-700 bg-red rounded-lg py-[2px] px-[50px] text-white'>
-                Buy now
-              </button>
+            
               
             </div>
            
