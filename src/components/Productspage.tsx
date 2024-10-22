@@ -49,7 +49,7 @@ const Productspage = (props: Props) => {
 
         {products?.slice(0, 8).map((product: Iproduct, index: number) => (
           <article className="mx-auto my-4 flex w-full flex-col overflow-hidden rounded-2xl border border-gray-300 bg-white text-gray-900 transition hover:translate-y-2 hover:shadow-lg">
-            <NavLink  to={`/product/${product._id}`}>
+            <NavLink  to={`/product/`+product._id}>
 
               <img
                 src= {product.img}
