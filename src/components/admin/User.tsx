@@ -75,6 +75,13 @@ const Users = (props: Props) => {
               >
                 Email
               </th>
+
+              <th
+                scope="col"
+                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+              >
+                Vai trò
+              </th>
             
               {/* <th
                 scope="col"
@@ -101,6 +108,9 @@ const Users = (props: Props) => {
               </td>
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
               {user.email}
+              </td>
+              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+              {user.role}
               </td>
              
               {/* <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
