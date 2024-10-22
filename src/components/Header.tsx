@@ -13,14 +13,18 @@ import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.pn
 import { useEffect, useState } from "react";
 
 const Header = () => {
-  const [user, setUser] = useState<{ info: string; id: string } | null>(null);
+  const [user, setUser] = useState<{
+    info: { role: string };
+    id: string;
+  } | null>(null);
   const Navigate = useNavigate();
 
   useEffect(() => {
-    const userData: any = sessionStorage.getItem("user");
+    const userData = sessionStorage.getItem("user");
     if (userData) {
       setUser(JSON.parse(userData));
     }
+    console.log(user?.info?.role, "roleodayyy");
   }, []);
 
   const handleLogout = () => {
@@ -40,55 +44,65 @@ const Header = () => {
             <p className="px-[20px]">Email:Beautifullhouse@gmail.com</p>
           </div>
           <div className="icon flex pr-[500px] gap-4 ">
-            <img src={Facebook} alt="" />
-            <img src={insta} alt="" />
-            <img src={twitter} alt="" />
-            <img src={link} alt="" />
+            <img className="w-[40px] h-[40px]" src={Facebook} alt="" />
+            <img className="w-[40px] h-[40px]" src={insta} alt="" />
+            <img className="w-[40px] h-[40px]" src={twitter} alt="" />
+            <img className="w-[40px] h-[40px]" src={link} alt="" />
           </div>
 
           <div className="phải flex gap-3">
             {user ? (
-              <> 
-			  <li>
-					<Link to="/admin" className='hover:border-b-2 border-black'>Admin</Link>
-					</li>
+              <>
+                {/* Show Admin link only if user role is "admin" */}
+                {user?.info?.role === "admin" && (
+                  <Link to="/admin" className="hover:border-b-2 border-black">
+                    <li>Admin</li>
+                  </Link>
+                )}
+
+                {/* Show "Xem Gio Hang" and "Xem Don Hang" buttons for both "user" and "admin" */}
+                {(user?.info?.role === "user" ||
+                  user?.info?.role === "admin") && (
+                  <>
+                    <Link to="/cart" className="btn btn-warning">
+                      <li>Xem Gio hang</li>
+                    </Link>
+
+                    <Link to="/order" className="btn btn-warning">
+                      <li>Xem Don hang</li>
+                    </Link>
+                  </>
+                )}
+
                 <li>
-					<button
-					onClick={handleLogout}
-					className="btn btn-warning" >
-						Logout 
-					</button>
-				</li>
-                <li>
-					<Link to={"/cart"} className="btn btn-warning">
-						Xem Gio hang
-					</Link>
-				</li>
-                <li>
-					<Link to={"/order"} className="btn btn-warning">
-						Xem Don hang
-					</Link>
-				</li>
+                  <button onClick={handleLogout} className="btn btn-warning">
+                    Logout
+                  </button>
+                </li>
               </>
             ) : (
               <>
                 <div></div>
-                <div className="flex">
-                  <img
-                    className="scale-[0.9] pl-[30px] pr-[10px]"
-                    src={nguoi}
-                    alt=""
-                  />
-                  <Link to={"/login"}>Login</Link>
-                </div>
-                <div className="flex">
-                  <img
-                    className="scale-[0.9] pl-[30px] pr-[10px]"
-                    src={nguoi}
-                    alt=""
-                  />
-                  <Link to={"/register"}> Register</Link>
-                </div>
+                <Link to={"/login"}>
+                  <div className="flex">
+                    <img
+                      className="scale-[0.9] pl-[30px] pr-[10px]"
+                      src={nguoi}
+                      alt=""
+                    />
+                    Login
+                  </div>
+                </Link>
+                <Link to={"/register"}>
+                  <div className="flex">
+                    <img
+                      className="scale-[0.9] pl-[30px] pr-[10px]"
+                      src={nguoi}
+                      alt=""
+                    />
+                    Register
+                  </div>
+                </Link>
               </>
             )}
           </div>
@@ -101,8 +115,6 @@ const Header = () => {
               <Link to="/" className="hover:border-b-2 border-black">
                 Home
               </Link>
-
-              
 
               <NavLink to={"/products"}>
                 <button className="hover:border-b-2 border-black">
@@ -156,42 +168,6 @@ const Header = () => {
         </div>
       </div>
     </>
-
-    // <header>
-
-    // 	<ul>
-    // 		<li>
-    // 			<Link to="/">Home</Link>
-    // 		</li>
-    // 		{user?.role === "admin" && (
-    // 			<li>
-    // 				<Link to="/admin">Admin</Link>
-    // 			</li>
-    // 		)}
-    // 		{user ? (
-    // 			<li>
-    // 				<button className="btn btn-warning" onClick={handleLogout}>
-    // 					Logout - {user.email}
-    // 				</button>
-    // 			</li>
-    // 		) : (
-    // 			<>
-    // 				<li>
-    // 					<Link to="/login">Login</Link>
-    // 				</li>
-    // 				<li>
-    // 					<Link to="/register">Register</Link>
-    // 				</li>
-    // 			</>
-    // 		)}
-
-    // 		{user && (
-    // 			<Link to={"/cart"} className="btn btn-warning">
-    // 				Xem Gio hang
-    // 			</Link>
-    // 		)}
-    // 	</ul>
-    // </header>
   );
 };
 
