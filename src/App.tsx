@@ -15,6 +15,7 @@ import Login from "./components/user/login";
 import Updatecategory from "./components/admin/modaladd/updatecategory";
 import Productspage from "./components/Productspage";
 import  ProductDetail  from "./components/ProductDetail";
+import Privaterouter from "./components/privaterouter";
 function App() {
   return (
     <>
@@ -27,7 +28,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           
-          <Route path="/admin" element={<Admin />}>
+          <Route path="/admin" element={<Privaterouter><Admin/></Privaterouter>}>
             <Route path="add" element={<Add />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Listcategory" element={<Listcategory />} />

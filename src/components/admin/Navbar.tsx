@@ -1,9 +1,22 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 type Props = {}
 
 const Navbar = (props: Props) => {
+  const [user, setUser] = useState<{
+    info: { role: string };
+    id: string;
+  } | null>(null);
+  const Navigate = useNavigate();
+  
+  
+  const handleLogout = () => {
+    sessionStorage.removeItem("user");
+    setUser(null);
+    Navigate("/");
+  };
+
   return (
     <>
   <div className="container flex flex-col mx-auto bg-white">
@@ -87,12 +100,12 @@ const Navbar = (props: Props) => {
           {/* menu item */}
           <div>
             <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-              <a
-                // href="javascript:;"
+              <button
+              onClick={handleLogout}
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-700/75 text-stone-500 hover:text-dark"
               >
                 Log out
-              </a>
+              </button>
             </span>
           </div>
           {/* menu item */}
