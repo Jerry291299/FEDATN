@@ -9,8 +9,8 @@ type Props = {}
 const Footer = (props: Props) => {
   return (
     <>
-    <div className='w-full pt-[100px] mt-[50px] '>
-  <div className='pl-[20px] pb-[70px] pl-[150px] w-full flex text-black'>
+    <div className='w-full border-t-2 border-black pt-[100px] mt-[50px] '>
+  <div className='pl-[20px] px-[10px] pb-[70px] pl-[150px] w-full flex text-black'>
     <div className="logo w-[100px]">
       <img className='w-full' src={logo} alt="" />
     </div>

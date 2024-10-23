@@ -15,7 +15,7 @@ import anh16 from './img/sofa4.jpeg';
 type Props = {}
 
 const ProductDetail = (props: Props) => {
-    const [product, setProduct] = useState<Iproduct | null>(null); // Sửa thành Iproduct hoặc null nếu chưa có dữ liệu
+    const [product, setProduct] = useState<Iproduct | null>(null); 
     const [category, setCategory] = useState<Icategory | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -26,7 +26,7 @@ const ProductDetail = (props: Props) => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const sanpham = await getProductByID(id); // Truyền ID sản phẩm
+                const sanpham = await getProductByID(id); 
                 const danhmuc = await getCategoryByID();
                 setProduct(sanpham);
                 setCategory(danhmuc);
@@ -37,8 +37,7 @@ const ProductDetail = (props: Props) => {
             }
         };
         fetchData();
-    }, [id]); // Thêm `id` vào dependency array
-
+    }, [id]); 
     if (loading) return <LoadingComponent />;
 
     return (

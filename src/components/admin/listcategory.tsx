@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import { DeleteProduct, getAllproducts } from '../../service/products';
 import { Iproduct } from '../../interface/products';
 import { Icategory, IcategoryLite } from '../../interface/category';
@@ -51,6 +51,8 @@ const Listcategory = (props: Props) => {
   return (
     <>
     {loading && <LoadingComponent />}
+    <NavLink to={'/admin/addcategory'}><button className=' focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 '>thêm mới</button></NavLink>
+
       <div className="flex flex-col w-full">
         <div className="overflow-x-auto">
           <div className="py-2 inline-block w-full px-0">

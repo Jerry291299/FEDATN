@@ -1,8 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Facebook from "../anh/Facebook.png";
-
 import heart from "../anh/heart.png";
-
 import noti from "../anh/notification.png";
 import shoppingcard from "../anh/shopping-cart.png";
 import insta from "../anh/Instagram.png";
@@ -11,12 +9,13 @@ import twitter from "../anh/Twitter.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
 import { useEffect, useState } from "react";
-
+import iconarrow from "./icons/down-arrow_5082780.png"
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string };
+    info: { role: string; email: string };
     id: string;
   } | null>(null);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const Navigate = useNavigate();
 
   useEffect(() => {
@@ -24,8 +23,11 @@ const Header = () => {
     if (userData) {
       setUser(JSON.parse(userData));
     }
-    console.log(user?.info?.role, "roleodayyy");
   }, []);
+
+  const toggleSubMenu = () => {
+    setIsSubMenuOpen(!isSubMenuOpen);
+  };
 
   const handleLogout = () => {
     sessionStorage.removeItem("user");
@@ -43,46 +45,85 @@ const Header = () => {
             </p>
             <p className="px-[20px]">Email:Beautifullhouse@gmail.com</p>
           </div>
-          <div className="icon flex pr-[500px] gap-4 ">
-            <img className="w-[40px] h-[40px]" src={Facebook} alt="" />
-            <img className="w-[40px] h-[40px]" src={insta} alt="" />
-            <img className="w-[40px] h-[40px]" src={twitter} alt="" />
-            <img className="w-[40px] h-[40px]" src={link} alt="" />
+          <div className="icon flex pr-[300px] gap-4">
+            <img className="w-6 h-6" src={Facebook} alt="" />
+            <img className="w-6 h-6" src={insta} alt="" />
+            <img className="w-6 h-6" src={twitter} alt="" />
+            <img className="w-6 h-6" src={link} alt="" />
           </div>
 
           <div className="phải flex gap-3">
             {user ? (
-              <>
-                {/* Show Admin link only if user role is "admin" */}
-                {user?.info?.role === "admin" && (
-                  <Link to="/admin" className="hover:border-b-2 border-black">
-                    <li>Admin</li>
-                  </Link>
+              <div className="relative">
+                {/* Profile Icon and Name */}
+                <div
+                  className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
+                  onClick={toggleSubMenu}
+                >
+                  <img
+                    src={nguoi}
+                    alt="Profile"
+                    className="w-5 h-5"
+                  />
+                  <p className="ml-2 flex gap-2">{user?.info?.email} 
+                    <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
+                  </p>
+                </div>
+
+                {/* Submenu */}
+                {isSubMenuOpen && (
+                  <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
+                    {user?.info?.role === "admin" && (
+                      <li className="hover:bg-gray-100">
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2"
+                          onClick={() => setIsSubMenuOpen(false)}
+                        >
+                          Admin
+                        </Link>
+                      </li>
+                    )}
+
+                    {(user?.info?.role === "user" || user?.info?.role === "admin") && (
+                      <>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to="/cart"
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Giỏ hàng
+                          </Link>
+                        </li>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to="/order"
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Đơn hàng
+                          </Link>
+                        </li>
+                      </>
+                    )}
+
+                    <li className="hover:bg-gray-100">
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsSubMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
                 )}
-
-                {/* Show "Xem Gio Hang" and "Xem Don Hang" buttons for both "user" and "admin" */}
-                {(user?.info?.role === "user" ||
-                  user?.info?.role === "admin") && (
-                  <>
-                    <Link to="/cart" className="btn btn-warning">
-                      <li>Xem Gio hang</li>
-                    </Link>
-
-                    <Link to="/order" className="btn btn-warning">
-                      <li>Xem Don hang</li>
-                    </Link>
-                  </>
-                )}
-
-                <li>
-                  <button onClick={handleLogout} className="btn btn-warning">
-                    Logout
-                  </button>
-                </li>
-              </>
+              </div>
             ) : (
               <>
-                <div></div>
                 <Link to={"/login"}>
                   <div className="flex">
                     <img
@@ -108,7 +149,7 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="down flex justify-between  border-y-2 py-[12px] border-black  pr-[10px]">
+        <div className="down flex justify-between border-y-2 py-[12px] border-black pr-[10px]">
           <img className="h-24 pl-[40px]" src={logo} alt="" />
           <div className="right flex pl-[30px]">
             <div className="text flex gap-14 pt-[25px] pr-[100px] text-lg">
@@ -116,10 +157,8 @@ const Header = () => {
                 Home
               </Link>
 
-              <NavLink to={"/products"}>
-                <button className="hover:border-b-2 border-black">
-                  Sảm phẩm
-                </button>
+              <NavLink to={"/products"} className="hover:border-b-2 border-black">
+                Sảm phẩm
               </NavLink>
 
               <p className="hover:border-b-2 border-black">Tin tức</p>

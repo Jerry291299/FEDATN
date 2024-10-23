@@ -47,9 +47,9 @@ const Dashboard = (props: Props) => {
   return (
     <>
     {loading && <LoadingComponent />}
-    <NavLink to={'/admin/add'}><button className=''>thêm mới</button></NavLink>
+    <NavLink to={'/admin/add'}><button className=' focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 '>thêm mới</button></NavLink>
     
-    <div className="flex flex-col w-full">
+    <div className=" mb-[20px] flex flex-col w-full">
   <div className="overflow-x-auto">
     <div className="py-2 inline-block w-full px-0">
       <div className="overflow-hidden">
