@@ -140,9 +140,6 @@ const Login = (props: Props) => {
                     Sign in
                   </button>
                 </div>
-                <p className="my-8 text-sm text-gray-400 text-center">
-                  or continue with
-                </p>
                 <div className="space-x-8 flex justify-center">
                   {/* Social media login buttons */}
                 </div>

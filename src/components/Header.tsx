@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import iconarrow from "./icons/down-arrow_5082780.png"
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string; email: string };
+    info: { role: string; email: string;  id: string; };
     id: string;
   } | null>(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
@@ -89,7 +89,7 @@ const Header = () => {
                       <>
                         <li className="hover:bg-gray-100">
                           <Link
-                            to="/cart"
+                            to={`/cart/${user?.info?.id}`}
                             className="block px-4 py-2"
                             onClick={() => setIsSubMenuOpen(false)}
                           >
@@ -189,7 +189,7 @@ const Header = () => {
               </div>
             </div>
 
-            <div className="icon2 flex gap-10 pt-[25px]">
+            {/* <div className="icon2 flex gap-10 pt-[25px]">
               <div className="">
                 <img className="pl-[15px]" src={heart} alt="" />
                 <p>Wishlist</p>
@@ -202,7 +202,7 @@ const Header = () => {
                 <img className="pl-[25px]" src={noti} alt="" />
                 <p>Notification</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

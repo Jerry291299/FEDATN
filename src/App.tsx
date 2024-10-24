@@ -16,6 +16,7 @@ import Updatecategory from "./components/admin/modaladd/updatecategory";
 import Productspage from "./components/Productspage";
 import  ProductDetail  from "./components/ProductDetail";
 import Privaterouter from "./components/privaterouter";
+import Cart from "./components/cart/cart";
 function App() {
   return (
     <>
@@ -24,6 +25,7 @@ function App() {
           <Route path="/" element={<Home />}></Route>
 
           <Route path="/products" element={<Productspage />}/>
+          <Route path="/cart/:id" element={<Privaterouter><Cart/></Privaterouter>}></Route>
           <Route path="/product/:id" element={<ProductDetail/>}/>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
