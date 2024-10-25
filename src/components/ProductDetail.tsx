@@ -30,7 +30,7 @@ export const ProductDetail = () => {
          <p className=" text-gray-500 m-[15px]">Giá thị trường:<span className="text-gray-400 line-through ml-2">1.000.000₫</span></p>
         </div>
         <p className="font-bold text-gray-600">Tiết kiệm: <span className="text-red-600">50.000₫</span></p>
-        <p className="font-bold text-gray-500 mt-2">Tình trạng: <span className="font-semibold text-red-600">Hết hàng</span></p>
+        <p className="font-bold text-gray-500 mt-2">Tình trạng: <span className="font-semibold text-red-600">Đặt hàng</span></p>
       </div>
 
       <div className="flex items-center my-4">
