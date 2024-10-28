@@ -19,7 +19,9 @@ export const getCartByID = async (id?: string) => {
   }
 
   try {
-    const { data } = await axiosservice.get(`/cart/${id}`);
+    const { data } = await axiosservice.get(`/Cart/${id}`);
+    console.log(data, "cartdata");
+    
     return data;
   } catch (error) {
     console.error("Error fetching cart by ID:", error);
