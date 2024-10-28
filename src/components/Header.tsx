@@ -158,7 +158,7 @@ const Header = () => {
               </Link>
 
               <NavLink to={"/products"} className="hover:border-b-2 border-black">
-                Sảm phẩm
+                Sản phẩm
               </NavLink>
 
               <p className="hover:border-b-2 border-black">Tin tức</p>

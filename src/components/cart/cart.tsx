@@ -135,7 +135,7 @@ const Cart = () => {
                     </div>
                   </div>
                   <h4 className="text-lg font-semibold text-gray-800">
-                    {item.price} $
+                    {item.price} ₫
                   </h4>
                 </div>
               ))}
@@ -172,7 +172,7 @@ const Cart = () => {
               </li>
               <li className="flex justify-between text-lg font-semibold border-t border-gray-300 pt-3 mt-2">
                 <span>Total</span>
-                <span>{total} $</span>
+                <span>{total} ₫</span>
               </li>
             </ul>
 
