@@ -191,21 +191,6 @@ const Header = () => {
                 </svg>
               </div>
             </div>
-
-            {/* <div className="icon2 flex gap-10 pt-[25px]">
-              <div className="">
-                <img className="pl-[15px]" src={heart} alt="" />
-                <p>Wishlist</p>
-              </div>
-              <div className="">
-                <img className="pl-[3px]" src={shoppingcard} alt="" />
-                <Link to={"/cart"}>Cart</Link>
-              </div>
-              <div className="">
-                <img className="pl-[25px]" src={noti} alt="" />
-                <p>Notification</p>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>
