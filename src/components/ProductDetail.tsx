@@ -55,6 +55,7 @@ const ProductDetail = (props: Props) => {
       <div className="container mx-auto w-[1400px] pt-[100px]">
         {products && (
           <div className="container mx-auto w-[1300px] flex">
+            
             <div className="">
               <img
                 className="mb-[20px] w-[150px]"
@@ -77,13 +78,14 @@ const ProductDetail = (props: Props) => {
                 alt={products.name}
               />
             </div>
-            <div className="ml-[40px]">
+            <div className="ml-[40px] mr-[30px]">
               <img
-                className="w-[650px] object-cover"
+                className="w-[690px] object-cover"
                 src={products.img}
                 alt={products.name}
               />
             </div>
+          
             <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
               <h1 className="text-xl font-bold text-black-800">
                 {products.name}
