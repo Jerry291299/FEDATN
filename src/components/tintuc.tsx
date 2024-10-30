@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink, useNavigate,useParams } from "react-router-dom";
 import Facebook from "../anh/Facebook.png";
 import heart from "../anh/heart.png";
 import noti from "../anh/notification.png";
@@ -19,6 +19,8 @@ const Tintuc = () => {
         info: { role: string; email: string; id: string };
         id: string;
     } | null>(null);
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    const Navigate = useNavigate();
 
     useEffect(() => {
         const userData = sessionStorage.getItem("user");
@@ -26,6 +28,15 @@ const Tintuc = () => {
             setUser(JSON.parse(userData));
         }
     }, []);
+    const toggleSubMenu = () => {
+        setIsSubMenuOpen(!isSubMenuOpen);
+      };
+    
+      const handleLogout = () => {
+        sessionStorage.removeItem("user");
+        setUser(null);
+        Navigate("/");
+      };
 
     const articles = [
         {
@@ -50,66 +61,164 @@ const Tintuc = () => {
 
     return (
         <div className="container mx-auto w-full">
-            <header className="up py-3 flex justify-between font-medium pr-2">
-                <div className="trái flex">
-                    <p className="border-r-2 border-black px-5">Phone: 0344357227</p>
-                    <p className="px-5">Email: Beautifullhouse@gmail.com</p>
-                </div>
-                <div className="icon flex pr-20 gap-4">
-                    <img className="w-6 h-6" src={Facebook} alt="Facebook" />
-                    <img className="w-6 h-6" src={insta} alt="Instagram" />
-                    <img className="w-6 h-6" src={twitter} alt="Twitter" />
-                    <img className="w-6 h-6" src={link} alt="LinkedIn" />
-                </div>
-                <div className="phải flex gap-3">
-                    {user ? (
-                        <div className="relative">
-                            <div className="flex items-center cursor-pointer border-2 border-black rounded-xl px-3 py-1">
-                                <img src={nguoi} alt="Profile" className="w-5 h-5" />
-                                <p className="ml-2 flex gap-2">
-                                    {user.info.email}
-                                    <img className="w-4 h-4 mt-1" src={iconarrow} alt="Arrow Icon" />
-                                </p>
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-                            <Link to={"/login"} className="flex gap-2 items-center">
-                                <img className="w-5" src={nguoi} alt="Login" />
-                                <span>Login</span>
-                            </Link>
-                            <Link to={"/register"} className="flex gap-2 items-center">
-                                <img className="w-5" src={nguoi} alt="Register" />
-                                <span>Register</span>
-                            </Link>
-                        </div>
-                    )}
-                </div>
-            </header>
+      <div className="container mx-auto w-full">
+        <div className="up py-[15px] flex justify-between font-medium pr-[10px]">
+          <div className="trái flex">
+            <p className="border-r-2 border-black px-[20px]">
+              Phone Number: 0344357227
+            </p>
+            <p className="px-[20px]">Email:Beautifullhouse@gmail.com</p>
+          </div>
+          <div className="icon flex pr-[300px] gap-4">
+            <img className="w-6 h-6" src={Facebook} alt="" />
+            <img className="w-6 h-6" src={insta} alt="" />
+            <img className="w-6 h-6" src={twitter} alt="" />
+            <img className="w-6 h-6" src={link} alt="" />
+          </div>
 
-            <div className="down flex justify-between border-y-2 py-3 border-black pr-2">
-                <img className="h-24 pl-10" src={logo} alt="Logo" />
-                <nav className="right flex pl-10">
-                    <div className="text flex gap-14 pt-6 pr-20 text-lg">
-                        <Link to="/" className="hover:border-b-2 border-black">Home</Link>
-                        <Link to="/products" className="hover:border-b-2 border-black">Sản phẩm</Link>
-                        <p className="hover:border-b-2 border-black">Tin tức</p>
-                        <p className="hover:border-b-2 border-black">Giới thiệu</p>
-                    </div>
-                    <div className="search px-10 pt-5">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                className="p-2 pl-8 rounded border bg-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
-                                placeholder="search..."
-                            />
-                            <svg className="w-4 h-4 absolute right-2 top-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </nav>
+          <div className="phải flex gap-3">
+            {user ? (
+              <div className="relative">
+                {/* Profile Icon and Name */}
+                <div
+                  className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
+                  onClick={toggleSubMenu}
+                >
+                  <img
+                    src={nguoi}
+                    alt="Profile"
+                    className="w-5 h-5"
+                  />
+                  <p className="ml-2 flex gap-2">{user?.info?.email} 
+                    <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
+                  </p>
+                </div>
+
+                {/* Submenu */}
+                {isSubMenuOpen && (
+                  <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
+                    {user?.info?.role === "admin" && (
+                      <li className="hover:bg-gray-100">
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2"
+                          onClick={() => setIsSubMenuOpen(false)}
+                        >
+                          Admin
+                        </Link>
+                      </li>
+                    )}
+
+                    {(user?.info?.role === "user" || user?.info?.role === "admin") && (
+                      <>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to={`/Cart/${user?.info?.id}`}
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Giỏ hàng
+                          </Link>
+                        </li>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to="/order"
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Đơn hàng
+                          </Link>
+                        </li>
+                      </>
+                    )}
+
+                    <li className="hover:bg-gray-100">
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsSubMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link to={"/login"}>
+                  <div className="flex">
+                    <img
+                      className="scale-[0.9] pl-[30px] pr-[10px]"
+                      src={nguoi}
+                      alt=""
+                    />
+                    Login
+                  </div>
+                </Link>
+                <Link to={"/register"}>
+                  <div className="flex">
+                    <img
+                      className="scale-[0.9] pl-[30px] pr-[10px]"
+                      src={nguoi}
+                      alt=""
+                    />
+                    Register
+                  </div>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="down flex justify-between border-y-2 py-[12px] border-black pr-[10px]">
+          <img className="h-24 pl-[40px]" src={logo} alt="" />
+          <div className="right flex pl-[30px]">
+            <div className="text flex gap-14 pt-[25px] pr-[100px] text-lg">
+              <Link to="/" className="hover:border-b-2 border-black">
+                Home
+              </Link>
+
+              <NavLink to={"/products"} className="hover:border-b-2 border-black">
+                Sản phẩm
+              </NavLink>
+
+              <NavLink to={"/tintuc"} className="hover:border-b-2 border-black">
+                Tin tức
+              </NavLink>
+              <NavLink to={"/gioithieu"} className="hover:border-b-2 border-black">
+                Giới Thiệu
+              </NavLink>
             </div>
+
+            <div className="search px-[30px] pt-[23px]">
+              <div className="relative">
+                <input
+                  type="text"
+                  className="p-2 pl-8 rounded border border-gray-200 bg-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
+                  placeholder="search..."
+                />
+                <svg
+                  className="w-4 h-4 absolute right-[10px] top-3.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
             <main className="container mx-auto my-5">
                 <h1 className="text-3xl font-bold text-center my-5">Tin Tức</h1>
