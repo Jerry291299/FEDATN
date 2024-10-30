@@ -19,7 +19,7 @@ import Privaterouter from "./components/privaterouter";
 import Cart from "./components/cart/cart";
 import Tintuc from './components/tintuc';
 import Tintucdetail from './components/tintucdetail';
-
+import Gioithieu from './components/gioithieu';
 
 
 function App() {
@@ -36,6 +36,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/tintuc" element={<Tintuc />} />
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
+          <Route path="/gioithieu" element={<Gioithieu />} />
 
           <Route path="/admin" element={<Privaterouter><Admin /></Privaterouter>}>
             <Route path="add" element={<Add />} />
