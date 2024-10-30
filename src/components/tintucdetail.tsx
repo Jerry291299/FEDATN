@@ -1,4 +1,6 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+
+import { Link, NavLink, useNavigate,useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Facebook from "../anh/Facebook.png";
 import heart from "../anh/heart.png";
 import noti from "../anh/notification.png";
@@ -8,37 +10,53 @@ import link from "../anh/LinkedIn.png";
 import twitter from "../anh/Twitter.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
-import { useEffect, useState } from "react";
-import iconarrow from "./icons/down-arrow_5082780.png"
+import iconarrow from "./icons/down-arrow_5082780.png";
+import canho from "../anh/noi-that-can-ho-cao-cap.jpg";
+import canho1 from "../anh/nt.jpg";
+import canho2 from "../anh/ntnt.jpg";
+const TintucDetail = () => {
+    const { id } = useParams<{ id: string }>();
+    
+    const articles = [
+        { id: "1", title: "Nội thất của căn hộ mang nét đẹp nghệ thuật", content: "Khi bước chân vào có thể cảm nhận sự thông thoáng...", image: canho },
+        { id: "2", title: "Phòng ăn với nội thất chất liệu gỗ và da", content: "Góc thư giãn nhất trong không gian là nơi tọa lạc", image: canho1 },
+        { id: "3", title: "Không gian phòng ngủ kết hợp nội thất từ vật liệu da và gỗ", content: "Góc vườn yên tĩnh xanh mát trên tầng thượng ngôi nhà", image: canho2 },
+    ];
+    const article = articles.find(article => article.id === id);
+      const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+      const Navigate = useNavigate();
+    
+      useEffect(() => {
+        const userData = sessionStorage.getItem("user");
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      }, []);
+    const [user, setUser] = useState<{
+        info: { role: string; email: string; id: string };
+        id: string;
+    } | null>(null);
 
-const Header = () => {
-  const [user, setUser] = useState<{
-    info: { role: string; email: string;  id: string; };
-    id: string;
-  } | null>(null);
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-  const Navigate = useNavigate();
+    useEffect(() => {
+        const userData = sessionStorage.getItem("user");
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+    const toggleSubMenu = () => {
+        setIsSubMenuOpen(!isSubMenuOpen);
+      };
+    
+      const handleLogout = () => {
+        sessionStorage.removeItem("user");
+        setUser(null);
+        Navigate("/");
+      };
+    
 
-  useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  const toggleSubMenu = () => {
-    setIsSubMenuOpen(!isSubMenuOpen);
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("user");
-    setUser(null);
-    Navigate("/");
-  };
-
-  return (
-    <>
-      <div className="container mx-auto w-full">
+    return (
+        <>
+                  <div className="container mx-auto w-full">
         <div className="up py-[15px] flex justify-between font-medium pr-[10px]">
           <div className="trái flex">
             <p className="border-r-2 border-black px-[20px]">
@@ -196,8 +214,29 @@ const Header = () => {
           </div>
         </div>
       </div>
-    </>
-  );
+
+            <div className="container mx-auto my-5">
+                <h2 className="text-3xl font-bold text-center my-5">Chi tiết tin tức</h2>
+                <div className="container mx-auto">
+                    {article ? (
+                        <>
+                            <img src={article.image} alt={article.title} className="w-full h-auto mb-3" />
+                            <h1 className="text-3xl font-bold">{article.title}</h1>
+                            <p className="mt-4">{article.content}</p>
+                        </>
+                    ) : (
+                        <p>Không tìm thấy bài viết.</p>
+                    )}
+                    <Link to="/tintuc" className="text-blue-500 underline mt-4">Quay lại trang tin tức</Link>
+                </div>
+            </div>
+            
+
+            <footer className="py-3 bg-gray-100 text-center">
+                <p className="text-sm text-gray-600">© 2024 Beautifull House. All rights reserved.</p>
+            </footer>
+        </>
+    );
 };
 
-export default Header;
+export default TintucDetail;

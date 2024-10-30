@@ -14,9 +14,14 @@ import Addcategory from "./components/admin/modaladd/addcategory";
 import Login from "./components/user/login";
 import Updatecategory from "./components/admin/modaladd/updatecategory";
 import Productspage from "./components/Productspage";
-import  ProductDetail  from "./components/ProductDetail";
+import ProductDetail from "./components/ProductDetail";
 import Privaterouter from "./components/privaterouter";
 import Cart from "./components/cart/cart";
+import Tintuc from './components/tintuc';
+import Tintucdetail from './components/tintucdetail';
+
+
+
 function App() {
   return (
     <>
@@ -24,13 +29,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}></Route>
 
-          <Route path="/products" element={<Productspage />}/>
-          <Route path="/Cart/:id" element={<Privaterouter><Cart/></Privaterouter>}></Route>
-          <Route path="/product/:id" element={<ProductDetail/>}/>
+          <Route path="/products" element={<Productspage />} />
+          <Route path="/Cart/:id" element={<Privaterouter><Cart /></Privaterouter>}></Route>
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          
-          <Route path="/admin" element={<Privaterouter><Admin/></Privaterouter>}>
+          <Route path="/tintuc" element={<Tintuc />} />
+          <Route path="/tintuc/:id" element={<Tintucdetail />} />
+
+          <Route path="/admin" element={<Privaterouter><Admin /></Privaterouter>}>
             <Route path="add" element={<Add />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Listcategory" element={<Listcategory />} />
