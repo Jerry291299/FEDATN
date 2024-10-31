@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { IUser } from "./user";
 
 interface Comment {
   id: number;
   user: string; // Chứa tên người dùng
   text: string; // Chứa nội dung bình luận
   createdAt: string; // Thời gian tạo bình luận
+  email: string;
 }
 
 const CommentSection: React.FC<{ 
   productId: string; 
-  userId: string; 
-  userEmail: string; 
-  userFullName: string 
+  user: IUser | any
 }> = ({ 
   productId, 
-  userId, 
-  userEmail, 
-  userFullName 
+  user
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
@@ -26,9 +24,18 @@ const CommentSection: React.FC<{
   useEffect(() => {
     const storedComments = localStorage.getItem(`comments_${productId}`);
     if (storedComments) {
-      setComments(JSON.parse(storedComments));
-    }
+       const cmts = JSON.parse(storedComments)
+       setComments(cmts);
+    }   
   }, [productId]);
+
+//   useEffect(() => {
+//     if (user) {
+//         const {info} = user as any;
+//         console.log('info', info);
+//         setComments(info);
+//     }
+//   }, [user]);
 
   const saveComments = (updatedComments: Comment[]) => {
     setComments(updatedComments);
@@ -39,11 +46,13 @@ const CommentSection: React.FC<{
     if (newComment.trim()) {
       const newCommentObj: Comment = {
         id: comments.length > 0 ? comments[comments.length - 1].id + 1 : 1,
-        user: userFullName, // Hiển thị họ tên thay vì email
+        user: '', 
+        email: user?.info.email,
         text: newComment.trim(),
         createdAt: new Date().toLocaleString(),
       };
-      saveComments([...comments, newCommentObj]);
+        const map = [...comments, newCommentObj];
+      saveComments(map);
       setNewComment("");
     }
   };
@@ -103,6 +112,7 @@ const CommentSection: React.FC<{
               ) : (
                 <div className="flex flex-col w-full">
                   <span className="text-lg font-semibold">{comment.user}</span>
+                  <span className="text-lg font-semibold">{comment.email}</span>
                   <p className="text-gray-700">{comment.text}</p>
                   <p className="text-xs text-gray-500">{comment.createdAt}</p>
                   <div className="flex space-x-2 mt-2">

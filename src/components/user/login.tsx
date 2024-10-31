@@ -17,6 +17,9 @@ const Login = (props: Props) => {
 
     try {
       const user = await UserLogin({ email, password });
+      
+      console.log('user', user);
+
       if (!user || !user.info) {
         setMessage("Login failed: Invalid credentials");
         alert("Login failed");
@@ -36,7 +39,9 @@ const Login = (props: Props) => {
         
         navigate('/');
       }
-      console.log(user);
+      
+          
+
     } catch (error) {
       setMessage("Đăng nhập thất bại");
       alert("Đăng nhập thất bại");

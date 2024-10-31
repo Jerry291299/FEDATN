@@ -6,6 +6,9 @@ import { IUserLogin, IUserRegister } from '../interface/user'
 export const getAllusers = async () => {
   try{
     const {data} = await axiosservice.get('users')
+
+    // console.log('getAllusers', data);
+    
     return data    
   } catch (error) {
     console.log(error);
@@ -15,6 +18,9 @@ export const getAllusers = async () => {
 export const UserLogin = async (datauser : IUserLogin) => {
   try {
       const {data} = await axiosservice.post('/login', datauser)
+
+      // console.log('UserLogin', data);
+
       return data
   } catch (error) {
       console.error('Login error:', error);

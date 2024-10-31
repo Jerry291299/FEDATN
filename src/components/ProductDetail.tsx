@@ -198,12 +198,7 @@ const ProductDetail: React.FC<Props> = () => {
         </div>
         <div className="pt-[50px]">
           {user ? (
-            <CommentSection
-              productId={id || ""}
-              userId={user.id}
-              userEmail={user.email}
-              userFullName={user.fullname} // Sửa lại chỗ này thành fullName
-            />
+            <CommentSection productId={id || ""} user={user} />
           ) : (
             <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
           )}
