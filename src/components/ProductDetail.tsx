@@ -1,38 +1,37 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Iproduct } from "../interface/products";
-import { Icategory } from "../interface/category";
+import { IUser } from "../interface/user";
+import { addtoCart } from "../service/cart";
 import { getProductByID } from "../service/products";
-import { getCategoryByID } from "../service/category";
 import Header from "./Header";
-import LoadingComponent from "./Loading";
 import Footer from "./Footer";
+import { actions, Cartcontext } from "./contexts/cartcontext";
+import { Icart } from "../interface/cart";
+import CommentSection from "../interface/comment";
 import anh12 from "./img/sofa6.jpeg";
 import anh13 from "./img/sofa5.jpeg";
 import anh15 from "./img/sofa3.jpeg";
 import anh16 from "./img/sofa4.jpeg";
-import { actions, Cartcontext } from "./contexts/cartcontext";
-import { addtoCart } from "../service/cart";
-import { Icart } from "../interface/cart";
 
 type Props = {};
 
-const ProductDetail = (props: Props) => {
+const ProductDetail: React.FC<Props> = () => {
   const { id } = useParams();
-  const [products, setProduct] = useState<Iproduct>();
+  const [products, setProduct] = useState<Iproduct | undefined>(undefined);
   const Globalstate = useContext(Cartcontext);
-  const [user, setUser] = useState<string>("");
+  const [user, setUser] = useState<IUser | null>(null);
 
   useEffect(() => {
-    const storedUserId = sessionStorage.getItem("user");
-    console.log("Retrieved userId:", storedUserId); // Debug log
-    if (storedUserId) {
-      setUser(storedUserId);
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser: IUser = JSON.parse(storedUser);
+      setUser(parsedUser); // Lưu thông tin người dùng
     } else {
-      console.error("User ID not found in sessionStorage.");
+      console.error("User not found in sessionStorage.");
     }
   }, []);
-  // const cartItemCount = cartItems ? cartItems[Number(id)] : 0;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,33 +46,15 @@ const ProductDetail = (props: Props) => {
 
   const dispatch = Globalstate.dispatch;
 
-  // if (loading) return <LoadingComponent />;
-
   return (
     <>
       <Header />
       <div className="container mx-auto w-[1400px] pt-[100px]">
         {products && (
           <div className="container mx-auto w-[1300px] flex">
-            
-            <div className="">
+            <div>
               <img
                 className="mb-[20px] w-[150px]"
-                src={products.img}
-                alt={products.name}
-              />
-              <img
-                className="mb-[20px] w-[150px]"
-                src={products.img}
-                alt={products.name}
-              />
-              <img
-                className="mt-[10px] w-[150px]"
-                src={products.img}
-                alt={products.name}
-              />
-              <img
-                className="mt-[10px] w-[150px]"
                 src={products.img}
                 alt={products.name}
               />
@@ -85,12 +66,10 @@ const ProductDetail = (props: Props) => {
                 alt={products.name}
               />
             </div>
-          
             <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
               <h1 className="text-xl font-bold text-black-800">
                 {products.name}
               </h1>
-              {/* <p className="font-bold text-gray-500">Danh mục: {products?.category}</p> */}
               <div className="my-4">
                 <div className="flex items-baseline">
                   <span className="text-2xl font-semibold text-black-600">
@@ -98,11 +77,10 @@ const ProductDetail = (props: Props) => {
                   </span>
                 </div>
                 <p className="font-bold text-gray-600">
-                  Tiết kiệm:
-                  <span className="text-red-600">50.000 ₫</span>
+                  Tiết kiệm: <span className="text-red-600">50.000 ₫</span>
                 </p>
                 <p className="font-bold text-gray-500 mt-2">
-                  Tình trạng:
+                  Tình trạng:{" "}
                   <span className="font-semibold text-green-600">Còn hàng</span>
                 </p>
               </div>
@@ -110,27 +88,19 @@ const ProductDetail = (props: Props) => {
                 type="button"
                 className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
                 onClick={async () => {
-                  // Retrieve user from sessionStorage
-                  const userString = sessionStorage.getItem("user");
-
-                  // Parse user string into an object
-                  const user = userString ? JSON.parse(userString) : null;
-
                   if (!products || !products._id) {
-                    alert("products ID is invalid.");
+                    alert("Product ID is invalid.");
                     return;
                   }
-
-                  if (!user || !user.info.id) {
+                  if (!user || !user.id) {
                     alert("User ID is invalid or missing.");
                     return;
                   }
-
                   const cartItem: Icart = {
-                    userId: user.info.id, // assuming `user.info.id` is correct
+                    userId: user.id,
                     items: [
                       {
-                        productId: String(products._id), // change from `productsId` to `productId`
+                        productId: String(products._id),
                         name: products.name,
                         price: products.price,
                         img: products.img,
@@ -138,16 +108,9 @@ const ProductDetail = (props: Props) => {
                       },
                     ],
                   };
-
                   try {
-                    console.log("Adding to cart:", cartItem);
-
-                    // Call the add to cart API
                     const response = await addtoCart(cartItem);
-
-                    // Dispatch the response to your context
                     dispatch({ type: actions.ADD, payload: response });
-
                     alert("Added to cart successfully");
                   } catch (error) {
                     console.error("Failed to add products to cart", error);
@@ -160,23 +123,24 @@ const ProductDetail = (props: Props) => {
                 <p className="text-gray-700">
                   Gọi đặt mua:
                   <a href="tel:0829721097" className="text-blue-600">
-                    {" "}
                     0829721097
                   </a>
-                  <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
+                  <span className="text-gray-600">
+                    (miễn phí 8:30 - 21:30)
+                  </span>
                 </p>
               </div>
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
                 <li>
                   MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
-                  <a className="font-bold">từ 10.000.000Đ</a>
+                  <span className="font-bold">từ 10.000.000Đ</span>
                 </li>
                 <li>
-                  BẢO HÀNH <a className="font-bold">1 đổi 1</a> DO LỖI NHÀ SẢN
-                  XUẤT
+                  BẢO HÀNH <span className="font-bold">1 đổi 1</span> DO LỖI NHÀ
+                  SẢN XUẤT
                 </li>
                 <li>
-                  CAM KẾT <a className="font-bold">100% chính hãng</a>
+                  CAM KẾT <span className="font-bold">100% chính hãng</span>
                 </li>
               </ul>
             </div>
@@ -229,11 +193,22 @@ const ProductDetail = (props: Props) => {
                 Add to cart
               </button>
             </div>
-
             {/* Các sản phẩm khác */}
           </div>
         </div>
-      </div>
+        <div className="pt-[50px]">
+          {user ? (
+            <CommentSection
+              productId={id || ""}
+              userId={user.id}
+              userEmail={user.email}
+              userFullName={user.fullname} // Sửa lại chỗ này thành fullName
+            />
+          ) : (
+            <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
+          )}
+        </div>
+        </div>
       <Footer />
     </>
   );
