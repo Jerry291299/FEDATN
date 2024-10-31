@@ -90,6 +90,18 @@ const Dashboard = (props: Props) => {
                 scope="col"
                 className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
               >
+                Số Lượng
+              </th>
+              <th
+                scope="col"
+                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+              >
+              Mô tả
+              </th>
+              <th
+                scope="col"
+                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+              >
                 Handle
               </th>
             </tr>
@@ -112,6 +124,8 @@ const Dashboard = (props: Props) => {
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
               <img className='w-[100px]' src={product?.img} alt="" />
               </td>
+              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.soLuong}</td>
+              <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.moTa}</td>
               <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
               <button
                       onClick={() => updateProduct(product._id)}
