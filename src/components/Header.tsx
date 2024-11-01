@@ -9,11 +9,11 @@ import twitter from "../anh/Twitter.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
 import { useEffect, useState } from "react";
-import iconarrow from "./icons/down-arrow_5082780.png"
+import iconarrow from "./icons/down-arrow_5082780.png";
 
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string; email: string;  id: string; };
+    info: { role: string; email: string; id: string };
     id: string;
   } | null>(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
@@ -35,7 +35,13 @@ const Header = () => {
     setUser(null);
     Navigate("/");
   };
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const handleSearchClick = () => {
+    if (searchTerm.trim()) {
+      Navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
   return (
     <>
       <div className="container mx-auto w-full">
@@ -61,12 +67,9 @@ const Header = () => {
                   className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
                   onClick={toggleSubMenu}
                 >
-                  <img
-                    src={nguoi}
-                    alt="Profile"
-                    className="w-5 h-5"
-                  />
-                  <p className="ml-2 flex gap-2">{user?.info?.email} 
+                  <img src={nguoi} alt="Profile" className="w-5 h-5" />
+                  <p className="ml-2 flex gap-2">
+                    {user?.info?.email}
                     <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
                   </p>
                 </div>
@@ -86,7 +89,8 @@ const Header = () => {
                       </li>
                     )}
 
-                    {(user?.info?.role === "user" || user?.info?.role === "admin") && (
+                    {(user?.info?.role === "user" ||
+                      user?.info?.role === "admin") && (
                       <>
                         <li className="hover:bg-gray-100">
                           <Link
@@ -158,14 +162,20 @@ const Header = () => {
                 Home
               </Link>
 
-              <NavLink to={"/products"} className="hover:border-b-2 border-black">
+              <NavLink
+                to={"/products"}
+                className="hover:border-b-2 border-black"
+              >
                 Sản phẩm
               </NavLink>
 
               <NavLink to={"/tintuc"} className="hover:border-b-2 border-black">
                 Tin tức
               </NavLink>
-              <NavLink to={"/gioithieu"} className="hover:border-b-2 border-black">
+              <NavLink
+                to={"/gioithieu"}
+                className="hover:border-b-2 border-black"
+              >
                 Giới Thiệu
               </NavLink>
             </div>
@@ -176,6 +186,9 @@ const Header = () => {
                   type="text"
                   className="p-2 pl-8 rounded border border-gray-200 bg-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                   placeholder="search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
                 />
                 <svg
                   className="w-4 h-4 absolute right-[10px] top-3.5"
