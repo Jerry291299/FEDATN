@@ -1,46 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
-import { DeleteProduct, getAllproducts } from '../../service/products';
-import { Iproduct } from '../../interface/products';
-import { Icategory, IcategoryLite } from '../../interface/category';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { deactivateCategory, activateCategory, getAllCategories } from '../../service/category';
+import { Icategory } from '../../interface/category';
 import { Popconfirm } from 'antd';
-import { delCategory, getAllCategories, updateCategory } from '../../service/category';
 import LoadingComponent from '../Loading';
 
-type Props = {}
-
-const Listcategory = (props: Props) => {
-  const [categories, setCategory] = useState<Icategory[]>([]);
-  const param = useParams();
+const Listcategory = () => {
+  const [categories, setCategory] = useState<Icategory[]>([]); // Khởi tạo là mảng rỗng
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const data = await getAllCategories();
+        console.log(data); // Kiểm tra dữ liệu
         setCategory(data);
-        console.log(data, "data");
       } catch (error) {
         console.log(error);
-      } finally{
-        setLoading(false)
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
-
-  const handleDeleteCategory = async (id: string) => {
+  
+  const handleDeactivateCategory = async (id: string) => {
     try {
-    
-      await delCategory(id);
-    
-      const updatedCategories = categories.filter((category) => category._id !== id);
+      await deactivateCategory(id);
+      const updatedCategories = categories.map((category) =>
+        category._id === id ? { ...category, status: 'deactive' as 'deactive' } : category
+      );
       setCategory(updatedCategories);
-      console.log(`Category with id ${id} deleted successfully`);
+      console.log(`Category with id ${id} deactivated successfully`);
     } catch (error) {
-      console.log("Error deleting category:", error);
+      console.log("Error deactivating category:", error);
+    }
+  };
+
+  const handleActivateCategory = async (id: string) => {
+    try {
+      await activateCategory(id);
+      const updatedCategories = categories.map((category) =>
+        category._id === id ? { ...category, status: 'active' as 'active' } : category
+      );
+      setCategory(updatedCategories);
+      console.log(`Category with id ${id} activated successfully`);
+    } catch (error) {
+      console.log("Error activating category:", error);
     }
   };
 
@@ -48,10 +57,25 @@ const Listcategory = (props: Props) => {
     navigate(`updatecategory/${id}`);
   };
 
+  // Kiểm tra categories có tồn tại và là mảng trước khi filter
+  const filteredCategories = Array.isArray(categories) ? categories.filter(category =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : [];
+
   return (
     <>
-    {loading && <LoadingComponent />}
-    <NavLink to={'/admin/addcategory'}><button className=' focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 '>thêm mới</button></NavLink>
+      {loading && <LoadingComponent />}
+      <NavLink to={'/admin/addcategory'}>
+        <button className='focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'>Thêm mới</button>
+      </NavLink>
+
+      <input
+        type="text"
+        placeholder="Tìm kiếm danh mục"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="border p-2 rounded mb-4"
+      />
 
       <div className="flex flex-col w-full">
         <div className="overflow-x-auto">
@@ -60,51 +84,72 @@ const Listcategory = (props: Props) => {
               <table className="min-w-full table-auto">
                 <thead className="bg-white border-b">
                   <tr>
-                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                      Stt
-                    </th>
-                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                      Tên danh mục
-                    </th>
-                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                      Handle
-                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Stt</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Tên danh mục</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Handle</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {categories.map((category: Icategory, index: number) => (
-                    <tr className="bg-gray-100 border-b" key={category._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {index + 1}
-                      </td>
-                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                        {category.name}
-                      </td>
-                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                        <button
-                          type="button"
-                          className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                          onClick={() => updateCategory(category._id)}
-                        >
-                          Edit
-                        </button>
-                        <Popconfirm
-                          title="Delete the task"
-                          description="Are you sure to delete this task?"
-                          onConfirm={() => handleDeleteCategory(category._id)}
-                          okText="Yes"
-                          cancelText="No"
-                        >
+                  {filteredCategories.length > 0 ? (
+                    filteredCategories.map((category: Icategory, index: number) => (
+                      <tr className="bg-gray-100 border-b" key={category._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{category.name}</td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {category.status === 'active' ? (
+                            <span className="text-green-600">Hoạt động</span>
+                          ) : (
+                            <span className="text-red-600">Vô hiệu hóa</span>
+                          )}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           <button
                             type="button"
-                            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            onClick={() => updateCategory(category._id)}
                           >
-                            Delete
+                            Edit
                           </button>
-                        </Popconfirm>
-                      </td>
+                          {category.status === 'active' ? (
+                            <Popconfirm
+                              title="Vô hiệu hóa danh mục"
+                              description="Bạn có chắc chắn muốn vô hiệu hóa danh mục này không?"
+                              onConfirm={() => handleDeactivateCategory(category._id)}
+                              okText="Có"
+                              cancelText="Không"
+                            >
+                              <button
+                                type="button"
+                                className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                              >
+                                Deactivate
+                              </button>
+                            </Popconfirm>
+                          ) : (
+                            <Popconfirm
+                              title="Kích hoạt lại danh mục"
+                              description="Bạn có chắc chắn muốn kích hoạt lại danh mục này không?"
+                              onConfirm={() => handleActivateCategory(category._id)}
+                              okText="Có"
+                              cancelText="Không"
+                            >
+                              <button
+                                type="button"
+                                className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                              >
+                                Activate
+                              </button>
+                            </Popconfirm>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="text-center text-gray-500 py-4">Không tìm thấy danh mục nào.</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
