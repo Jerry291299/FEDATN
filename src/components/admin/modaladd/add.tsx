@@ -72,6 +72,8 @@ const Add = (props: Props) => {
     const fileResult = await uploadImage(tailen);
     const payload = {
       ...values,
+      moTa: values.moTa,
+      soLuong: values.soLuong,
       img: fileResult,
       categoryID: values.category,
     };
@@ -115,6 +117,41 @@ const Add = (props: Props) => {
               />
             </Form.Item>
           </div>
+
+          <div>
+            <label className="mb-2 text-2xl text-black block">
+              Số Lượng
+            </label>
+            <Form.Item
+              name="soLuong"
+              rules={[
+                { required: true, message: "Bắt buộc nhập tên sl!" },
+              ]}
+            >
+              <Input
+                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                placeholder="Enter product name"
+              />
+            </Form.Item>
+          </div>
+
+          <div>
+            <label className="mb-2 text-2xl text-black block">
+              Mô tả
+            </label>
+            <Form.Item
+              name="moTa"
+              rules={[
+                { required: true, message: "Bắt buộc nhập tên mt!" },
+              ]}
+            >
+              <Input
+                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                placeholder="Enter product name"
+              />
+            </Form.Item>
+          </div>
+          
           <div>
             <label className="mb-2 text-sm text-black block">
               Your price ($):

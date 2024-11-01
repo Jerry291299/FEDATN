@@ -74,6 +74,8 @@ const Dashboard = (props: Props) => {
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Tên Sản Phẩm</th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Giá</th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Danh mục</th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Số lượng</th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Mô tả</th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Ảnh</th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Handle</th>
                   </tr>
@@ -85,6 +87,8 @@ const Dashboard = (props: Props) => {
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.name}</td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.price}</td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product?.category?.name}</td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.soLuong}</td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{product.moTa}</td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                         <img className='w-[100px]' src={product?.img} alt="" />
                       </td>
