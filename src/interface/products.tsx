@@ -9,4 +9,4 @@ export interface Iproduct{
     price: number,
     category: Icategory,
 }
-export type IProductLite = Pick<Iproduct,'name'| 'img' | 'price'|'category' >
+export type IProductLite = Pick<Iproduct,'_id'|'name'| 'img' | 'price'|'category' >
