@@ -3,10 +3,11 @@ import { IUser } from "./user";
 
 interface Comment {
   id: number;
-  user: string; // Chứa tên người dùng
-  text: string; // Chứa nội dung bình luận
-  createdAt: string; // Thời gian tạo bình luận
-  email: string;
+  user: string; 
+  text: string; 
+  createdAt: string; 
+  // email: string;
+  name: string;
 }
 
 const CommentSection: React.FC<{ 
@@ -47,9 +48,10 @@ const CommentSection: React.FC<{
       const newCommentObj: Comment = {
         id: comments.length > 0 ? comments[comments.length - 1].id + 1 : 1,
         user: '', 
-        email: user?.info.email,
+        // email: user?.info.email,
         text: newComment.trim(),
         createdAt: new Date().toLocaleString(),
+        name: user.info.name,
       };
         const map = [...comments, newCommentObj];
       saveComments(map);
@@ -112,7 +114,7 @@ const CommentSection: React.FC<{
               ) : (
                 <div className="flex flex-col w-full">
                   <span className="text-lg font-semibold">{comment.user}</span>
-                  <span className="text-lg font-semibold">{comment.email}</span>
+                  <span className="text-lg font-semibold">{comment.name}</span>
                   <p className="text-gray-700">{comment.text}</p>
                   <p className="text-xs text-gray-500">{comment.createdAt}</p>
                   <div className="flex space-x-2 mt-2">
