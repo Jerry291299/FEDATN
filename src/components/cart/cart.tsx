@@ -4,14 +4,14 @@ import { CartItem } from "../../interface/cart";
 import { getCartByID, removeFromCart } from "../../service/cart";
 import Header from "../Header";
 import Footer from "../Footer";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 const Cart = () => {
   const Globalstate = useContext(Cartcontext);
   const { state, dispatch } = Globalstate;
   const [userId, setUserId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
+  const { id } = useParams();
   const handleRemove = async (item: CartItem) => {
     try {
       const updatedCart = await removeFromCart(
@@ -41,14 +41,15 @@ const Cart = () => {
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (userData) {
-      const { info } = JSON.parse(userData);
+      const { id } = JSON.parse(userData);
 
-      console.log(info.id);
+      console.log(id);
 
-      if (info.id) {
-        fetchCartData(info.id);
-        setUserId(info.id);
+      if (id) {
+        fetchCartData(id);
+        setUserId(id);
       }
+      
     }
   }, [userId]);
 

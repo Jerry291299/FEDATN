@@ -90,7 +90,7 @@ const Header = () => {
                       <>
                         <li className="hover:bg-gray-100">
                           <Link
-                            to={`/Cart/${user?.info?.id}`}
+                            to={`/Cart/${user.id}`}
                             className="block px-4 py-2"
                             onClick={() => setIsSubMenuOpen(false)}
                           >
