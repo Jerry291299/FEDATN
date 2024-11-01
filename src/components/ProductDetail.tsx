@@ -58,6 +58,21 @@ const ProductDetail: React.FC<Props> = () => {
                 src={products.img}
                 alt={products.name}
               />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
             </div>
             <div className="ml-[40px] mr-[30px]">
               <img
