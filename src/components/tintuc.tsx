@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate,useParams } from "react-router-dom";
 import Facebook from "../anh/Facebook.png";
 import heart from "../anh/heart.png";
 import noti from "../anh/notification.png";
@@ -8,42 +8,59 @@ import link from "../anh/LinkedIn.png";
 import twitter from "../anh/Twitter.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
-import { useEffect, useState } from "react";
 import iconarrow from "./icons/down-arrow_5082780.png";
+import { useEffect, useState } from "react";
+import canho from "../anh/noi-that-can-ho-cao-cap.jpg";
+import canho1 from "../anh/nt.jpg";
+import canho2 from "../anh/ntnt.jpg";
 
-const Header = () => {
-  const [user, setUser] = useState<{
-    info: { role: string; email: string; id: string };
-    id: string;
-  } | null>(null);
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-  const Navigate = useNavigate();
+const Tintuc = () => {
+    const [user, setUser] = useState<{
+        info: { role: string; email: string; id: string };
+        id: string;
+    } | null>(null);
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    const Navigate = useNavigate();
 
-  useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
+    useEffect(() => {
+        const userData = sessionStorage.getItem("user");
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+    const toggleSubMenu = () => {
+        setIsSubMenuOpen(!isSubMenuOpen);
+      };
+    
+      const handleLogout = () => {
+        sessionStorage.removeItem("user");
+        setUser(null);
+        Navigate("/");
+      };
 
-  const toggleSubMenu = () => {
-    setIsSubMenuOpen(!isSubMenuOpen);
-  };
+    const articles = [
+        {
+            id: 1,
+            image: canho,
+            title: "Nội thất của căn hộ mang nét đẹp nghệ thuật",
+            content: "Khi bước chân vào có thể cảm nhận sự thông thoáng...",
+        },
+        {
+            id: 2,
+            image: canho1,
+            title: "Phòng ăn với nội thất chất liệu gỗ và da",
+            content: "Góc thư giãn nhất trong không gian là nơi tọa lạc...",
+        },
+        {
+            id: 3,
+            image: canho2,
+            title: "Không gian phòng ngủ kết hợp nội thất từ vật liệu da và gỗ",
+            content: "Góc vườn yên tĩnh xanh mát trên tầng thượng ngôi nhà...",
+        },
+    ];
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("user");
-    setUser(null);
-    Navigate("/");
-  };
-  const [searchTerm, setSearchTerm] = useState<string>("");
-
-  const handleSearchClick = () => {
-    if (searchTerm.trim()) {
-      Navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
-    }
-  };
-  return (
-    <>
+    return (
+        <div className="container mx-auto w-full">
       <div className="container mx-auto w-full">
         <div className="up py-[15px] flex justify-between font-medium pr-[10px]">
           <div className="trái flex">
@@ -67,9 +84,12 @@ const Header = () => {
                   className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
                   onClick={toggleSubMenu}
                 >
-                  <img src={nguoi} alt="Profile" className="w-5 h-5" />
-                  <p className="ml-2 flex gap-2">
-                    {user?.info?.email}
+                  <img
+                    src={nguoi}
+                    alt="Profile"
+                    className="w-5 h-5"
+                  />
+                  <p className="ml-2 flex gap-2">{user?.info?.email} 
                     <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
                   </p>
                 </div>
@@ -89,12 +109,11 @@ const Header = () => {
                       </li>
                     )}
 
-                    {(user?.info?.role === "user" ||
-                      user?.info?.role === "admin") && (
+                    {(user?.info?.role === "user" || user?.info?.role === "admin") && (
                       <>
                         <li className="hover:bg-gray-100">
                           <Link
-                            to={`/Cart/${user.id}`}
+                            to={`/Cart/${user?.info?.id}`}
                             className="block px-4 py-2"
                             onClick={() => setIsSubMenuOpen(false)}
                           >
@@ -162,20 +181,14 @@ const Header = () => {
                 Home
               </Link>
 
-              <NavLink
-                to={"/products"}
-                className="hover:border-b-2 border-black"
-              >
+              <NavLink to={"/products"} className="hover:border-b-2 border-black">
                 Sản phẩm
               </NavLink>
 
               <NavLink to={"/tintuc"} className="hover:border-b-2 border-black">
                 Tin tức
               </NavLink>
-              <NavLink
-                to={"/gioithieu"}
-                className="hover:border-b-2 border-black"
-              >
+              <NavLink to={"/gioithieu"} className="hover:border-b-2 border-black">
                 Giới Thiệu
               </NavLink>
             </div>
@@ -186,9 +199,6 @@ const Header = () => {
                   type="text"
                   className="p-2 pl-8 rounded border border-gray-200 bg-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                   placeholder="search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
                 />
                 <svg
                   className="w-4 h-4 absolute right-[10px] top-3.5"
@@ -209,8 +219,24 @@ const Header = () => {
           </div>
         </div>
       </div>
-    </>
-  );
+
+            <main className="container mx-auto my-5">
+                <h1 className="text-3xl font-bold text-center my-5">Tin Tức</h1>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {articles.map((article) => (
+                        <Link key={article.id} to={`/tintuc/${article.id}`} className="block border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-transform">
+                            <img src={article.image} alt={article.title} className="w-full h-48 object-cover" />
+                            <div className="p-4">
+                                <h2 className="text-xl font-semibold">{article.title}</h2>
+                                <p className="mt-2 text-gray-600">{article.content}</p>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+
+            </main>
+        </div>
+    );
 };
 
-export default Header;
+export default Tintuc;

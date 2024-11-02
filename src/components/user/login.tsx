@@ -17,6 +17,9 @@ const Login = (props: Props) => {
 
     try {
       const user = await UserLogin({ email, password });
+      
+      console.log('user', user);
+
       if (!user || !user.info) {
         setMessage("Login failed: Invalid credentials");
         alert("Login failed");
@@ -36,7 +39,9 @@ const Login = (props: Props) => {
         
         navigate('/');
       }
-      console.log(user);
+      
+          
+
     } catch (error) {
       setMessage("Đăng nhập thất bại");
       alert("Đăng nhập thất bại");
@@ -55,10 +60,10 @@ const Login = (props: Props) => {
                   <h3 className="text-3xl font-extrabold">Sign in</h3>
                   <p className="text-sm mt-4 pb-[10px] flex">
                     Don't have an account?{" "}
-                    <NavLink to={"/register"}>
-                      <p className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
+                    <NavLink to={"/register"} className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
+                     
                         Register here
-                      </p>
+                    
                     </NavLink>
                   </p>
                   <NavLink
@@ -127,9 +132,9 @@ const Login = (props: Props) => {
                     </label>
                   </div>
                   <div>
-                    <p className="text-blue-600 font-semibold text-sm hover:underline">
+                    <button className="text-blue-600 font-semibold text-sm hover:underline">
                       Forgot Password?
-                    </p>
+                    </button>
                   </div>
                 </div>
                 <div className="mt-12">
