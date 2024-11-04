@@ -1,129 +1,227 @@
-import React from 'react'
-import anh1 from './img/giuong-ngu-pio-1.jpg'
-import anh6 from './img/sofa1.jpeg'
-import anh7 from './img/sofa2.jpeg'
-import anh16 from "./img/sofa4.jpeg"
-import anh15 from "./img/sofa3.jpeg"
-import anh13 from "./img/sofa5.jpeg"
-import anh12 from "./img/sofa6.jpeg"
-export const ProductDetail = () => {
-    return (
-        <>
-        <div className='container mx-auto w-[1400px] pt-[100px]'>
-        <div className='container mx-auto w-[1300px] flex' >
-        <div className=''>
-            <img className='mb-[20px] w-[150px]' src={anh1} alt="" />
-            <img className='mb-[20px] w-[150px]' src={anh1} alt="" />
-            <img className='mt-[10px] w-[150px]' src={anh1} alt="" />
-            <img className='mt-[10px] w-[150px]' src={anh1} alt="" />
-        </div>
-        <div className='ml-[40px]'>
-            <img className='w-[650px] object-cover' src={anh1} alt="" />
-        </div>
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-xl font-bold text-black-800">RG 1/144 MSN-04 SAZABI</h1>
-      <p className="font-bold text-gray-500">SKU: (ĐANG CẬP NHẬT...)</p>
-      
-      <div className="my-4">
-        <div className="flex items-baseline">
-          <span className="text-2xl font-semibold text-black-600">950.000₫</span>
-         <p className=" text-gray-500 m-[15px]">Giá thị trường:<span className="text-gray-400 line-through ml-2">1.000.000₫</span></p>
-        </div>
-        <p className="font-bold text-gray-600">Tiết kiệm: <span className="text-red-600">50.000₫</span></p>
-        <p className="font-bold text-gray-500 mt-2">Tình trạng: <span className="font-semibold text-red-600">Đặt hàng</span></p>
-      </div>
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Iproduct } from "../interface/products";
+import { IUser } from "../interface/user";
+import { addtoCart } from "../service/cart";
+import { getProductByID } from "../service/products";
+import Header from "./Header";
+import Footer from "./Footer";
+import { actions, Cartcontext } from "./contexts/cartcontext";
+import { Icart } from "../interface/cart";
+import CommentSection from "../interface/comment";
+import anh12 from "./img/sofa6.jpeg";
+import anh13 from "./img/sofa5.jpeg";
+import anh15 from "./img/sofa3.jpeg";
+import anh16 from "./img/sofa4.jpeg";
 
-      <div className="flex items-center my-4">
-        <p className="font-bold">Số Lượng</p>
-        <button 
-   
-          className="px-2 py-1 bg-gray-300 rounded-l hover:bg-gray-400"
-        >
-          -
-        </button>
-        <input 
-          type="text" 
-      
-          readOnly 
-          className="w-12 text-center border border-gray-300"
-        />
-        <button 
-        
-          className="px-2 py-1 bg-gray-300 rounded-r hover:bg-gray-400"
-        >
-          +
-        </button>
-      </div>
+type Props = {};
 
-      <button 
-        className="w-full py-2 bg-gray-500 text-white font-semibold rounded-lg cursor-not-allowed"
-        disabled
-      >
-        HẾT HÀNG
-      </button>
+const ProductDetail: React.FC<Props> = () => {
+  const { id } = useParams();
+  const [products, setProduct] = useState<Iproduct | undefined>(undefined);
+  const Globalstate = useContext(Cartcontext);
+  const [user, setUser] = useState<IUser | null>(null);
 
-      <div className="my-4 font-bold">
-        <p className="text-gray-700">Gọi đặt mua: 
-          <a href="tel:0829721097" className="text-blue-600"> 0829721097</a> 
-          <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
-        </p>
-      </div>
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser: IUser = JSON.parse(storedUser);
+      setUser(parsedUser); // Lưu thông tin người dùng
+    } else {
+      console.error("User not found in sessionStorage.");
+    }
+  }, []);
 
-      <ul className="list-disc pl-5 space-y-2 text-gray-700">
-        <li>MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG <a className='font-bold'>từ 10.000.000Đ</a></li>
-        <li>BẢO HÀNH  <a className='font-bold'>1 đổi 1</a> DO LỖI NHÀ SẢN XUẤT</li>
-        <li>CAM KẾT  <a className='font-bold'>100% chính hãng</a></li>
-      </ul>
- 
-            <div className='foot pt-[100px] mb-[10px] border-t-2 border-black justify-between flex'>
-            
-              
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getProductByID(id);
+        setProduct(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  const dispatch = Globalstate.dispatch;
+
+  return (
+    <>
+      <Header />
+      <div className="container mx-auto w-[1400px] pt-[100px]">
+        {products && (
+          <div className="container mx-auto w-[1300px] flex">
+            <div>
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
+              <img
+                className="mb-[20px] w-[150px]"
+                src={products.img}
+                alt={products.name}
+              />
             </div>
-           
+            <div className="ml-[40px] mr-[30px]">
+              <img
+                className="w-[690px] object-cover"
+                src={products.img}
+                alt={products.name}
+              />
+            </div>
+            <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+              <h1 className="text-xl font-bold text-black-800">
+                {products.name}
+              </h1>
+              <div className="my-4">
+                <div className="flex items-baseline">
+                  <span className="text-2xl font-semibold text-black-600">
+                    {products.price}₫
+                  </span>
+                </div>
+                <p className="font-bold text-gray-600">
+                  Tiết kiệm: <span className="text-red-600">50.000 ₫</span>
+                </p>
+                <p className="font-bold text-gray-500 mt-2">
+                  Tình trạng:{" "}
+                  <span className="font-semibold text-green-600">Còn hàng</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
+                onClick={async () => {
+                  if (!products || !products._id) {
+                    alert("Product ID is invalid.");
+                    return;
+                  }
+                  if (!user || !user.id) {
+                    alert("User ID is invalid or missing.");
+                    return;
+                  }
+                  const cartItem: Icart = {
+                    userId: user.id,
+                    items: [
+                      {
+                        productId: String(products._id),
+                        name: products.name,
+                        price: products.price,
+                        img: products.img,
+                        quantity: 1,
+                      },
+                    ],
+                  };
+                  try {
+                    const response = await addtoCart(cartItem);
+                    dispatch({ type: actions.ADD, payload: response });
+                    alert("Added to cart successfully");
+                  } catch (error) {
+                    console.error("Failed to add products to cart", error);
+                  }
+                }}
+              >
+                Add to cart
+              </button>
+              <div className="my-4 font-bold">
+                <p className="text-gray-700">
+                  Gọi đặt mua:
+                  <a href="tel:0829721097" className="text-blue-600">
+                    0829721097
+                  </a>
+                  <span className="text-gray-600">
+                    (miễn phí 8:30 - 21:30)
+                  </span>
+                </p>
+              </div>
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                <li>
+                  MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
+                  <span className="font-bold">từ 10.000.000Đ</span>
+                </li>
+                <li>
+                  BẢO HÀNH <span className="font-bold">1 đổi 1</span> DO LỖI NHÀ
+                  SẢN XUẤT
+                </li>
+                <li>
+                  CAM KẾT <span className="font-bold">100% chính hãng</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+        <div className="pt-[90px]">
+          <h1 className="text-4xl font-bold mb-[10px]">Other product</h1>
+          <div className="pt-[10px] grid grid-cols-4 gap-4">
+            <div className="pt-[40px]">
+              <img className="w-[100%]" src={anh16} alt="Round Dining Table" />
+              <div className="flex">
+                <h2 className="text-[18px] font-bold">Round Dining Table</h2>
+                <p className="text-[20px] font-bold pl-[110px]">$55</p>
+              </div>
+              <p>Bed table</p>
+              <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">
+                Add to cart
+              </button>
+            </div>
+            <div className="pt-[40px]">
+              <img className="w-[100%]" src={anh16} alt="Round Dining Table" />
+              <div className="flex">
+                <h2 className="text-[18px] font-bold">Round Dining Table</h2>
+                <p className="text-[20px] font-bold pl-[110px]">$55</p>
+              </div>
+              <p>Bed table</p>
+              <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">
+                Add to cart
+              </button>
+            </div>
+            <div className="pt-[40px]">
+              <img className="w-[100%]" src={anh16} alt="Round Dining Table" />
+              <div className="flex">
+                <h2 className="text-[18px] font-bold">Round Dining Table</h2>
+                <p className="text-[20px] font-bold pl-[110px]">$55</p>
+              </div>
+              <p>Bed table</p>
+              <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">
+                Add to cart
+              </button>
+            </div>
+            <div className="pt-[40px]">
+              <img className="w-[100%]" src={anh16} alt="Round Dining Table" />
+              <div className="flex">
+                <h2 className="text-[18px] font-bold">Round Dining Table</h2>
+                <p className="text-[20px] font-bold pl-[110px]">$55</p>
+              </div>
+              <p>Bed table</p>
+              <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">
+                Add to cart
+              </button>
+            </div>
+            {/* Các sản phẩm khác */}
+          </div>
+        </div>
+        <div className="pt-[50px]">
+          {user ? (
+            <CommentSection productId={id || ""} user={user} />
+          ) : (
+            <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
+          )}
         </div>
         </div>
-        <div className='pt-[90px]'>
-        <h1 className="text-4xl font-bold mb-[10px]">Other Products</h1>
-        <div className='pt-[10px] grid grid-cols-4 gap-4'>
-        <div className="pt-[40px]">
-        <img className="w-[100%]" src={anh16} alt="" />
-        <div className="flex  ">
-          <h2 className="text-[18px] font-bold">Round Dining Table</h2>
-          <p className="text-[20px] font-bold pl-[110px]">$55</p>
-        </div>
-        <p>Bed table</p>
-        <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">Add to cart</button>
-      </div>
-      <div className="pt-[40px]">
-        <img className="w-[100%]" src={anh15} alt="" />
-        <div className="flex  ">
-          <h2 className="text-[18px] font-bold">Right Hand Fabric</h2>
-          <p className="text-[20px] font-bold pl-[110px]">$55</p>
-        </div>
-        <p>Desk decor</p>
-        <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">Add to cart</button>
-      </div>
-      <div className="pt-[40px]">
-        <img className="w-[100%]" src={anh13} alt="" />
-        <div className="flex  ">
-          <h2 className="text-[18px] font-bold">Velvet Wingback Chair</h2>
-          <p className="text-[20px] font-bold pl-[110px]">$55</p>
-        </div>
-        <p>Basket</p>
-        <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">Add to cart</button>
-      </div>
-      <div className="pt-[40px]">
-        <img className="w-[100%]" src={anh12} alt="" />
-        <div className="flex  ">
-          <h2 className="text-[18px] font-bold">Velvet Wingback Chair</h2>
-          <p className="text-[20px] font-bold pl-[110px]">$55</p>
-        </div>
-        <p>Chair</p>
-        <button className="border-2 border-black rounded-lg py-[5px] px-[125px] mt-[10px]">Add to cart</button>
-      </div>
-        </div>
-        </div>
-    </div>
-        </>
-    )
-}
+      <Footer />
+    </>
+  );
+};
+
+export default ProductDetail;

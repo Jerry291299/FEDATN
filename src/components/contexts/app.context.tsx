@@ -1,26 +1,22 @@
 import { createContext, useState } from "react";
 
-type user = {
-    name: string;
+type User = {
+  email: string; // Change this to match your API response
+  role: string;  // Add this to match your API response
 };
 
 type AppContextType = {
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 
-  user: {
-    name: string;
-  };
-  setUser: React.Dispatch<React.SetStateAction<user>>;
+  user: User | null; // Change to User or null
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Change to User or null
 };
 
 const initialAppContext: AppContextType = {
   isAuthenticated: false,
-  // sessionStorage.getItem("isAuthenticated") === "true",
   setIsAuthenticated: () => null,
-  user: {
-    name: "",
-  },
+  user: null, // Change to null
   setUser: () => {},
 };
 
@@ -30,7 +26,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     initialAppContext.isAuthenticated
   );
-  const [user, setUser] = useState<any>({ name: "" });
+  const [user, setUser] = useState<User | null>(null); // Change to User or null
   return (
     <AppContext.Provider
       value={{ isAuthenticated, setIsAuthenticated, user, setUser }}

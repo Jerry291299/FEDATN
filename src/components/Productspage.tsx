@@ -40,7 +40,7 @@ const Productspage = (props: Props) => {
      {loading && <LoadingComponent/>}
       <Header />
 
-      <section className="py-10">
+      {/* <section className="py-10">
         <h1 className="mb-12 text-center font-sans text-5xl font-bold">
           Our Product
         </h1>
@@ -49,7 +49,7 @@ const Productspage = (props: Props) => {
 
         {products?.slice(0, 8).map((product: Iproduct, index: number) => (
           <article className="mx-auto my-4 flex w-full flex-col overflow-hidden rounded-2xl border border-gray-300 bg-white text-gray-900 transition hover:translate-y-2 hover:shadow-lg">
-            <NavLink  to={`/product/${product._id}`}>
+            <NavLink  to={`/product/`+product._id}>
 
               <img
                 src= {product.img}
@@ -162,8 +162,34 @@ const Productspage = (props: Props) => {
 ))}
           
         </div>
-      </section>
+      </section> */}
 
+<div className="bg-white">
+      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <h2 className="sr-only">Products</h2>
+
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+        {products?.slice(0, 8).map((product: Iproduct, index: number) => (
+        <NavLink  to={`/product/`+product._id}>
+         
+            <a key={product._id}  className="group">
+              <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                <img
+                  alt={product.img}
+                  src={product.img}
+                  className="h-full w-full object-cover object-center group-hover:opacity-75"
+                />
+              </div>
+              <h3 className="mt-4 text-sm  text-gray-700">{product.name}</h3>
+              <p className="mt-1 text-lg text-[21px] font-medium flex justify-center text-gray-900">$ {product.price}</p>
+            </a>
+        
+          </NavLink>
+        ))}
+        </div>
+        
+      </div>
+    </div>
       <Footer />
     </>
   );
