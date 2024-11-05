@@ -16,7 +16,7 @@ import anh16 from "./img/sofa4.jpeg";
 
 type Props = {};
 
-const ProductDetail: React.FC<Props> = () => {
+const ProductDetail= () => {
   const { id } = useParams();
   const [products, setProduct] = useState<Iproduct | undefined>(undefined);
   const Globalstate = useContext(Cartcontext);

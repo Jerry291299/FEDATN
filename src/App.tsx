@@ -21,6 +21,7 @@ import Tintuc from "./components/tintuc";
 import Tintucdetail from "./components/tintucdetail";
 import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
+import OrderPayment from "./components/OrderPayment";
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
           <Route path="/tintuc" element={<Tintuc />} />
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
           <Route path="/gioithieu" element={<Gioithieu />} />
-
+          <Route path="/order" element={<OrderPayment />} />
           <Route
             path="/admin"
             element={
@@ -59,6 +60,7 @@ function App() {
             <Route path="Listcategory" element={<Listcategory />} />
             <Route path="addcategory" element={<Addcategory />} />
             <Route path="users" element={<Users />} />
+            
             <Route path="dashboard/update/:id" Component={Update}></Route>
             <Route
               path="Listcategory/updatecategory/:id"
