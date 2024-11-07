@@ -23,6 +23,7 @@ import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
 import OrderPayment from "./components/OrderPayment";
 import Donhang from "./components/Donhang";
+import Order from "./components/admin/Order";
 
 function App() {
   return (
@@ -62,7 +63,7 @@ function App() {
             <Route path="Listcategory" element={<Listcategory />} />
             <Route path="addcategory" element={<Addcategory />} />
             <Route path="users" element={<Users />} />
-            
+            <Route path="order" element={<Order />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
             <Route
               path="Listcategory/updatecategory/:id"
