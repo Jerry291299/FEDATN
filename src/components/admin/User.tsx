@@ -83,9 +83,7 @@ const activateUserById = async (_id: string) => {
   return (
     <>
       {loading && <LoadingComponent />}
-      <NavLink to={'/admin/adduser'}>
-        <button className='focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'>Thêm mới</button>
-      </NavLink>
+      
       
       <div className="flex flex-col w-full">
         <input
