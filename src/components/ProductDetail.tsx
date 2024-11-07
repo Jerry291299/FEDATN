@@ -16,7 +16,7 @@ import anh16 from "./img/sofa4.jpeg";
 
 type Props = {};
 
-const ProductDetail= () => {
+const ProductDetail = () => {
   const { id } = useParams();
   const [products, setProduct] = useState<Iproduct | undefined>(undefined);
   const Globalstate = useContext(Cartcontext);
@@ -108,9 +108,10 @@ const ProductDetail= () => {
                     return;
                   }
                   if (!user || !user.id) {
-                    alert("User ID is invalid or missing.");
+                    alert("Bạn phải đăng nhập thì mới mua được hàng?");
                     return;
                   }
+
                   const cartItem: Icart = {
                     userId: user.id,
                     items: [
@@ -140,9 +141,7 @@ const ProductDetail= () => {
                   <a href="tel:0829721097" className="text-blue-600">
                     0829721097
                   </a>
-                  <span className="text-gray-600">
-                    (miễn phí 8:30 - 21:30)
-                  </span>
+                  <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
                 </p>
               </div>
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
@@ -218,7 +217,7 @@ const ProductDetail= () => {
             <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
           )}
         </div>
-        </div>
+      </div>
       <Footer />
     </>
   );
