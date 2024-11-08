@@ -24,10 +24,10 @@ const Add = (props: Props) => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false)
-  
-  
-  
-  
+
+
+
+
   const info = () => {
     messageApi.open({
       type: "success",
@@ -46,6 +46,8 @@ const Add = (props: Props) => {
     };
     fetchCategories();
   }, []);
+
+  const activeCategories = category.filter(category => category.status === "active");
 
   const labelRender: LabelRender = (props) => {
     const { label, value } = props;
@@ -67,166 +69,191 @@ const Add = (props: Props) => {
   };
 
   const onFinish = async (values: any) => {
-    console.log("Success:", values);
-    setLoading(true)
-    const fileResult = await uploadImage(tailen);
-    const payload = {
-      ...values,
-      moTa: values.moTa,
-      soLuong: values.soLuong,
-      img: fileResult,
-      categoryID: values.category,
-    };
-    console.log(values);
+    setLoading(true);
 
-    const product = await addProduct(payload);
-    console.log(product);
+    try {
+        // Tải ảnh lên và lấy URL
+        const fileResult = await uploadImage(tailen);
 
-    const newproducts = [product];
-    setProducts(newproducts);
-    setName("");
-    setImg("");
-    setPrice(0);
-    setCategory([]);
-    info()
+        // Tạo payload, thêm trường status: 'active'
+        const payload = {
+            ...values,
+            moTa: values.moTa,
+            soLuong: values.soLuong,
+            img: fileResult,
+            categoryID: values.category,
+            status: true, // Mặc định trạng thái là active
+        };
 
-    form.resetFields();
-    setLoading(false)
-  };
+        // Gọi API để thêm sản phẩm mới
+        const product = await addProduct(payload);
 
-  return (
-    <>
-    
-    {loading && <LoadingComponent />}
+        // Cập nhật danh sách sản phẩm và thông báo thành công
+        info();
+
+        // Reset form và trạng thái
+        form.resetFields();
+        setName("");
+        setImg("");
+        setPrice(0);
+        setCategory([]);
+        setLoading(false);
+    } catch (error) {
+        console.error("Error adding product:", error);
+        setLoading(false);
+        message.error("Something went wrong. Please try again.");
+    }
+};
+
+return (
+  <>
+      {loading && <LoadingComponent />}
       {contextHolder}
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-        <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>
-          <div>
-            <label className="mb-2 text-2xl text-black block">
-              Tên sản phẩm:
-            </label>
-            <Form.Item
-              name="name"
-              rules={[
-                { required: true, message: "Bắt buộc nhập tên Sản Phẩm!" },
-              ]}
-            >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
-              />
-            </Form.Item>
-          </div>
-
-          <div>
-            <label className="mb-2 text-2xl text-black block">
-              Số Lượng
-            </label>
-            <Form.Item
-              name="soLuong"
-              rules={[
-                { required: true, message: "Bắt buộc nhập tên sl!" },
-              ]}
-            >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
-              />
-            </Form.Item>
-          </div>
-
-          <div>
-            <label className="mb-2 text-2xl text-black block">
-              Mô tả
-            </label>
-            <Form.Item
-              name="moTa"
-              rules={[
-                { required: true, message: "Bắt buộc nhập tên mt!" },
-              ]}
-            >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
-              />
-            </Form.Item>
-          </div>
-          
-          <div>
-            <label className="mb-2 text-sm text-black block">
-              Your price ($):
-            </label>
-            <div className="relative flex items-center">
-              <Form.Item
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your product price!",
-                  },
-                ]}
-              >
-                <Input
-                  className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                  placeholder="Enter Price $$$"
-                />
-              </Form.Item>
-              <div className="absolute left-4"></div>
-            </div>
-
-            <label className="mb-2 text-sm text-black block">Your Image:</label>
-            <div className="relative flex items-center">
-              <Form.Item
-                name="img"
-                rules={[
-                  {
-                    required: false,
-                    message: "Please input your product image!",
-                  },
-                ]}
-              >
-                <Input
-                  type="file"
-                  onChange={(e: any) => {
-                    setTailen(e.target.files[0]);
-                  }}
-                  className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                  placeholder="Enter product image"
-                />
-              </Form.Item>
-              <div className="absolute left-4"></div>
-            </div>
-
-            <div className="pt-[20px]">
-              <Form.Item
-                name="category"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your Category!",
-                  },
-                ]}
-              >
-                <Select labelRender={labelRender} style={{ width: "100%" }}>
-                  {category.map((categoryID: Icategory, index: number) => (
-                    <Select.Option key={categoryID._id} value={categoryID._id}>
-                      {categoryID.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+          <Form
+              form={form}
+              initialValues={{ category: "1" }}
+              onFinish={onFinish}
           >
-            Thêm mới sản phẩm
-          </button>
-        </Form>
-      </div>
-    </>
-  );
+              <div>
+                  <label className="mb-2 text-2xl text-black block">
+                      Tên sản phẩm:
+                  </label>
+                  <Form.Item
+                      name="name"
+                      rules={[
+                          {
+                              required: true,
+                              message: "Bắt buộc nhập tên Sản Phẩm!",
+                          },
+                      ]}
+                  >
+                      <Input
+                          className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                          placeholder="Enter product name"
+                      />
+                  </Form.Item>
+              </div>
+
+              <div>
+                  <label className="mb-2 text-2xl text-black block">
+                      Số Lượng
+                  </label>
+                  <Form.Item
+                      name="soLuong"
+                      rules={[
+                          {
+                              required: true,
+                              message: "Bắt buộc nhập số lượng!",
+                          },
+                      ]}
+                  >
+                      <Input
+                          className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                          placeholder="Enter product quantity"
+                      />
+                  </Form.Item>
+              </div>
+
+              <div>
+                  <label className="mb-2 text-2xl text-black block">
+                      Mô tả
+                  </label>
+                  <Form.Item
+                      name="moTa"
+                      rules={[
+                          {
+                              required: true,
+                              message: "Bắt buộc nhập mô tả!",
+                          },
+                      ]}
+                  >
+                      <Input
+                          className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                          placeholder="Enter product description"
+                      />
+                  </Form.Item>
+              </div><div>
+                        <label className="mb-2 text-sm text-black block">
+                            Giá sản phẩm:
+                        </label>
+                        <div className="relative flex items-center">
+                            <Form.Item
+                                name="price"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            "Please input your product price!",
+                                    },
+                                ]}
+                            >
+                                <Input
+                                    className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                                    placeholder="Enter Price $$$"
+                                />
+                            </Form.Item>
+                        </div>
+
+                        <label className="mb-2 text-sm text-black block">
+                            Ảnh sản phẩm:
+                        </label>
+                        <div className="relative flex items-center">
+                            <Form.Item
+                                name="img"
+                                rules={[
+                                    {
+                                        required: false,
+                                        message:
+                                            "Please input your product image!",
+                                    },
+                                ]}
+                            >
+                                <Input
+                                    type="file"
+                                    onChange={(e: any) =>
+                                        setTailen(e.target.files[0])
+                                    }
+                                    className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                                    placeholder="Enter product image"
+                                />
+                            </Form.Item>
+                        </div>
+
+                        <div className="pt-[20px]">
+                            <Form.Item
+                                name="category"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please select a category!",
+                                    },
+                                ]}
+                            >
+                                <Select style={{ width: "100%" }}>
+                                    {activeCategories.map((categoryID: Icategory) => (
+                                        <Select.Option 
+                                        key={categoryID._id}
+                                            value={categoryID._id}
+                                        >
+                                            {categoryID.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        Thêm mới sản phẩm
+                    </button>
+                </Form>
+            </div>
+        </>
+    );
 };
 
 export default Add;

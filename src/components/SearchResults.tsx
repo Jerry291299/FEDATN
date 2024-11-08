@@ -25,6 +25,7 @@ const SearchResults = () => {
             img: product.img,
             price: product.price,
             category: product.category,
+            status: product.status
           }));
         setFilteredProducts(results);
       } catch (error) {

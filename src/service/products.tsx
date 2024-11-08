@@ -49,3 +49,23 @@ export const DeleteProduct = async(pid:string)=> {
     
   }
 }
+
+// Hàm kích hoạt sản phẩm
+export const ActivateProduct = async (pid: string) => {
+  try {
+      const { data } = await axiosservice.put(`/product/activate/${pid}`);
+      return data;
+  } catch (error) {
+      console.log("Error activating product:", error);
+  }
+};
+
+// Hàm vô hiệu hóa sản phẩm
+export const DeactivateProduct = async (pid: string) => {
+  try {
+      const { data } = await axiosservice.put(`/product/deactivate/${pid}`);
+      return data;
+  } catch (error) {
+      console.log("Error deactivating product:", error);
+  }
+};
