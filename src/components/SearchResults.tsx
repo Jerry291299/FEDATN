@@ -14,9 +14,8 @@ const SearchResults = () => {
     const fetchAndFilterProducts = async () => {
       setLoading(true);
       try {
-        const products: IProductLite[] = await getAllproducts();
-        const results = products
-          .filter((product: IProductLite) =>
+        const products: any = await getAllproducts({limit: 10, page:1});
+        const results : IProductLite[] = products?.docs?.filter((product: IProductLite) =>
             product.name.toLowerCase().includes(searchTerm?.toLowerCase() || "")
           )
           .map((product: IProductLite) => ({

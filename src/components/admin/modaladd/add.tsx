@@ -96,7 +96,6 @@ const Add = (props: Props) => {
         setName("");
         setImg("");
         setPrice(0);
-        setCategory([]);
         setLoading(false);
     } catch (error) {
         console.error("Error adding product:", error);

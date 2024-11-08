@@ -6,7 +6,7 @@ import {
   getAllproducts,
 } from "../../service/products";
 import { Iproduct } from "../../interface/products";
-import { Popconfirm } from "antd";
+import { Pagination, Popconfirm } from "antd";
 import LoadingComponent from "../Loading";
 
 type Props = {};
@@ -16,25 +16,42 @@ const Dashboard = (props: Props) => {
   const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [pageConfig, setPageConfig] = useState<any>()
+  const [page, setPage] = useState<any>({
+    limit: 1,
+    currentPage: 1,
+  })
 
+  const fetchData = async (currentPage : number) => {
+    try {
+      setLoading(true);
+      const data = await getAllproducts({limit: page.limit, page:currentPage});
+      setProduct(data?.docs);
+      setPageConfig(data)
+      console.log(data?.docs, "data");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllproducts();
-        setProduct(data);
-        console.log(data, "data");
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+   
+    fetchData(1);
   }, []);
 
   const updateProduct = (id: string) => {
     navigate(`update/${id}`);
+  };
+
+ 
+
+  // Xử lý khi người dùng chuyển trang
+  const handlePageChange = (currentPage: number) => {
+    setPage((prev : any)   => {
+      return {...prev, currentPage: currentPage}
+    });
+    fetchData(currentPage || 0)
   };
 
   // Hàm cập nhật trạng thái sản phẩm
@@ -63,6 +80,8 @@ const Dashboard = (props: Props) => {
       // Xử lý lỗi nếu có
     }
   };
+
+
 
   // Lọc danh sách sản phẩm dựa trên tên sản phẩm
   const filteredProducts = products.filter((product) =>
@@ -236,6 +255,7 @@ const Dashboard = (props: Props) => {
           </div>
         </div>
       </div>
+      <Pagination align="end" onChange={handlePageChange} pageSize= {pageConfig?.limit}  total={pageConfig?.totalDocs || 0} current={page.currentPage}/>
     </>
   );
 };

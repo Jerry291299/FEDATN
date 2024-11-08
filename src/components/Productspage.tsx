@@ -19,9 +19,11 @@ const Productspage = (props: Props) => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const sanpham = await getAllproducts();
+                const sanpham = await getAllproducts({limit: 10, page:1});
                 const danhmuc = await getAllCategories();
-                setProducts(sanpham);
+                setProducts(sanpham.docs || []);
+                console.log(sanpham.docs,"day");
+                
                 setCategory(danhmuc);
             } catch (error) {
                 console.log(error);
@@ -169,7 +171,7 @@ const Productspage = (props: Props) => {
         <h2 className="sr-only">Products</h2>
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-        {products?.slice(0, 8).map((product: Iproduct, index: number) => (
+        {products?.slice(0, 8)?.map((product: Iproduct, index: number) => (
         <NavLink  to={`/product/`+product._id}>
          
             <a key={product._id}  className="group">
