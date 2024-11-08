@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { Cartcontext } from "../contexts/cartcontext";
 import { CartItem } from "../../interface/cart";
-import { getCartByID, removeFromCart } from "../../service/cart";
+import { getCartByID, removeFromCart, updateCartQuantity } from "../../service/cart";
 import Header from "../Header";
 import Footer from "../Footer";
 import { NavLink, useParams } from "react-router-dom";
 
 const Cart = () => {
   const Globalstate = useContext(Cartcontext);
-  const { state, dispatch } = Globalstate;
+  // const { state, dispatch } = Globalstate;
   const [userId, setUserId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { id } = useParams();
@@ -53,25 +53,41 @@ const Cart = () => {
     }
   }, [userId]);
 
-  const handleIncrease = (item: CartItem) => {
-    const updatedItems = cartItems.map((cartItem) =>
-      cartItem.productId === item.productId
-        ? { ...cartItem, quantity: (cartItem.quantity ?? 0) + 1 }
-        : cartItem
-    );
-    setCartItems(updatedItems);
-  };
-
-  const handleDecrease = (item: CartItem) => {
-    if (item.quantity && item.quantity > 1) {
+  const handleIncrease = async (item: CartItem) => {
+    try {
+      // Update local cart state
       const updatedItems = cartItems.map((cartItem) =>
         cartItem.productId === item.productId
-          ? { ...cartItem, quantity: cartItem.quantity - 1 }
+          ? { ...cartItem, quantity: (cartItem.quantity ?? 0) + 1 }
           : cartItem
       );
       setCartItems(updatedItems);
-    } else {
-      handleRemove(item);
+  
+      // Update backend with the new quantity
+      await updateCartQuantity(userId as string, item.productId, item.quantity + 1);  // Add your API call here to update the backend
+    } catch (error) {
+      console.error("Failed to increase quantity:", error);
+    }
+  };
+  
+  const handleDecrease = async (item: CartItem) => {
+    try {
+      if (item.quantity && item.quantity > 1) {
+        // Update local cart state
+        const updatedItems = cartItems.map((cartItem) =>
+          cartItem.productId === item.productId
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            : cartItem
+        );
+        setCartItems(updatedItems);
+  
+        // Update backend with the new quantity
+        await updateCartQuantity(userId as string, item.productId, item.quantity - 1);  // Add your API call here to update the backend
+      } else {
+        handleRemove(item);
+      }
+    } catch (error) {
+      console.error("Failed to decrease quantity:", error);
     }
   };
 
