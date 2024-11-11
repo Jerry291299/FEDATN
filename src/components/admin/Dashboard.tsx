@@ -18,7 +18,7 @@ const Dashboard = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [pageConfig, setPageConfig] = useState<any>()
   const [page, setPage] = useState<any>({
-    limit: 1,
+    limit: 5,
     currentPage: 1,
   })
 
