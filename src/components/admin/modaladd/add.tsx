@@ -111,7 +111,7 @@ return (
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
           <Form
               form={form}
-              initialValues={{ category: "1" }}
+              initialValues={{ category: "chọn danh mục" }}
               onFinish={onFinish}
           >
               <div>
@@ -148,6 +148,7 @@ return (
                       ]}
                   >
                       <Input
+                      type="number"
                           className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
                           placeholder="Enter product quantity"
                       />
@@ -188,6 +189,7 @@ return (
                                 ]}
                             >
                                 <Input
+                                 type="number"
                                     className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
                                     placeholder="Enter Price $$$"
                                 />
