@@ -21,7 +21,7 @@ const Update = (props: Props) => {
                 form.setFieldsValue({
                     name: response.name,
                     price: response.price,
-                    img: response.img,
+                    // img: response.img,
                     soLuong: response.soLuong,
                     moTa: response.moTa,
                     category: response.category?._id,
@@ -119,13 +119,13 @@ const Update = (props: Props) => {
                 </Form.Item>
 
                 {/* Image */}
-                <Form.Item
+                {/* <Form.Item
                     label="Image URL"
                     name="img"
                     rules={[{ required: true, message: "Please enter the image URL" }]}
                 >
                     <Input placeholder="Enter image URL" className="rounded" />
-                </Form.Item>
+                </Form.Item> */}
 
                 <button
                     type="submit"
