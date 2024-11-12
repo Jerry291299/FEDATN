@@ -87,7 +87,7 @@ const Cart = () => {
         handleRemove(item);
       }
     } catch (error) {
-      console.error("Failed to decrease quantity:", error);
+      console.error("Failed to decrease quantity::", error);
     }
   };
 

@@ -1,38 +1,18 @@
-import { Form, FormProps, Input, Select, SelectProps } from "antd";
+import { Form, Input, Select } from "antd";
 import React, { useEffect, useState } from "react";
-import {
-    addProduct,
-    getProductByID,
-    updateProduct,
-} from "../../../service/products";
-import { IProductLite, Iproduct } from "../../../interface/products";
+import { getProductByID, updateProduct } from "../../../service/products";
+import { Iproduct } from "../../../interface/products";
 import { useNavigate, useParams } from "react-router-dom";
-import { upload } from "../../../service/upload";
-import { Icategory } from "../../../interface/category";
 import { getAllCategories } from "../../../service/category";
+import { Icategory } from "../../../interface/category";
 
 type Props = {};
 
 const Update = (props: Props) => {
-    const [name, setName] = useState<string>("");
-    const [price, setPrice] = useState<number>(0);
-    const [category, setCategory] = useState<Icategory[]>([]); // Change this to array of Icategory
-    const [Products, setProducts] = useState<Iproduct[]>([]);
+    const [categories, setCategories] = useState<Icategory[]>([]);
     const navigate = useNavigate();
     const { id } = useParams();
     const [form] = Form.useForm();
-    console.log(id, "log id");
-
-    type LabelRender = SelectProps["labelRender"];
-
-    const labelRender: LabelRender = (props) => {
-        const { label, value } = props;
-
-        if (label) {
-            return value;
-        }
-        return <span>Please choose the type of product: </span>;
-    };
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -41,18 +21,22 @@ const Update = (props: Props) => {
                 form.setFieldsValue({
                     name: response.name,
                     price: response.price,
-                    category: response.category,
+                    // img: response.img,
+                    soLuong: response.soLuong,
+                    moTa: response.moTa,
+                    category: response.category?._id,
                 });
-                console.log(response);
-            } catch (error) {}
+            } catch (error) {
+                console.error("Error fetching product:", error);
+            }
         };
 
         const fetchCategories = async () => {
             try {
-                const categories = await getAllCategories();
-                setCategory(categories);
+                const response = await getAllCategories();
+                setCategories(response.data || response);
             } catch (error) {
-                console.error(error);
+                console.error("Error fetching categories:", error);
             }
         };
 
@@ -60,144 +44,97 @@ const Update = (props: Props) => {
         fetchCategories();
     }, [id, form]);
 
-    const onFinish = async (values: any) => {
-        console.log("Success:", values);
-
-        const product: any = await updateProduct(id, values);
-        setName(product.name);
-        setPrice(product.price);
-        setCategory(product.category);
-        alert("success");
-
-        navigate("/admin/dashboard");
+    const onFinish = async (values: Iproduct) => {
+        try {
+            await updateProduct(id, values);
+            alert("Product updated successfully!");
+            navigate("/admin/dashboard");
+        } catch (error) {
+            console.error("Error updating product:", error);
+        }
     };
 
-    console.log(name);
-
     return (
-        <>
-            <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-                <Form form={form} onFinish={onFinish}>
-                    <div>
-                        <label className="mb-2 text-2xl text-black block">
-                            Coffee name:
-                        </label>
-                        <Form.Item
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your Coffeename!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                                placeholder="Enter Coffee name"
-                            />
-                        </Form.Item>
-                    </div>
-                    <div>
-                        <label className="mb-2 text-sm text-black block">
-                            Your price ($):
-                        </label>
-                        <div className="relative flex items-center">
-                            <Form.Item
-                                name="price"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message:
-                                            "Please input your product price!",
-                                    },
-                                ]}
-                            >
-                                <Input
-                                    className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                                    placeholder="Enter Price $$$"
-                                />
-                            </Form.Item>
-                        </div>
-                    </div>
+        <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md space-y-6 font-[sans-serif]">
+            <h2 className="text-xl font-semibold text-center text-gray-800 mb-4">Update Product</h2>
+            <Form
+                form={form}
+                onFinish={onFinish}
+                layout="vertical"
+                className="space-y-4"
+            >
+                {/* Name */}
+                <Form.Item
+                    label="Product Name"
+                    name="name"
+                    rules={[{ required: true, message: "Please enter the product name" }]}
+                >
+                    <Input placeholder="Enter product name" className="rounded" />
+                </Form.Item>
 
-                    <div>
-                        <label className="mb-2 text-sm text-black block">
-                            Quantity:
-                        </label>
-                        <Form.Item
-                            name="soLuong"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input the quantity!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                                type="number"
-                                placeholder="Enter Quantity"
-                            />
-                        </Form.Item>
-                    </div>
+                {/* Price */}
+                <Form.Item
+                    label="Price"
+                    name="price"
+                    rules={[{ required: true, message: "Please enter the product price" }]}
+                >
+                    <Input type="number" placeholder="Enter price in $" className="rounded" />
+                </Form.Item>
 
-                    <div>
-                        <label className="mb-2 text-sm text-black block">
-                            Description:
-                        </label>
-                        <Form.Item
-                            name="moTa"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please provide a description!",
-                                },
-                            ]}
-                        >
-                            <Input.TextArea
-                                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                                placeholder="Enter Coffee Description"
-                            />
-                        </Form.Item>
-                    </div>
+                {/* Quantity */}
+                <Form.Item
+                    label="Quantity"
+                    name="soLuong"
+                    rules={[{ required: true, message: "Please enter the quantity" }]}
+                >
+                    <Input type="number" placeholder="Enter quantity" className="rounded" />
+                </Form.Item>
 
-                    <div className="pt-[20px]">
-                        <Form.Item
-                            name="category"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your Category!",
-                                },
-                            ]}
-                        >
-                            <Select
-                                labelRender={labelRender}
-                                style={{ width: "100%" }}
-                            >
-                                {category.map(
-                                    (categoryID: Icategory, index: number) => (
-                                        <Select.Option
-                                            key={categoryID._id}
-                                            value={categoryID._id}
-                                        >
-                                            {categoryID.name}
-                                        </Select.Option>
-                                    )
-                                )}
-                            </Select>
-                        </Form.Item>
-                    </div>
+                {/* Description */}
+                <Form.Item
+                    label="Description"
+                    name="moTa"
+                    rules={[{ required: true, message: "Please enter a description" }]}
+                >
+                    <Input.TextArea placeholder="Enter product description" rows={4} className="rounded" />
+                </Form.Item>
 
-                    <button
-                        type="submit"
-                        className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                        Cập nhật sản phẩm
-                    </button>
-                </Form>
-            </div>
-        </>
+                {/* Category */}
+                <Form.Item
+                    label="Category"
+                    name="category"
+                    rules={[{ required: true, message: "Please select a category" }]}
+                >
+                    <Select placeholder="Select category" className="rounded">
+                        {categories.length > 0 ? (
+                            categories.map((category) => (
+                                <Select.Option key={category._id} value={category._id}>
+                                    {category.name}
+                                </Select.Option>
+                            ))
+                        ) : (
+                            <Select.Option disabled>Loading categories...</Select.Option>
+                        )}
+                    </Select>
+                </Form.Item>
+
+                {/* Image */}
+                {/* <Form.Item
+                    label="Image URL"
+                    name="img"
+                    rules={[{ required: true, message: "Please enter the image URL" }]}
+                >
+                    <Input placeholder="Enter image URL" className="rounded" />
+                </Form.Item> */}
+
+                <button
+                    type="submit"
+                    className="w-full px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+                >
+                    Update Product
+                </button>
+            </Form>
+        </div>
     );
 };
 
