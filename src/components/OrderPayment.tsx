@@ -66,20 +66,18 @@ function OrderPayment() {
       return total + (item.price || 0) * (item.quantity || 0);
     }, 0);
   
-    // Define orderData including customer details
     const orderData: IOrderData = {
-      userId: user, // Ensure user ID is available or provide a default
+      userId: user,
       items: cartItems,
       totalAmount,
       paymentMethod: selectedPaymentMethod,
-      customerDetails: customerDetails, // Include customer details here
+      customerDetails: customerDetails,
     };
   
     try {
-      console.log("Order Data:", orderData); // Log to see the order data structure
       const response = await placeOrder(orderData);
       alert("Order confirmed successfully!");
-      navigate("/order-success"); // Navigate to success page after order confirmation
+      navigate("/success", { state: { orderData } });
     } catch (error) {
       alert("Failed to confirm order. Please try again.");
     }
