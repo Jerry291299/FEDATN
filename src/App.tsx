@@ -24,7 +24,8 @@ import SearchResults from "./components/SearchResults";
 import OrderPayment from "./components/OrderPayment";
 
 import Order from "./components/admin/Order";
-import Success from "./components/Donhang";
+import Success from "./components/success";
+import Donhangpage from "./components/Donhangpage";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="/gioithieu" element={<Gioithieu />} />
           <Route path="/order" element={<OrderPayment />} />
           <Route path="/success" element={<Success />} />
+          <Route path="/listdonhang" element={<Donhangpage />} />
           <Route
             path="/admin"
             element={

@@ -77,6 +77,7 @@ function OrderPayment() {
     try {
       const response = await placeOrder(orderData);
       alert("Order confirmed successfully!");
+      setCartItems([]);
       navigate("/success", { state: { orderData } });
     } catch (error) {
       alert("Failed to confirm order. Please try again.");
