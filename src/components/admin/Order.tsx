@@ -15,16 +15,18 @@ const Order = (props: Props) => {
                 <thead className="bg-white border-b">
                   <tr>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Stt</th>
-                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">email</th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Mã đơn</th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Email</th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Địa chỉ </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Đơn hàng</th>
-                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Giá trị dơn hàng </th>
+                    <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Giá trị đơn hàng </th>
                     <th scope="col" className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái đơn hàng </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="bg-gray-100 border-b">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">1</td>
+                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">45672</td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">Hoaian12@gmail.com</td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">Hà Nội</td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">ghế sofa</td>

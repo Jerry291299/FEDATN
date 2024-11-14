@@ -146,7 +146,7 @@ const Navbar = (props: Props) => {
                 // href="javascript:;"
                 className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
               >
-                Track Order
+                Comment
               </a>
             </span>
           </div>
