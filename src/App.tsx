@@ -26,6 +26,10 @@ import OrderPayment from "./components/OrderPayment";
 import Order from "./components/admin/Order";
 import Success from "./components/success";
 import Donhangpage from "./components/Donhangpage";
+import ListMaterial from "./components/admin/Material";
+import AddMaterial from "./components/admin/modaladd/addmaterial";
+import { updateMaterial } from "./service/material";
+import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
 
 function App() {
   return (
@@ -65,13 +69,21 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Listcategory" element={<Listcategory />} />
             <Route path="addcategory" element={<Addcategory />} />
+            <Route path="Material" element={<ListMaterial />} />
+            <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
+            
             <Route
               path="Listcategory/updatecategory/:id"
               Component={Updatecategory}
             ></Route>
+            <Route
+              path="Material/updateMaterial/:id"
+              Component={UpdateMaterial}
+            ></Route>
+            
           </Route>
         </Routes>
       </BrowserRouter>
