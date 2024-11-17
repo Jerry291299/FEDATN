@@ -21,7 +21,7 @@ import Tintuc from "./components/tintuc";
 import Tintucdetail from "./components/tintucdetail";
 import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
-
+import OrderList from "./components/OrderList";
 function App() {
   return (
     <>
@@ -45,7 +45,7 @@ function App() {
           <Route path="/tintuc" element={<Tintuc />} />
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
           <Route path="/gioithieu" element={<Gioithieu />} />
-
+          <Route path="/OrderList" element={<OrderList />} />
           <Route
             path="/admin"
             element={
