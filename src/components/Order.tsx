@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import PlacedOrders from "./PlacedOrders";
+import Footer from "./Footer";
+import Header from "./Header";
 
-const Order = () => {
+const Donhang = () => {
   // Dữ liệu mẫu cho bảng
   const orders = [
     {
@@ -22,6 +24,8 @@ const Order = () => {
   ];
 
   return (
+    <>
+    <Header/>
     <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       
       <h2 className="text-xl font-semibold mb-4">DANH SÁCH ĐƠN HÀNG MỚI NHẤT</h2>
@@ -52,8 +56,10 @@ const Order = () => {
         </table>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 
 
-export default Order;
+export default Donhang;
