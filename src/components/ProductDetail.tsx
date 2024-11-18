@@ -71,29 +71,29 @@ const ProductDetail = () => {
             <div>
               <img
                 className="mb-[20px] w-[150px]"
-                src={product.img}
+                src={product?.img[1]}
                 alt={product.name}
               />
               <img
                 className="mb-[20px] w-[150px]"
-                src={product.img}
+                src={product?.img[2]}
                 alt={product.name}
               />
               <img
                 className="mb-[20px] w-[150px]"
-                src={product.img}
+                src={product?.img[3]}
                 alt={product.name}
               />
               <img
                 className="mb-[20px] w-[150px]"
-                src={product.img}
+                src={product?.img[4]}
                 alt={product.name}
               />
             </div>
             <div className="ml-[40px] mr-[30px]">
               <img
                 className="w-[690px] object-cover"
-                src={product.img}
+                src={product.img[0]}
                 alt={product.name}
               />
             </div>
