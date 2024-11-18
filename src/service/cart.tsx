@@ -40,3 +40,18 @@ export const removeFromCart = async (userId: string, productId: string) => {
     throw error;
   }
 };
+
+
+export const updateCartQuantity = async (userId: string, productId: string, newQuantity: number) => {
+  try {
+    const response = await axiosservice.put(`/${userId}/cartupdate`, {
+      productId,
+      newQuantity
+    });
+    return response.data; // Return updated cart data if needed
+  } catch (error) {
+    console.error("Failed to update cart quantity:", error);
+    throw error;
+  }
+};
+

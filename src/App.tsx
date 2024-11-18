@@ -22,8 +22,6 @@ import Tintucdetail from "./components/tintucdetail";
 import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
 import OrderList from "./components/OrderList";
-
-
 function App() {
   return (
     <>
@@ -48,7 +46,6 @@ function App() {
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
           <Route path="/gioithieu" element={<Gioithieu />} />
           <Route path="/OrderList" element={<OrderList />} />
-         
           <Route
             path="/admin"
             element={
@@ -57,7 +54,6 @@ function App() {
               </Privaterouter>
             }
           >
-      
             <Route path="add" element={<Add />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Listcategory" element={<Listcategory />} />

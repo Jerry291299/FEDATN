@@ -2,9 +2,9 @@ import React from 'react'
 import { axiosservice } from '../config/API'
 import { IProductLite } from '../interface/products';
 
-export const getAllproducts = async () => {
+export const getAllproducts = async ({limit = 10 , page = 1 } : {limit: number, page: number}) => {
   try{
-    const {data} = await axiosservice.get('product')
+    const {data} = await axiosservice.get(`product-test?page=${page}&limit=${limit}`)
     return data    
   } catch (error) {
     console.log(error);
@@ -49,3 +49,23 @@ export const DeleteProduct = async(pid:string)=> {
     
   }
 }
+
+// Hàm kích hoạt sản phẩm
+export const ActivateProduct = async (pid: string) => {
+  try {
+      const { data } = await axiosservice.put(`/product/activate/${pid}`);
+      return data;
+  } catch (error) {
+      console.log("Error activating product:", error);
+  }
+};
+
+// Hàm vô hiệu hóa sản phẩm
+export const DeactivateProduct = async (pid: string) => {
+  try {
+      const { data } = await axiosservice.put(`/product/deactivate/${pid}`);
+      return data;
+  } catch (error) {
+      console.log("Error deactivating product:", error);
+  }
+};

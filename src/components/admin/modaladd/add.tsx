@@ -1,39 +1,19 @@
-import { Form, FormProps, Input, Select, SelectProps } from "antd";
 import React, { useEffect, useState } from "react";
+import { Form, Input, Select, message, Upload } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { addProduct } from "../../../service/products";
-import { Iproduct } from "../../../interface/products";
-import { useNavigate } from "react-router-dom";
-import { Button, message } from "antd";
-import { upload } from "../../../service/upload";
-import { url } from "inspector";
-
 import { Icategory } from "../../../interface/category";
 import { getAllCategories } from "../../../service/category";
+import { upload } from "../../../service/upload";
 import LoadingComponent from "../../Loading";
 
-type Props = {};
-type LabelRender = SelectProps["labelRender"];
-const Add = (props: Props) => {
-  const [name, setName] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
-  const [img, setImg] = useState<string>("");
+const Add = () => {
   const [category, setCategory] = useState<Icategory[]>([]);
-  const [products, setProducts] = useState<Iproduct[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const [tailen, setTailen] = useState<any>(null);
-  const navigate = useNavigate();
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState<boolean>(false)
-  
-  
-  
-  
-  const info = () => {
-    messageApi.open({
-      type: "success",
-      content: "Product added successfully",
-    });
-  };
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -41,66 +21,83 @@ const Add = (props: Props) => {
         const data = await getAllCategories();
         setCategory(data);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching categories:", error);
       }
     };
     fetchCategories();
   }, []);
 
-  const labelRender: LabelRender = (props) => {
-    const { label, value } = props;
+  const activeCategories = category.filter((cat) => cat.status === "active");
 
-    if (label) {
-      return value;
-    }
-    return <span>Please choose the category: </span>;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const newFiles = Array.from(e.target.files);
+    setFiles((prev) => [...prev, ...newFiles]);
+
+    // Generate image previews
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setPreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const uploadImage = async (files: any) => {
-    const formdata = new FormData();
-    formdata.append("images", files);
-    const upImage = await upload(formdata);
-    console.log(upImage, "url img");
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    const urls: string[] = [];
 
-    console.log(upImage.payload[0].url);
-    return upImage.payload[0].url;
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("images", file);
+
+      try {
+        const response = await upload(formData);
+        const imageUrl = response.payload[0].url; // Adjust based on your API structure
+        urls.push(imageUrl);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+
+    return urls;
   };
 
   const onFinish = async (values: any) => {
-    console.log("Success:", values);
-    setLoading(true)
-    const fileResult = await uploadImage(tailen);
-    const payload = {
-      ...values,
-      moTa: values.moTa,
-      soLuong: values.soLuong,
-      img: fileResult,
-      categoryID: values.category,
-    };
-    console.log(values);
+    setLoading(true);
 
-    const product = await addProduct(payload);
-    console.log(product);
+    try {
+      const imageUrls = await uploadImages(files);
 
-    const newproducts = [product];
-    setProducts(newproducts);
-    setName("");
-    setImg("");
-    setPrice(0);
-    setCategory([]);
-    info()
+      const payload = {
+        ...values,
+        moTa: values.moTa,
+        soLuong: values.soLuong,
+        img: imageUrls, // Array of image URLs
+        categoryID: values.category,
+        status: true, // Default status is active
+      };
 
-    form.resetFields();
-    setLoading(false)
+      await addProduct(payload);
+      message.success("Product added successfully!");
+      form.resetFields();
+      setFiles([]);
+      setPreviews([]);
+    } catch (error) {
+      console.error("Error adding product:", error);
+      message.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <>
-    
-    {loading && <LoadingComponent />}
+      {loading && <LoadingComponent />}
       {contextHolder}
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-        <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>
+        <Form form={form} onFinish={onFinish}>
           <div>
             <label className="mb-2 text-2xl text-black block">
               Tên sản phẩm:
@@ -111,112 +108,95 @@ const Add = (props: Props) => {
                 { required: true, message: "Bắt buộc nhập tên Sản Phẩm!" },
               ]}
             >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
-              />
+              <Input placeholder="Enter product name" />
             </Form.Item>
           </div>
 
           <div>
-            <label className="mb-2 text-2xl text-black block">
-              Số Lượng
-            </label>
+            <label className="mb-2 text-2xl text-black block">Số Lượng</label>
             <Form.Item
               name="soLuong"
+              rules={[{ required: true, message: "Bắt buộc nhập số lượng!" }]}
+            >
+              <Input type="number" placeholder="Enter product quantity" />
+            </Form.Item>
+          </div>
+          <label className="mb-2 text-2xl text-black block">
+            Giá sản phẩm:
+          </label>
+          <div className="relative flex items-center">
+            <Form.Item
+              name="price"
               rules={[
-                { required: true, message: "Bắt buộc nhập tên sl!" },
+                {
+                  required: true,
+                  message: "Please input your product price!",
+                },
               ]}
             >
               <Input
+                type="number"
                 className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
+                placeholder="Enter Price $$$"
               />
             </Form.Item>
           </div>
 
           <div>
-            <label className="mb-2 text-2xl text-black block">
-              Mô tả
-            </label>
+            <label className="mb-2 text-2xl text-black block">Mô tả</label>
             <Form.Item
               name="moTa"
-              rules={[
-                { required: true, message: "Bắt buộc nhập tên mt!" },
-              ]}
+              rules={[{ required: true, message: "Bắt buộc nhập mô tả!" }]}
             >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter product name"
-              />
+              <Input placeholder="Enter product description" />
             </Form.Item>
           </div>
-          
+
           <div>
             <label className="mb-2 text-sm text-black block">
-              Your price ($):
+              Ảnh sản phẩm:
             </label>
-            <div className="relative flex items-center">
-              <Form.Item
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your product price!",
-                  },
-                ]}
-              >
-                <Input
-                  className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                  placeholder="Enter Price $$$"
-                />
-              </Form.Item>
-              <div className="absolute left-4"></div>
+            <div className="flex flex-wrap gap-4 mb-4">
+              {previews.map((preview, index) => (
+                <div key={index} className="relative w-24 h-24">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index}`}
+                    className="w-full h-full object-cover rounded"
+                  />
+                  <button
+                    onClick={() => removeImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
             </div>
-
-            <label className="mb-2 text-sm text-black block">Your Image:</label>
-            <div className="relative flex items-center">
-              <Form.Item
-                name="img"
-                rules={[
-                  {
-                    required: false,
-                    message: "Please input your product image!",
-                  },
-                ]}
-              >
-                <Input
-                  type="file"
-                  onChange={(e: any) => {
-                    setTailen(e.target.files[0]);
-                  }}
-                  className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                  placeholder="Enter product image"
-                />
-              </Form.Item>
-              <div className="absolute left-4"></div>
-            </div>
-
-            <div className="pt-[20px]">
-              <Form.Item
-                name="category"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your Category!",
-                  },
-                ]}
-              >
-                <Select labelRender={labelRender} style={{ width: "100%" }}>
-                  {category.map((categoryID: Icategory, index: number) => (
-                    <Select.Option key={categoryID._id} value={categoryID._id}>
-                      {categoryID.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
+            <Input type="file" multiple onChange={handleFileChange} />
           </div>
+
+          <div>
+            <label className="mb-2 text-sm text-black block">Danh mục:</label>
+            <Form.Item
+              name="category"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a category!",
+                },
+              ]}
+            >
+              <Select style={{ width: "100%" }}>
+                {activeCategories.map((categoryID: Icategory) => (
+                  <Select.Option key={categoryID._id} value={categoryID._id}>
+                    {categoryID.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
+
           <button
             type="submit"
             className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
