@@ -1,16 +1,15 @@
 import React from "react";
-import PlacedOrders from "./PlacedOrders";
+import Order from "./Order";
 
-const Order = () => {
-  // Dữ liệu mẫu cho bảng
-  const orders = [
+const PlacedOrders = () => {
+  // Dữ liệu mẫu cho các đơn hàng đã đặt
+  const placedOrders = [
     {
       id: "DH125894",
       date: "15/11/2024",
       amount: "9,015,500đ",
       paymentStatus: "Đang chờ xử lý",
       shippingStatus: "Chưa giao hàng",
-
     },
     {
       id: "DH125895",
@@ -19,14 +18,21 @@ const Order = () => {
       paymentStatus: "Đã thanh toán",
       shippingStatus: "Đang vận chuyển",
     },
+    {
+      id: "DH125896",
+      date: "13/11/2024",
+      amount: "3,200,000đ",
+      paymentStatus: "Đã thanh toán",
+      shippingStatus: "Đã giao hàng",
+    },
   ];
 
   return (
     <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      
-      <h2 className="text-xl font-semibold mb-4">DANH SÁCH ĐƠN HÀNG MỚI NHẤT</h2>
+      {/* Tiêu đề */}
+      <h2 className="text-xl font-semibold mb-4">DANH SÁCH ĐƠN HÀNG ĐÃ ĐẶT</h2>
 
-   
+      {/* Bảng đơn hàng */}
       <div className="overflow-x-auto">
         <table className="w-full table-auto border-collapse border border-gray-200">
           <thead>
@@ -39,7 +45,7 @@ const Order = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
+            {placedOrders.map((order, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2">{order.id}</td>
                 <td className="border border-gray-300 px-4 py-2">{order.date}</td>
@@ -55,5 +61,4 @@ const Order = () => {
   );
 };
 
-
-export default Order;
+export default PlacedOrders;
