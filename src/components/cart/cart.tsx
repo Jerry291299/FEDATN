@@ -145,7 +145,7 @@ const Cart = () => {
                       <td className="p-4">
                         <div className="w-20 h-20 shrink-0 bg-white p-2 rounded-md border border-gray-200">
                           <img
-                            src={item.img}
+                            src={item?.img[0]}
                             alt={item.name}
                             className="w-full h-full object-contain"
                           />
