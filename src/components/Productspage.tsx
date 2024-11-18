@@ -64,7 +64,7 @@ const Productspage = (props: Props) => {
             >
               <NavLink to={`/product/${product._id}`}>
                 <img
-                  src={product.img[0]}
+                  src={product.img}
                   alt={product.name}
                   className="h-56 w-full object-cover rounded-t-lg"
                 />
