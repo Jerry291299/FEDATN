@@ -50,7 +50,7 @@ const Success = () => {
             <h2 className="text-lg font-bold mb-4">Chi tiết đơn hàng</h2>
             {orderData.items.map((item, index) => (
               <div key={index} className="flex items-center gap-4 border-b border-gray-300 pb-4 mb-4">
-                <img src={item.img} alt={item.name} className="w-20 h-20 object-cover rounded" />
+                <img src={item?.img[0]} alt={item.name} className="w-20 h-20 object-cover rounded" />
                 <div>
                   <p className="font-semibold">{item.name} x {item.quantity}</p>
                   <p className="text-gray-500 font-medium">
