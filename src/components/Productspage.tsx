@@ -7,6 +7,7 @@ import { getAllproducts } from "../service/products";
 import { getAllCategories } from "../service/category";
 import { NavLink } from "react-router-dom";
 import LoadingComponent from "./Loading";
+import { Pagination } from "antd";
 
 type Props = {};
 
@@ -14,23 +15,39 @@ const Productspage = (props: Props) => {
   const [products, setProducts] = useState<Iproduct[]>([]);
   const [category, setCategory] = useState<Icategory[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [pageConfig, setPageConfig] = useState<any>()
+  const [page, setPage] = useState<any>({
+    limit: 5,
+    currentPage: 1,
+  })
+  
 
+
+  const fetchData = async (currentPage : number) => {
+    try {
+      setLoading(true);
+      const data = await getAllproducts({limit: page.limit, page:currentPage});
+      const danhmuc = await getAllCategories();
+      setProducts(data?.docs);
+      setPageConfig(data)
+      console.log(data?.docs, "data");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const sanpham = await getAllproducts({ limit: 10, page: 1 });
-        const danhmuc = await getAllCategories();
-        setProducts(sanpham.docs || []);
-        setCategory(danhmuc);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+   
+    fetchData(1);
   }, []);
+
+  const handlePageChange = (currentPage: number) => {
+    setPage((prev : any)   => {
+      return {...prev, currentPage: currentPage}
+    });
+    fetchData(currentPage || 0)
+  };
 
   return (
     <>
@@ -67,6 +84,8 @@ const Productspage = (props: Props) => {
             </article>
           ))}
         </div>
+        <Pagination align="center" onChange={handlePageChange} pageSize= {pageConfig?.limit}  total={pageConfig?.totalDocs || 0} current={page.currentPage}/>
+
       </section>
 
       <Footer />
