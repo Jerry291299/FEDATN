@@ -53,32 +53,30 @@ const Content = (props: Props) => {
       
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
                     {products.slice(0, 8).map((product: Iproduct, index: number) => (
-                        <article key={index} className="relative flex flex-col overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                            <NavLink to={`/product/${product._id}`} className="flex-shrink-0">
-                                <img
-                                    src={product.img}
-                                    alt={product.name}
-                                    className="h-56 w-full object-cover"
-                                />
-                            </NavLink>
-                            <div className="flex flex-col p-4 bg-white">
-                                <h2 className="text-lg font-semibold text-gray-800">
-                                    {product.name}
-                                </h2>
-                                {/* <p className="text-sm text-gray-500 mt-1">
-                                    Category: {category.find(cat => cat._id === product.category)?.name || 'Unknown'}
-                                </p> */}
-                                <p className="mt-2 text-lg font-bold text-green-600">
-                                    ${product.price}
-                                </p>
-                                <NavLink
-                                    to={`/product/${product._id}`}
-                                    className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600"
-                                >
-                                    View Details
-                                </NavLink>
-                            </div>
-                        </article>
+                         <article
+                         key={product._id}
+                         className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
+                       >
+                         <NavLink to={`/product/${product._id}`}>
+                           <img
+                             src={product.img[0]}
+                             alt={product.name}
+                             className="h-56 w-full object-cover rounded-t-lg"
+                           />
+                           <div className="p-4">
+                             <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+                             <p className="text-sm text-gray-500">{product.moTa}</p>
+                             <p className="text-xl font-bold text-red-600">
+                               ${product.price}
+                             </p>
+                           </div>
+                           <div className="p-4">
+                             <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                               View Details
+                           </button>
+                           </div>
+                         </NavLink>
+                       </article>
                     ))}
                 </div>
       <div className="grid grid-cols-2 gap-4">
