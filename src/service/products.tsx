@@ -2,7 +2,7 @@ import React from 'react'
 import { axiosservice } from '../config/API'
 import { IProductLite } from '../interface/products';
 
-export const getAllproducts = async ({limit = 10 , page = 1 } : {limit: number, page: number}) => {
+export const getAllproducts = async ({limit = 10 , page = 1 , category} : {limit: number, page: number , category?: string;}) => {
   try{
     const {data} = await axiosservice.get(`product-test?page=${page}&limit=${limit}`)
     return data    
@@ -69,3 +69,13 @@ export const DeactivateProduct = async (pid: string) => {
       console.log("Error deactivating product:", error);
   }
 };
+
+// hàm lọc sản phẩm theo danh mục
+export const getProductsByCategory = async (categoryId: string) => {
+  try {
+    const { data } = await axiosservice.get(`/products/category/${categoryId}`);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
