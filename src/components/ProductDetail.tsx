@@ -11,10 +11,11 @@ import { Icart } from "../interface/cart";
 import CommentSection from "../interface/comment";
 
 const ProductDetail = () => {
-  const [products, setProducts] = useState<Iproduct[]>([]); // Dữ liệu sản phẩm khác
+  const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
   const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
   const { id } = useParams<{ id: string }>(); // Lấy id sản phẩm từ URL
   const [product, setProduct] = useState<Iproduct | undefined>(undefined);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // Ảnh đang hiển thị lớn
   const Globalstate = useContext(Cartcontext);
   const [user, setUser] = useState<IUser | null>(null);
 
@@ -37,6 +38,9 @@ const ProductDetail = () => {
       try {
         const data = await getProductByID(id);
         setProduct(data);
+        if (Array.isArray(data.img) && data.img.length > 0) {
+          setSelectedImage(data.img[0]); // Đặt ảnh đầu tiên làm ảnh chính
+        }
       } catch (error) {
         console.log("Failed to fetch product by ID", error);
       }
@@ -63,40 +67,40 @@ const ProductDetail = () => {
   return (
     <>
       <Header />
-      
-        
-       <div className="container mx-auto w-[1400px] pt-[100px]">
+
+      <div className="container mx-auto w-[1400px] pt-[100px]">
         {product && (
           <div className="container mx-auto w-[1300px] flex">
-            <div>
-              <img
-                className="mb-[20px] w-[150px]"
-                src={product?.img[1]}
-                alt={product?.name}
-              />
-              <img
-                className="mb-[20px] w-[150px]"
-                src={product?.img[2]}
-                alt={product?.name}
-              />
-              <img
-                className="mb-[20px] w-[150px]"
-                src={product?.img[3]}
-                alt={product?.name}
-              />
-              <img
-                className="mb-[20px] w-[150px]"
-                src={product?.img[4]}
-                alt={product?.name}
-              />
+            {/* Danh sách ảnh nhỏ */}
+            <div className="flex flex-col gap-4">
+              {Array.isArray(product?.img) &&
+                product.img.map((image, index) => (
+                  <img
+                    key={index}
+                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${
+                      selectedImage === image
+                        ? "border-blue-500"
+                        : "border-gray-200"
+                    } cursor-pointer`}
+                    src={image}
+                    alt={`Product image ${index + 1}`}
+                    onClick={() => setSelectedImage(image)} // Đặt ảnh được chọn
+                  />
+                ))}
             </div>
+
+            {/* Ảnh lớn */}
             <div className="ml-[40px] mr-[30px]">
-              <img
-                className="w-[690px] object-cover"
-                src={product.img[0]}
-                alt={product.name}
-              />
+              {selectedImage && (
+                <img
+                  className="w-[690px] h-[690px] object-cover rounded-lg border border-gray-200"
+                  src={selectedImage}
+                  alt={product.name}
+                />
+              )}
             </div>
+
+            {/* Thông tin sản phẩm */}
             <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
               <h1 className="text-xl font-bold text-black-800">
                 {product.name}
@@ -176,42 +180,47 @@ const ProductDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Danh sách sản phẩm tương tự */}
         <div className="border-t-2 border-black mt-[40px]"></div>
-       <section className="py-10">
-                <h1 className="mb-12 text-center font-sans text-4xl font-bold">
-                    Sản phẩm tương tự 
-                </h1>
-                <div className="container mx-auto grid grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {products.slice(0, 8).map((product: Iproduct, index: number) => (
-                        <article key={index} className="relative flex flex-col overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                            <NavLink to={`/product/${product._id}`} className="flex-shrink-0">
-                                <img
-                                    src={product.img[0]}
-                                    alt={product.name}
-                                    className="h-56 w-full object-cover"
-                                />
-                            </NavLink>
-                            <div className="flex flex-col p-4 bg-white">
-                                <h2 className="text-lg font-semibold text-gray-800">
-                                    {product.name}
-                                </h2>
-                                {/* <p className="text-sm text-gray-500 mt-1">
-                                    Category: {category.find(cat => cat._id === product.category)?.name || 'Unknown'}
-                                </p> */}
-                                <p className="mt-2 text-lg font-bold text-green-600">
-                                    ${product.price}
-                                </p>
-                                <NavLink
-                                    to={`/product/${product._id}`}
-                                    className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600"
-                                >
-                                    View Details
-                                </NavLink>
-                            </div>
-                        </article>
-                    ))}
+        <section className="py-10">
+          <h1 className="mb-12 text-center font-sans text-4xl font-bold">
+            Sản phẩm tương tự
+          </h1>
+          <div className="container mx-auto grid grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.slice(0, 8).map((product: Iproduct, index: number) => (
+              <article
+                key={index}
+                className="relative flex flex-col overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105"
+              >
+                <NavLink
+                  to={`/product/${product._id}`}
+                  className="flex-shrink-0"
+                >
+                  <img
+                    src={product.img[0]}
+                    alt={product.name}
+                    className="h-56 w-full object-cover"
+                  />
+                </NavLink>
+                <div className="flex flex-col p-4 bg-white">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {product.name}
+                  </h2>
+                  <p className="mt-2 text-lg font-bold text-green-600">
+                    ${product.price}
+                  </p>
+                  <NavLink
+                    to={`/product/${product._id}`}
+                    className="mt-auto inline-block rounded-lg bg-blue-500 px-4 py-2 text-center text-white transition-all duration-200 hover:bg-blue-600"
+                  >
+                    Chi tiết
+                  </NavLink>
                 </div>
-            </section>
+              </article>
+            ))}
+          </div>
+        </section>
         <div className="pt-[50px]">
           {user ? (
             <CommentSection productId={id || ""} user={user} />
@@ -220,9 +229,8 @@ const ProductDetail = () => {
           )}
         </div>
       </div>
-       
-      
       <Footer />
+      {/* <CommentSection /> */}
     </>
   );
 };
