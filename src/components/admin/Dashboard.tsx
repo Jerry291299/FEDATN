@@ -13,21 +13,27 @@ type Props = {};
 
 const Dashboard = (props: Props) => {
   const [products, setProduct] = useState<Iproduct[]>([]);
-  const [filterName, setFilterName] = useState<string>(""); 
+
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
-  const [pageConfig, setPageConfig] = useState<any>()
+  const [pageConfig, setPageConfig] = useState<any>();
   const [page, setPage] = useState<any>({
     limit: 5,
     currentPage: 1,
-  })
+  });
 
-  const fetchData = async (currentPage : number) => {
+  const fetchData = async (currentPage: number) => {
     try {
       setLoading(true);
-      const data = await getAllproducts({limit: page.limit, page:currentPage});
+      const data = await getAllproducts({
+        limit: page.limit,
+        page: currentPage,
+      });
       setProduct(data?.docs);
-      setPageConfig(data)
+      setPageConfig(data);
       console.log(data?.docs, "data");
     } catch (error) {
       console.log(error);
@@ -36,7 +42,6 @@ const Dashboard = (props: Props) => {
     }
   };
   useEffect(() => {
-   
     fetchData(1);
   }, []);
 
@@ -44,14 +49,13 @@ const Dashboard = (props: Props) => {
     navigate(`update/${id}`);
   };
 
- 
 
-  
+  // Xử lý khi người dùng chuyển trang
   const handlePageChange = (currentPage: number) => {
-    setPage((prev : any)   => {
-      return {...prev, currentPage: currentPage}
+    setPage((prev: any) => {
+      return { ...prev, currentPage: currentPage };
     });
-    fetchData(currentPage || 0)
+    fetchData(currentPage || 0);
   };
 
 
@@ -68,9 +72,11 @@ const Dashboard = (props: Props) => {
       const updatedProducts = products.map((product) =>
         product._id === id
           ? {
-            ...product,
-            status: !status, 
-          }
+
+              ...product,
+              status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
+            }
+
           : product
       );
 
@@ -82,10 +88,17 @@ const Dashboard = (props: Props) => {
   };
 
 
+  // Lọc danh sách sản phẩm dựa trên tên sản phẩm và tên danh mục
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(filterName.toLowerCase()) &&
+      (selectedCategory === "" ||
+        product.category.name.toLowerCase() === selectedCategory.toLowerCase())
+  );
+  // Tạo một mảng mới chứa các danh mục duy nhất
+  const uniqueCategories = Array.from(
+    new Set(products.map((product) => product.category.name))
 
-  
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(filterName.toLowerCase())
   );
 
   return (
@@ -105,6 +118,20 @@ const Dashboard = (props: Props) => {
         onChange={(e) => setFilterName(e.target.value)}
         className="mb-4 p-2 border border-gray-300 rounded"
       />
+
+      {/* lọc sản phẩm theo danh mục */}
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+        className="mb-4 p-2 border border-gray-300 rounded"
+      >
+        <option value="">All Categories</option>
+        {uniqueCategories.map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
 
       <div className="mb-[20px] flex flex-col w-full">
         <div className="overflow-x-auto">
@@ -170,56 +197,69 @@ const Dashboard = (props: Props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map(
-                    (product: Iproduct, index: number) => (
-                      <tr
-                        className="bg-gray-100 border-b"
-                        key={product._id}
+                  {filteredProducts.map((product: Iproduct, index: number) => (
+                    <tr className="bg-gray-100 border-b" key={product._id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {product.name}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {product.price}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {product?.category?.name}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {product.soLuong}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {product.moTa}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        <img className="w-[100px]" src={product?.img} alt="" />
+                      </td>
+                      <td
+                        className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${
+                          product.status === true
+                            ? "text-green-700"
+                            : "text-red-700"
+                        }`}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {index + 1}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {product.name}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {product.price}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {product?.category?.name}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {product.soLuong}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {product.moTa}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          <img
-                            className="w-[100px]"
-                            src={product?.img[0]}
-                            alt=""
-                          />
-                        </td>
-                        <td className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${product.status === true ? "text-green-700" : 'text-red-700'}`}>
-                          {product.status === true
-                            ? "Hoạt động"
-                            : "Vô hiệu hóa"}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() =>
-                              updateProduct(
-                                product._id
-                              )
-                            }
-                            type="button"
-                            className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                          >
-                            Edit
-                          </button>
 
-                         
+                        {product.status === true ? "Hoạt động" : "Vô hiệu hóa"}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => updateProduct(product._id)}
+                          type="button"
+                          className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                        >
+                          Edit
+                        </button>
+
+                        {/* Nút Active/Deactive */}
+                        <Popconfirm
+                          title="Are you sure?"
+                          onConfirm={() =>
+                            toggleProductStatus(product._id, product.status)
+                          }
+                          okText="Yes"
+                          cancelText="No"
+                        >
+
+                          <button
+                            type="button"
+                            className={`focus:outline-none text-white ${
+                              product.status === true
+                                ? "bg-red-700 hover:bg-red-800"
+                                : "bg-green-700 hover:bg-green-800"
+                            } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
+                          >
+                            {product.status === true ? "Deactive" : "Active"}
+                          </button>
+        
                           <Popconfirm
                             title="Are you sure?"
                             onConfirm={() =>
@@ -249,13 +289,22 @@ const Dashboard = (props: Props) => {
                       </tr>
                     )
                   )}
+
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
-      <Pagination align="start" onChange={handlePageChange} pageSize= {pageConfig?.limit}  total={pageConfig?.totalDocs || 0} current={page.currentPage}/>
+
+      <Pagination
+        align="start"
+        onChange={handlePageChange}
+        pageSize={pageConfig?.limit}
+        total={pageConfig?.totalDocs || 0}
+        current={page.currentPage}
+      />
+
     </>
   );
 };

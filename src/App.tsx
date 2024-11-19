@@ -22,7 +22,7 @@ import Tintucdetail from "./components/tintucdetail";
 import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
 import OrderPayment from "./components/OrderPayment";
-
+import CategorisPage from "./components/CategorisPage";
 import Order from "./components/admin/Orderadmin";
 import Success from "./components/success";
 import Donhangpage from "./components/Donhangpage";
@@ -39,8 +39,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />}></Route>
-
+          <Route path="/categories/:id" element={<CategorisPage />} />
+          
           <Route path="/products" element={<Productspage />} />
+          <Route path="/products/categories/:id" element={<Productspage />} />
           <Route path="/search/:searchTerm" element={<SearchResults />} />
           <Route
             path="/Cart/:id"
