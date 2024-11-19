@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Popconfirm, message } from "antd";
-import { getAllusers, activateUser, deactivateUser } from "../../service/user";
+import { getAllusersAccount, activateUser, deactivateUser } from "../../service/user";
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
 import { NavLink } from "react-router-dom";
@@ -16,7 +16,7 @@ const Users = (props: Props) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getAllusers();
+        const data = await getAllusersAccount();
         setUser(data);
         console.log(data, "data");
 
@@ -28,12 +28,9 @@ const Users = (props: Props) => {
       }
     };
 
-    const storedUsers = localStorage.getItem("users");
-    if (storedUsers) {
-      setUser(JSON.parse(storedUsers));
-    } else {
+   
       fetchData();
-    }
+    
   }, []);
 
 const deactivateUserById = async (_id: string) => {

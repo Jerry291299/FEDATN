@@ -13,7 +13,7 @@ type Props = {};
 
 const Dashboard = (props: Props) => {
   const [products, setProduct] = useState<Iproduct[]>([]);
-  const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
+  const [filterName, setFilterName] = useState<string>(""); 
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [pageConfig, setPageConfig] = useState<any>()
@@ -46,7 +46,7 @@ const Dashboard = (props: Props) => {
 
  
 
-  // Xử lý khi người dùng chuyển trang
+  
   const handlePageChange = (currentPage: number) => {
     setPage((prev : any)   => {
       return {...prev, currentPage: currentPage}
@@ -54,36 +54,36 @@ const Dashboard = (props: Props) => {
     fetchData(currentPage || 0)
   };
 
-  // Hàm cập nhật trạng thái sản phẩm
+
   const toggleProductStatus = async (id: string, status: boolean) => {
     try {
-      // Kiểm tra trạng thái hiện tại của sản phẩm và gọi API thích hợp
+      
       if (status) {
-        await DeactivateProduct(id); // Gọi API để vô hiệu hóa sản phẩm
+        await DeactivateProduct(id); 
       } else {
-        await ActivateProduct(id); // Gọi API để kích hoạt sản phẩm
+        await ActivateProduct(id); 
       }
 
-      // Cập nhật lại trạng thái của sản phẩm trong danh sách
+     
       const updatedProducts = products.map((product) =>
         product._id === id
           ? {
             ...product,
-            status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
+            status: !status, 
           }
           : product
       );
 
-      setProduct(updatedProducts); // Cập nhật lại danh sách sản phẩm sau khi thay đổi trạng thái
+      setProduct(updatedProducts);
     } catch (error) {
       console.error("Error toggling product status:", error);
-      // Xử lý lỗi nếu có
+      
     }
   };
 
 
 
-  // Lọc danh sách sản phẩm dựa trên tên sản phẩm
+  
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(filterName.toLowerCase())
   );
@@ -97,7 +97,7 @@ const Dashboard = (props: Props) => {
         </button>
       </NavLink>
 
-      {/* Trường nhập để lọc sản phẩm theo tên */}
+      
       <input
         type="text"
         placeholder="Lọc theo tên sản phẩm"
@@ -197,7 +197,7 @@ const Dashboard = (props: Props) => {
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           <img
                             className="w-[100px]"
-                            src={product?.img}
+                            src={product?.img[0]}
                             alt=""
                           />
                         </td>
@@ -219,7 +219,7 @@ const Dashboard = (props: Props) => {
                             Edit
                           </button>
 
-                          {/* Nút Active/Deactive */}
+                         
                           <Popconfirm
                             title="Are you sure?"
                             onConfirm={() =>
@@ -255,7 +255,7 @@ const Dashboard = (props: Props) => {
           </div>
         </div>
       </div>
-      <Pagination align="end" onChange={handlePageChange} pageSize= {pageConfig?.limit}  total={pageConfig?.totalDocs || 0} current={page.currentPage}/>
+      <Pagination align="start" onChange={handlePageChange} pageSize= {pageConfig?.limit}  total={pageConfig?.totalDocs || 0} current={page.currentPage}/>
     </>
   );
 };

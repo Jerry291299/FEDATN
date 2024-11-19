@@ -70,7 +70,8 @@ const Productspage = (props: Props) => {
                 />
                 <div className="p-4">
                   <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-                  <p className="text-sm text-gray-500">{product.moTa}</p>
+                  <p className="text-md text-gray-400">{product?.category?.name}</p>
+                  <p className="text-sm text-gray-500">{product?.moTa}</p>
                   <p className="text-xl font-bold text-red-600">
                     ${product.price}
                   </p>

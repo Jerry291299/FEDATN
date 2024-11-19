@@ -48,18 +48,18 @@ const Login = (props: Props) => {
           <div className="md:max-w-md w-full sm:px-6 py-4">
             <form onSubmit={handleSubmit}>
               <div className="mb-12">
-                <h3 className="text-3xl font-extrabold">Sign in</h3>
+                <h3 className="text-3xl font-bold">Đăng nhập</h3>
                 <p className="text-sm mt-4 pb-[10px] flex">
-                  Don't have an account?{" "}
+                  Chưa có tài khoản?{" "}
                   <NavLink to={"/register"} className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
-                    Register here
+                    Đăng ký tại đây!
                   </NavLink>
                 </p>
                 <NavLink
                   to={"/"}
                   className="text-blue-400 font-semibold hover:underline ml-1 whitespace-nowrap"
                 >
-                  Back to Home
+                  Quay về trang chủ
                 </NavLink>
               </div>
               <div>
@@ -71,12 +71,12 @@ const Login = (props: Props) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none"
-                    placeholder="Enter email"
+                    placeholder="Mời nhập Email"
                   />
                 </div>
               </div>
               <div className="mt-8">
-                <label className="text-xs block mb-2">Password</label>
+                <label className="text-xs block mb-2">Mật khẩu</label>
                 <div className="relative flex items-center">
                   <input
                     name="password"
@@ -84,7 +84,7 @@ const Login = (props: Props) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none"
-                    placeholder="Enter password"
+                    placeholder="Mời nhập mật khẩu"
                   />
                 </div>
               </div>
@@ -105,12 +105,12 @@ const Login = (props: Props) => {
                     }}
                   />
                   <label htmlFor="remember-me" className="ml-3 block text-sm">
-                    Remember me
+                    Ghi nhớ đăng nhập
                   </label>
                 </div>
                 <div>
                   <button className="text-blue-600 font-semibold text-sm hover:underline">
-                    Forgot Password?
+                    Quên mật khẩu
                   </button>
                 </div>
               </div>
@@ -119,7 +119,7 @@ const Login = (props: Props) => {
                   type="submit"
                   className="w-full shadow-xl py-2.5 px-4 text-sm font-semibold rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                 >
-                  Sign in
+                  Đăng nhập
                 </button>
               </div>
             </form>

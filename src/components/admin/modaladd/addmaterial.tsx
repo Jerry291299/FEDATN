@@ -24,6 +24,7 @@ const AddMaterial = () => {
       if (material) {
         console.log("Added Material:", material);
         info();
+        message.success("Thêm Chất Liệu thành công!");
         form.resetFields();
         navigate("/admin/Material"); // Điều hướng người dùng đến trang ListMaterial sau khi thêm thành công
       } else {
