@@ -80,8 +80,29 @@ const Productspage = (props: Props) => {
                 selectedCategory === category._id ? 'bg-blue-500 text-white' : 'bg-gray-200'
               }`}
             >
-              {category.name}
-            </NavLink>
+
+              <NavLink to={`/product/${product._id}`}>
+                <img
+                  src={product.img[0]}
+                  alt={product.name}
+                  className="h-56 w-full object-cover rounded-t-lg"
+                />
+                <div className="p-4">
+                  <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+                  <p className="text-md text-gray-400">{product?.category?.name}</p>
+                  <p className="text-sm text-gray-500">{product?.moTa}</p>
+                  <p className="text-xl font-bold text-red-600">
+                    ${product.price}
+                  </p>
+                </div>
+                <div className="p-4">
+                  <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                    View Details
+                </button>
+                </div>
+              </NavLink>
+            </article>
+
           ))}
         </div>
 

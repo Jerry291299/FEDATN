@@ -3,9 +3,9 @@ import { axiosservice } from '../config/API'
 import { IUserLogin, IUserRegister } from '../interface/user'
 import axios from "axios";
 
-export const getAllusers = async () => {
+export const getAllusersAccount = async () => {
   try{
-    const {data} = await axiosservice.get('users')
+    const {data} = await axiosservice.get('usersaccount')
 
     // console.log('getAllusers', data);
     

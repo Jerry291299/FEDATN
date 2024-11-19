@@ -75,12 +75,12 @@ const Add = () => {
       };
 
       await addProduct(payload);
-      message.success("Product added successfully!");
+      message.success("Thêm Sản Phẩm thành công!");
       form.resetFields();
       setFiles([]);
       setPreviews([]);
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Lỗi thêm sản phẩm:", error);
       message.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);

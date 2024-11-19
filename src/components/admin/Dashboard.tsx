@@ -13,8 +13,10 @@ type Props = {};
 
 const Dashboard = (props: Props) => {
   const [products, setProduct] = useState<Iproduct[]>([]);
+
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [pageConfig, setPageConfig] = useState<any>();
@@ -47,6 +49,7 @@ const Dashboard = (props: Props) => {
     navigate(`update/${id}`);
   };
 
+
   // Xử lý khi người dùng chuyển trang
   const handlePageChange = (currentPage: number) => {
     setPage((prev: any) => {
@@ -55,32 +58,35 @@ const Dashboard = (props: Props) => {
     fetchData(currentPage || 0);
   };
 
-  // Hàm cập nhật trạng thái sản phẩm
+
   const toggleProductStatus = async (id: string, status: boolean) => {
     try {
-      // Kiểm tra trạng thái hiện tại của sản phẩm và gọi API thích hợp
+      
       if (status) {
-        await DeactivateProduct(id); // Gọi API để vô hiệu hóa sản phẩm
+        await DeactivateProduct(id); 
       } else {
-        await ActivateProduct(id); // Gọi API để kích hoạt sản phẩm
+        await ActivateProduct(id); 
       }
 
-      // Cập nhật lại trạng thái của sản phẩm trong danh sách
+     
       const updatedProducts = products.map((product) =>
         product._id === id
           ? {
+
               ...product,
               status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
             }
+
           : product
       );
 
-      setProduct(updatedProducts); // Cập nhật lại danh sách sản phẩm sau khi thay đổi trạng thái
+      setProduct(updatedProducts);
     } catch (error) {
       console.error("Error toggling product status:", error);
-      // Xử lý lỗi nếu có
+      
     }
   };
+
 
   // Lọc danh sách sản phẩm dựa trên tên sản phẩm và tên danh mục
   const filteredProducts = products.filter(
@@ -92,6 +98,7 @@ const Dashboard = (props: Props) => {
   // Tạo một mảng mới chứa các danh mục duy nhất
   const uniqueCategories = Array.from(
     new Set(products.map((product) => product.category.name))
+
   );
 
   return (
@@ -103,7 +110,7 @@ const Dashboard = (props: Props) => {
         </button>
       </NavLink>
 
-      {/* Trường nhập để lọc sản phẩm theo tên */}
+      
       <input
         type="text"
         placeholder="Lọc theo tên sản phẩm"
@@ -220,6 +227,7 @@ const Dashboard = (props: Props) => {
                             : "text-red-700"
                         }`}
                       >
+
                         {product.status === true ? "Hoạt động" : "Vô hiệu hóa"}
                       </td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
@@ -240,6 +248,7 @@ const Dashboard = (props: Props) => {
                           okText="Yes"
                           cancelText="No"
                         >
+
                           <button
                             type="button"
                             className={`focus:outline-none text-white ${
@@ -250,23 +259,52 @@ const Dashboard = (props: Props) => {
                           >
                             {product.status === true ? "Deactive" : "Active"}
                           </button>
-                        </Popconfirm>
-                      </td>
-                    </tr>
-                  ))}
+        
+                          <Popconfirm
+                            title="Are you sure?"
+                            onConfirm={() =>
+                              toggleProductStatus(
+                                product._id,
+                                product.status
+                              )
+                            }
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <button
+                              type="button"
+                              className={`focus:outline-none text-white ${product.status ===
+                                  true
+                                  ? "bg-red-700 hover:bg-red-800"
+                                  : "bg-green-700 hover:bg-green-800"
+                                } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
+                            >
+                              {product.status ===
+                                true
+                                ? "Deactive"
+                                : "Active"}
+                            </button>
+                          </Popconfirm>
+                        </td>
+                      </tr>
+                    )
+                  )}
+
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
+
       <Pagination
-        align="end"
+        align="start"
         onChange={handlePageChange}
         pageSize={pageConfig?.limit}
         total={pageConfig?.totalDocs || 0}
         current={page.currentPage}
       />
+
     </>
   );
 };

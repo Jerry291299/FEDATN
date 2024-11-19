@@ -38,6 +38,8 @@ const Addcategory = (props: Props) => {
     setName("");
      
     info();
+    message.success("Thêm Danh Mục thành công !");
+
 
     form.resetFields();
 
