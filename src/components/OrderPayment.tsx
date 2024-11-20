@@ -199,7 +199,7 @@ function OrderPayment() {
           {cartItems.map((item) => (
             <div key={item.productId} className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <img src={item.img} alt={item.name} className="w-16 h-16 rounded-md mr-4" />
+                <img src={item.img[0]} alt={item.name} className="w-16 h-16 rounded-md mr-4" />
                 <span>{item.name}</span>
               </div>
               <span className="font-semibold">

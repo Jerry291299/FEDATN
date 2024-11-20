@@ -13,6 +13,8 @@ type Props = {};
 
 const Dashboard = (props: Props) => {
     const [products, setProduct] = useState<Iproduct[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+
     const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
@@ -83,8 +85,16 @@ const Dashboard = (props: Props) => {
     };
 
     // Lọc danh sách sản phẩm dựa trên tên sản phẩm
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(filterName.toLowerCase())
+    const filteredProducts = products.filter(
+        (product) =>
+            product.name.toLowerCase().includes(filterName.toLowerCase()) &&
+            (selectedCategory === "" ||
+                product.category.name.toLowerCase() ===
+                    selectedCategory.toLowerCase())
+    );
+    // Tạo một mảng mới chứa các danh mục duy nhất
+    const uniqueCategories = Array.from(
+        new Set(products.map((product) => product.category.name))
     );
 
     return (
@@ -96,50 +106,79 @@ const Dashboard = (props: Props) => {
                 </button>
             </NavLink>
 
-            {/* Trường nhập để lọc sản phẩm theo tên */}
-            <input
-                type="text"
-                placeholder="Lọc theo tên sản phẩm"
-                value={filterName}
-                onChange={(e) => setFilterName(e.target.value)}
+            {/* lọc sản phẩm theo danh mục */}
+            <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
                 className="mb-4 p-2 border border-gray-300 rounded"
-            />
+            >
+                <option value="">All Categories</option>
+                {uniqueCategories.map((category) => (
+                    <option key={category} value={category}>
+                        {category}
+                    </option>
+                ))}
+            </select>
 
             <div className="mb-[20px] flex flex-col w-full">
                 <div className="overflow-x-auto">
                     <div className="py-2 inline-block w-full px-0">
-                        <div className="overflow-auto">
+                        <div className="overflow-hidden">
                             <table className="min-w-full table-auto">
                                 <thead className="bg-white border-b">
                                     <tr>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Stt
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Tên Sản Phẩm
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Giá
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Danh mục
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                                            Chất liệu
-                                        </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Số lượng
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Mô tả
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Ảnh
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Trạng Thái
                                         </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                                        <th
+                                            scope="col"
+                                            className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
                                             Handle
                                         </th>
                                     </tr>
@@ -151,56 +190,70 @@ const Dashboard = (props: Props) => {
                                                 className="bg-gray-100 border-b"
                                                 key={product._id}
                                             >
-                                                <td className="px-6 py-4 text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {index + 1}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     {product.name}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
-                                                    {product.price}
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                    {new Intl.NumberFormat(
+                                                        "vi-VN",
+                                                        {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }
+                                                    ).format(product.price)}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     {product?.category?.name}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
                                                     {product?.material?.name}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     {product.soLuong}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm truncate text-gray-900 max-w-xs">
-                                                    {product.moTa}
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                    {product.moTa.length > 50
+                                                        ? `${product.moTa.substring(
+                                                              0,
+                                                              20
+                                                          )}...`
+                                                        : product.moTa}
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     <img
-                                                        className="w-20 h-20 object-cover"
-                                                        src={product?.img}
+                                                        className="w-[100px]"
+                                                        src={product?.img[0]}
                                                         alt=""
                                                     />
                                                 </td>
                                                 <td
-                                                    className={`px-6 py-4 text-sm ${
-                                                        product.status
+                                                    className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${
+                                                        product.status === true
                                                             ? "text-green-700"
                                                             : "text-red-700"
                                                     }`}
                                                 >
-                                                    {product.status
+                                                    {product.status === true
                                                         ? "Hoạt động"
                                                         : "Vô hiệu hóa"}
                                                 </td>
-                                                <td className="px-6 py-4 flex space-x-2">
+                                                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     <button
                                                         onClick={() =>
                                                             updateProduct(
                                                                 product._id
                                                             )
                                                         }
-                                                        className="text-white bg-sky-600 hover:bg-sky-900 px-4 py-2 rounded"
+                                                        type="button"
+                                                        className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                                     >
                                                         Edit
                                                     </button>
+
+                                                    {/* Nút Active/Deactive */}
                                                     <Popconfirm
                                                         title="Are you sure?"
                                                         onConfirm={() =>
@@ -213,13 +266,16 @@ const Dashboard = (props: Props) => {
                                                         cancelText="No"
                                                     >
                                                         <button
-                                                            className={`text-white px-4 py-2 rounded ${
-                                                                product.status
+                                                            type="button"
+                                                            className={`focus:outline-none text-white ${
+                                                                product.status ===
+                                                                true
                                                                     ? "bg-red-700 hover:bg-red-800"
                                                                     : "bg-green-700 hover:bg-green-800"
-                                                            }`}
+                                                            } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
                                                         >
-                                                            {product.status
+                                                            {product.status ===
+                                                            true
                                                                 ? "Deactive"
                                                                 : "Active"}
                                                         </button>

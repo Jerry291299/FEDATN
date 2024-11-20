@@ -22,7 +22,7 @@ import Tintucdetail from "./components/tintucdetail";
 import Gioithieu from "./components/gioithieu";
 import SearchResults from "./components/SearchResults";
 import OrderPayment from "./components/OrderPayment";
-
+import CategorisPage from "./components/CategorisPage";
 import Order from "./components/admin/Orderadmin";
 import Success from "./components/success";
 import Donhangpage from "./components/Donhangpage";
@@ -32,6 +32,9 @@ import { updateMaterial } from "./service/material";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
 import OrderList from "./components/OrderList";
 import Donhang from "./components/Order";
+import Shipper from "./layout/Shipper";
+import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
+import OrdersShipper from "./components/admin/shipper/OrdersShipper";
 
 function App() {
   return (
@@ -39,8 +42,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />}></Route>
-
+          <Route path="/categories/:id" element={<CategorisPage />} />
+          
           <Route path="/products" element={<Productspage />} />
+          <Route path="/products/categories/:id" element={<Productspage />} />
           <Route path="/search/:searchTerm" element={<SearchResults />} />
           <Route
             path="/Cart/:id"
@@ -60,6 +65,7 @@ function App() {
           <Route path="/donhang" element={<Donhang/>} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
+          
           <Route
             path="/admin"
             element={
@@ -88,6 +94,18 @@ function App() {
             ></Route>
             
           </Route>
+          <Route
+          path="/shipper"
+          element={
+            <Privaterouter>
+              <Shipper />
+            </Privaterouter>
+          }
+        >
+          <Route path="/shipper/dashboard" element={<ShipperDashboard />} />
+          {/* {/* <Route path="orders" element={<ShipperOrders />} /> */}
+          <Route path="/shipper/orders" element={<OrdersShipper />} /> 
+        </Route>
         </Routes>
       </BrowserRouter>
     </>

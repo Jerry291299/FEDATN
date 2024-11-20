@@ -43,7 +43,12 @@ const Content = (props: Props) => {
         };
         fetchData();
     }, []);
-
+    const truncateText = (text: string, maxLength: number): string => {
+        if (text.length > maxLength) {
+            return text.slice(0, maxLength) + "...";
+        }
+        return text;
+    };
     return (
         <>
             <h2 className="font-bold text-[35px] text-center pt-[25px]">
@@ -65,7 +70,7 @@ const Content = (props: Props) => {
                                 className="block"
                             >
                                 <img
-                                    src={product.img}
+                                    src={product.img[0]}
                                     alt={product.name}
                                     className="h-60 w-full object-cover transition-opacity duration-300 hover:opacity-90"
                                 />
@@ -76,11 +81,15 @@ const Content = (props: Props) => {
                                 <h2 className="text-lg font-semibold text-gray-800 truncate">
                                     {product.name}
                                 </h2>
-                                <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-                                    {product.moTa}
+                                <p className="text-sm text-gray-500">
+                                    {truncateText(product.moTa, 40)}
                                 </p>
-                                <p className="mt-2 text-lg font-bold text-green-600">
-                                    {product.price.toLocaleString()}₫
+
+                                <p className="text-xl font-bold text-red-600">
+                                    {new Intl.NumberFormat("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    }).format(product.price)}
                                 </p>
 
                                 {/* Nút chi tiết */}

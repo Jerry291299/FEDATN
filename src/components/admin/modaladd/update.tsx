@@ -1,4 +1,4 @@
-import { Form, Input, Select } from "antd";
+import { Form, Input, Select, Upload } from "antd";
 import React, { useEffect, useState } from "react";
 import { getProductByID, updateProduct } from "../../../service/products";
 import { Iproduct } from "../../../interface/products";
@@ -6,12 +6,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getAllCategories } from "../../../service/category";
 import { Icategory } from "../../../interface/category";
 import { getAllMaterials } from "../../../service/material";
+import { UploadOutlined } from "@ant-design/icons";
 
 type Props = {};
 
 const Update = (props: Props) => {
     const [categories, setCategories] = useState<Icategory[]>([]);
     const [materials, setMaterials] = useState<Icategory[]>([]);
+    const [images, setImages] = useState<string[]>([]); // Existing images
+    const [fileList, setFileList] = useState<any[]>([]); // Newly uploaded files
     const navigate = useNavigate();
     const { id } = useParams();
     const [form] = Form.useForm();
@@ -20,6 +23,7 @@ const Update = (props: Props) => {
         const fetchProduct = async () => {
             try {
                 const response = await getProductByID(id);
+                setImages(response.img || []); // Assuming `img` is an array of URLs
 
                 form.setFieldsValue({
                     name: response.name,
@@ -65,19 +69,38 @@ const Update = (props: Props) => {
 
     const onFinish = async (values: Iproduct) => {
         try {
-            await updateProduct(id, values);
+            // Combine existing images and new uploaded images
+            const newImages = fileList.map(
+                (file) => file.url || file.response.url
+            );
+            const updatedProduct = {
+                ...values,
+                img: [...images, ...newImages],
+            };
+            await updateProduct(id, updatedProduct);
             alert("Product updated successfully!");
             navigate("/admin/dashboard");
         } catch (error) {
             console.error("Error updating product:", error);
         }
     };
+    const handleUploadChange = ({ fileList: newFileList }: any) => {
+        setFileList(newFileList);
+    };
+
+    const handleRemoveImage = (index: number) => {
+        const updatedImages = [...images];
+        updatedImages.splice(index, 1);
+        setImages(updatedImages);
+    };
+    return;
 
     return (
         <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md space-y-6 font-[sans-serif]">
             <h2 className="text-xl font-semibold text-center text-gray-800 mb-4">
                 Update Product
             </h2>
+
             <Form
                 form={form}
                 onFinish={onFinish}
@@ -205,15 +228,41 @@ const Update = (props: Props) => {
                         )}
                     </Select>
                 </Form.Item>
+                {/* Images */}
+                <div>
+                    <label className="block mb-2 text-lg font-semibold text-gray-800">
+                        Images
+                    </label>
+                    {/* Display existing images */}
+                    <div className="flex flex-wrap gap-4 mb-4">
+                        {images.map((img, index) => (
+                            <div key={index} className="relative w-24 h-24">
+                                <img
+                                    src={img}
+                                    alt={`Image ${index}`}
+                                    className="w-full h-full object-cover rounded"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full"
+                                    onClick={() => handleRemoveImage(index)}
+                                >
+                                    x
+                                </button>
+                            </div>
+                        ))}
+                    </div>
 
-                {/* Image */}
-                {/* <Form.Item
-                    label="Image URL"
-                    name="img"
-                    rules={[{ required: true, message: "Please enter the image URL" }]}
-                >
-                    <Input placeholder="Enter image URL" className="rounded" />
-                </Form.Item> */}
+                    {/* Upload new images */}
+                    <Upload
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleUploadChange}
+                        action="YOUR_IMAGE_UPLOAD_ENDPOINT" // Replace with your backend endpoint
+                    >
+                        {fileList.length < 5 && <UploadOutlined />}
+                    </Upload>
+                </div>
 
                 <button
                     type="submit"

@@ -11,7 +11,7 @@ import { Pagination } from "antd";
 
 type Props = {};
 
-const Productspage = (props: Props) => {
+const CategoriesPage = (props: Props) => {
   const [products, setProducts] = useState<Iproduct[]>([]);
   const [categories, setCategories] = useState<Icategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -65,26 +65,23 @@ const Productspage = (props: Props) => {
     // Navigate to the new category route
     // history.push(`/categories/${categoryName}`);
   };
-  const truncateText = (text: string, maxLength: number): string => {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + "...";
-    }
-    return text;
-  };
   return (
     <>
       {loading && <LoadingComponent />}
       <Header />
 
       <section className="py-10 bg-gray-100">
-        <h1 className="text-center text-4xl font-bold mb-6">Our Products</h1>
+        <h1 className="text-center text-4xl font-bold mb-6">
+          Our Categories Page
+        </h1>
 
         {/* Danh Mục Lọc */}
         <div className="flex justify-center space-x-4 mb-6">
+        
           {categories.map((category) => (
             <NavLink
               key={category._id}
-              to={`/products/categories/${category.name}`}
+              to={`/categories/${category.name}`}
               onClick={() => handleCategoryFilter(category.name)}
               className={`px-4 py-2 rounded-lg cursor-pointer ${
                 selectedCategory === category._id
@@ -95,11 +92,12 @@ const Productspage = (props: Props) => {
               {category.name}
             </NavLink>
           ))}
+
         </div>
-        {/* alo alo */}
 
         {/* Danh Sách Sản Phẩm */}
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
+        
           {products
             ?.filter(
               (product) =>
@@ -122,15 +120,9 @@ const Productspage = (props: Props) => {
                     <p className="text-sm text-gray-500">
                       {product.category.name}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      {truncateText(product.moTa, 50)}
-                    </p>
+                    <p className="text-sm text-gray-500">{product.moTa}</p>
                     <p className="text-xl font-bold text-red-600">
-                      {" "}
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(product.price)}
+                      ${product.price}
                     </p>
                   </div>
                   <div className="p-4">
@@ -157,4 +149,4 @@ const Productspage = (props: Props) => {
   );
 };
 
-export default Productspage;
+export default CategoriesPage;

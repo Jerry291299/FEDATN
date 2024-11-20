@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Icategory } from "../interface/category";
 import { getAllCategories } from "../service/category";
+import { getProductsByCategory } from "../service/products";
 import Facebook from "../anh/Facebook.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
@@ -13,12 +14,17 @@ const Header = () => {
     id: string;
   } | null>(null);
   const [categories, setCategories] = useState<Icategory[]>([]);
-
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
-
+  const [productsByCategory, setProductsByCategory] = useState([]);
   const Navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const [prevSelectedCategory, setPrevSelectedCategory] = useState<
+    string | null
+  >(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
@@ -54,6 +60,17 @@ const Header = () => {
     }
   };
 
+  const handleCategoryFilter = (categoryName: string) => {
+    if (categoryName === selectedCategory) {
+      // Thông báo khi cùng một danh mục được nhấp hai lần.
+      alert(`Bạn đã chọn danh mục ${categoryName}.`);
+    } else {
+      setPrevSelectedCategory(selectedCategory);
+      setSelectedCategory(categoryName);
+      navigate(`/categories/${categoryName}`);
+    }
+  };
+
   return (
     <div className="container mx-auto w-full">
       <div className="up py-[15px] flex justify-between font-medium pr-[10px]">
@@ -78,10 +95,10 @@ const Header = () => {
               </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {user.info.role === "admin" && (
+                  {(user.info.role === "admin" ||user.info.role === "shipper") && (
                     <li className="hover:bg-gray-100">
                       <Link
-                        to="/admin"
+                        to={user?.info?.role === "admin" ? "/admin" : "/shipper"}
                         className="block px-4 py-2"
                         onClick={() => setIsSubMenuOpen(false)}
                       >
@@ -90,7 +107,7 @@ const Header = () => {
                     </li>
                   )}
                   {(user.info.role === "user" ||
-                    user.info.role === "admin") && (
+                    user.info.role === "admin" ||user.info.role === "shipper") && (
                     <>
                       <li className="hover:bg-gray-100">
                         <Link
@@ -174,10 +191,13 @@ const Header = () => {
                     .map((category) => (
                       <li key={category._id} className="hover:bg-gray-100">
                         <Link
-                          to={`/category/${category._id}`}
+                          to={`/categories/${category.name}`} // Use category name in the path
+                          onClick={() => handleCategoryFilter(category.name)}
                           className="block px-4 py-2"
+                          
                         >
                           {category.name}
+                         
                         </Link>
                       </li>
                     ))}
