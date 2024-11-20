@@ -72,7 +72,10 @@ const Content = (props: Props) => {
                              <h2 className="text-lg font-serif mb-2">{product.name}</h2>
                              <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
                              <p className="text-xl font-bold text-red-600">
-                               ${product.price}
+                             {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.price)}
                              </p>
                            </div>
                            <div className="p-4">
