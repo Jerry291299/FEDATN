@@ -72,16 +72,19 @@ const Content = (props: Props) => {
                         <div className="p-4 flex flex-col justify-between flex-grow">
                           {/* Container chứa các thông tin sản phẩm */}
                           <div className="flex flex-col space-y-2">
+                          <NavLink to={`/product/${product._id}`}>
                             <h2 className="text-base font-semibold">{product.name}</h2>
+                            </NavLink>
                             <p className="text-sm text-gray-500">{product.category.name}</p>
                             <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
                             <p className="text-xl font-bold text-red-600">${product.price}</p>
                           </div>
-                      
+                          <NavLink to={`/product/${product._id}`}>
                           {/* Nút "View Details" */}
                           <button className="w-full py-2 text-center mt-4 bg-gray-100 rounded-lg hover:bg-gray-200">
                             View Details
                           </button>
+                          </NavLink>
                         </div>
                       </article>
                       
