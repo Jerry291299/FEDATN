@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink ,useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import { Iproduct } from "../interface/products";
@@ -44,7 +44,9 @@ const Productspage = (props: Props) => {
 
   useEffect(() => {
     if (categoryName) {
-      const categoryId = categories.find(category => category.name === categoryName)?._id || null;
+      const categoryId =
+        categories.find((category) => category.name === categoryName)?._id ||
+        null;
       setSelectedCategory(categoryId);
     }
     fetchData(page.currentPage); // Fetch products when category changes
@@ -54,16 +56,18 @@ const Productspage = (props: Props) => {
   };
 
   const handleCategoryFilter = (categoryName: string | null) => {
-    const selectedCategoryId = categories.find(category => category.name === categoryName)?._id || null;
+    const selectedCategoryId =
+      categories.find((category) => category.name === categoryName)?._id ||
+      null;
     setSelectedCategory(selectedCategoryId);
     setPage({ ...page, currentPage: 1 });
-  
+
     // Navigate to the new category route
     // history.push(`/categories/${categoryName}`);
   };
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length > maxLength) {
-      return text.slice(0, maxLength) + '...';
+      return text.slice(0, maxLength) + "...";
     }
     return text;
   };
@@ -83,7 +87,9 @@ const Productspage = (props: Props) => {
               to={`/products/categories/${category.name}`}
               onClick={() => handleCategoryFilter(category.name)}
               className={`px-4 py-2 rounded-lg cursor-pointer ${
-                selectedCategory === category._id ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                selectedCategory === category._id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
               }`}
             >
               {category.name}
@@ -93,37 +99,47 @@ const Productspage = (props: Props) => {
 
         {/* Danh Sách Sản Phẩm */}
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
-        {products
-  ?.filter(
-    (product) =>
-      selectedCategory === null || product.category._id === selectedCategory
-  )
-  .map((product: Iproduct) => (
-    <article
-      key={`${product._id}_${product.category._id}`}
-      className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
-    >
-      <NavLink to={`/product/${product._id}`}>
-        <img
-          src={product.img[0]}
-          alt={product.name}
-          className="h-56 w-full object-cover rounded-t-lg"
-        />
-        <div className="p-4">
-          <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-          <p className="text-sm text-gray-500">{product.category.name}</p>
-          <p className="text-sm text-gray-500">{truncateText(product.moTa, 50)}</p>
-          <p className="text-xl font-bold text-red-600">${product.price}</p>
-        </div>
-        <div className="p-4">
-          <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-            View Details
-          </button>
-        </div>
-      </NavLink>
-    </article>
-  ))}
-
+          {products
+            ?.filter(
+              (product) =>
+                selectedCategory === null ||
+                product.category._id === selectedCategory
+            )
+            .map((product: Iproduct) => (
+              <article
+                key={`${product._id}_${product.category._id}`}
+                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
+              >
+                <NavLink to={`/product/${product._id}`}>
+                  <img
+                    src={product.img[0]}
+                    alt={product.name}
+                    className="h-56 w-full object-cover rounded-t-lg"
+                  />
+                  <div className="p-4">
+                    <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+                    <p className="text-sm text-gray-500">
+                      {product.category.name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {truncateText(product.moTa, 50)}
+                    </p>
+                    <p className="text-xl font-bold text-red-600">
+                      {" "}
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(product.price)}
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                      View Details
+                    </button>
+                  </div>
+                </NavLink>
+              </article>
+            ))}
         </div>
 
         <Pagination
