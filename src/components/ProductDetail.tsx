@@ -112,7 +112,10 @@ const ProductDetail = () => {
               <div className="my-4">
                 <div className="flex items-baseline">
                   <span className="text-2xl font-semibold text-black-600">
-                    {product.price}₫
+                  {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.price)}
                   </span>
                 </div>
                 <p className="font-bold text-gray-600">
@@ -143,7 +146,7 @@ const ProductDetail = () => {
                         productId: String(product._id),
                         name: product.name,
                         price: product.price,
-                        img: product.img,
+                        img: product.img[0],
                         quantity: 1,
                       },
                     ],
@@ -191,9 +194,13 @@ const ProductDetail = () => {
               {/* Hiển thị nội dung mô tả */}
               {product.moTa ? (
                 <div
-                  className="text-gray-800 text-base leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: product.moTa }}
-                ></div>
+                  className="text-gray-800 text-base leading-relaxed">
+                    <div className="img flex gap-2">
+                      <img className="w-[50%]" src={product.img[4]} alt="" />
+                      <img className="w-[50%]" src={product.img[3]} alt="" />
+                    </div>
+                    <div className="mota">{product.moTa}</div>
+                  </div>
               ) : (
                 <p className="text-gray-500 italic">Chưa có mô tả cho sản phẩm này.</p>
               )}

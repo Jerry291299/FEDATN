@@ -3,7 +3,7 @@ import { Icategory } from "./category";
 export interface Iproduct {
     _id: string;
     name: string;
-    img: string;
+    img: string[];
     price: number;
     soLuong: number;
     moTa: string;
