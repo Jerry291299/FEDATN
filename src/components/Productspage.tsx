@@ -61,6 +61,12 @@ const Productspage = (props: Props) => {
     // Navigate to the new category route
     // history.push(`/categories/${categoryName}`);
   };
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length > maxLength) {
+      return text.slice(0, maxLength) + '...';
+    }
+    return text;
+  };
   return (
     <>
       {loading && <LoadingComponent />}
@@ -87,30 +93,37 @@ const Productspage = (props: Props) => {
 
         {/* Danh Sách Sản Phẩm */}
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
-          {products
-            ?.filter(
-              (product) =>
-                selectedCategory === null ||
-                product.category._id === selectedCategory
-            )
-            .map((product: Iproduct) => (
-              <article key={`${product._id}_${product.category._id}`} className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all">
-                <NavLink to={`/product/${product._id}`}>
-                  <img src={product.img[0]} alt={product.name} className="h-56 w-full object-cover rounded-t-lg" />
-                  <div className="p-4">
-                    <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-                    <p className="text-sm text-gray-500">{product.category.name}</p>
-                    <p className="text-sm text-gray-500">{product.moTa}</p>
-                    <p className="text-xl font-bold text-red-600">${product.price}</p>
-                  </div>
-                  <div className="p-4">
-                    <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-                      View Details
-                    </button>
-                  </div>
-                </NavLink>
-              </article>
-            ))}
+        {products
+  ?.filter(
+    (product) =>
+      selectedCategory === null || product.category._id === selectedCategory
+  )
+  .map((product: Iproduct) => (
+    <article
+      key={`${product._id}_${product.category._id}`}
+      className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
+    >
+      <NavLink to={`/product/${product._id}`}>
+        <img
+          src={product.img[0]}
+          alt={product.name}
+          className="h-56 w-full object-cover rounded-t-lg"
+        />
+        <div className="p-4">
+          <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+          <p className="text-sm text-gray-500">{product.category.name}</p>
+          <p className="text-sm text-gray-500">{truncateText(product.moTa, 50)}</p>
+          <p className="text-xl font-bold text-red-600">${product.price}</p>
+        </div>
+        <div className="p-4">
+          <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+            View Details
+          </button>
+        </div>
+      </NavLink>
+    </article>
+  ))}
+
         </div>
 
         <Pagination
