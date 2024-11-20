@@ -32,6 +32,9 @@ import { updateMaterial } from "./service/material";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
 import OrderList from "./components/OrderList";
 import Donhang from "./components/Order";
+import Shipper from "./layout/Shipper";
+import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
+import OrdersShipper from "./components/admin/shipper/OrdersShipper";
 
 function App() {
   return (
@@ -60,6 +63,7 @@ function App() {
           <Route path="/donhang" element={<Donhang/>} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
+          
           <Route
             path="/admin"
             element={
@@ -88,6 +92,18 @@ function App() {
             ></Route>
             
           </Route>
+          <Route
+          path="/shipper"
+          element={
+            <Privaterouter>
+              <Shipper />
+            </Privaterouter>
+          }
+        >
+          <Route path="/shipper/dashboard" element={<ShipperDashboard />} />
+          {/* {/* <Route path="orders" element={<ShipperOrders />} /> */}
+          <Route path="/shipper/orders" element={<OrdersShipper />} /> 
+        </Route>
         </Routes>
       </BrowserRouter>
     </>

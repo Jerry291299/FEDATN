@@ -78,10 +78,10 @@ const Header = () => {
               </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {user.info.role === "admin" && (
+                  {(user.info.role === "admin" ||user.info.role === "shipper") && (
                     <li className="hover:bg-gray-100">
                       <Link
-                        to="/admin"
+                        to={user?.info?.role === "admin" ? "/admin" : "/shipper"}
                         className="block px-4 py-2"
                         onClick={() => setIsSubMenuOpen(false)}
                       >
@@ -90,7 +90,7 @@ const Header = () => {
                     </li>
                   )}
                   {(user.info.role === "user" ||
-                    user.info.role === "admin") && (
+                    user.info.role === "admin" ||user.info.role === "shipper") && (
                     <>
                       <li className="hover:bg-gray-100">
                         <Link
