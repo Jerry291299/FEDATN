@@ -69,9 +69,9 @@ const Dashboard = (props: Props) => {
       const updatedProducts = products.map((product) =>
         product._id === id
           ? {
-              ...product,
-              status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
-            }
+            ...product,
+            status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
+          }
           : product
       );
 
@@ -208,17 +208,16 @@ const Dashboard = (props: Props) => {
                         {product.soLuong}
                       </td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                        {product.moTa}
+                        {product.moTa.length > 50 ? `${product.moTa.substring(0, 40)}...` : product.moTa}
                       </td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                         <img className="w-[100px]" src={product?.img[0]} alt="" />
                       </td>
                       <td
-                        className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${
-                          product.status === true
+                        className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${product.status === true
                             ? "text-green-700"
                             : "text-red-700"
-                        }`}
+                          }`}
                       >
                         {product.status === true ? "Hoạt động" : "Vô hiệu hóa"}
                       </td>
@@ -242,11 +241,10 @@ const Dashboard = (props: Props) => {
                         >
                           <button
                             type="button"
-                            className={`focus:outline-none text-white ${
-                              product.status === true
+                            className={`focus:outline-none text-white ${product.status === true
                                 ? "bg-red-700 hover:bg-red-800"
                                 : "bg-green-700 hover:bg-green-800"
-                            } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
+                              } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
                           >
                             {product.status === true ? "Deactive" : "Active"}
                           </button>
