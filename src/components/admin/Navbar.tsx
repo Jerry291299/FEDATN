@@ -30,7 +30,9 @@ const Navbar = (props: Props) => {
           id="sidenav-main"
         >
           <div className="flex shrink-0 px-8 items-center justify-between h-[96px]">
-            Beautiful-House Admin
+            {" "}
+            {(user?.info?.role === "admin" && "Beautiful-House Admin") ||
+              (user?.info?.role === "shipper" && "Beautiful-House Shipper")}
           </div>
           <div className="hidden border-b border-dashed lg:block dark:border-neutral-700/70 border-neutral-200" />
           <div className="flex items-center justify-between px-8 py-5">
@@ -102,81 +104,118 @@ const Navbar = (props: Props) => {
                 </span>
               </div>
               {/* menu item */}
-              <div className="block pt-5 pb-[.15rem]">
-                <div className="px-4 py-[.65rem]">
-                  <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
-                    Applications
-                  </span>
-                </div>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/users"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Users
-                  </NavLink>
-                </span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/order"}
-                    // href="javascript:;"
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Orders
-                  </NavLink>
-                </span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <a
-                    // href="javascript:;"
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Comment
-                  </a>
-                </span>
-              </div>
+              {user?.info?.role === "admin" && (
+                <>
+                  <div className="block pt-5 pb-[.15rem]">
+                    <div className="px-4 py-[.65rem]">
+                      <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
+                        Applications
+                      </span>
+                    </div>
+                  </div>
+                  {/* menu item */}
 
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/Listcategory"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Category list
-                  </NavLink>
-                </span>
-              </div>
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/admin/users"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Users
+                      </NavLink>
+                    </span>
+                  </div>
+                  {/* menu item */}
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/admin/order"}
+                        // href="javascript:;"
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Orders
+                      </NavLink>
+                    </span>
+                  </div>
+                  {/* menu item */}
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <a
+                        // href="javascript:;"
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Comment
+                      </a>
+                    </span>
+                  </div>
 
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/Material"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Material list
-                  </NavLink>
-                </span>
-              </div>
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/admin/Listcategory"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Category list
+                      </NavLink>
+                    </span>
+                  </div>
 
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/dashboard"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Products list
-                  </NavLink>
-                </span>
-              </div>
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/admin/Material"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Material list
+                      </NavLink>
+                    </span>
+                  </div>
+
+                  {/* menu item */}
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/admin/dashboard"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Products list
+                      </NavLink>
+                    </span>
+                  </div>
+                </>
+              )}
+              {user?.info?.role === "shipper" && (
+                <>
+                  <div className="block pt-5 pb-[.15rem]">
+                    <div className="px-4 py-[.65rem]">
+                      <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
+                        Applications
+                      </span>
+                    </div>
+                  </div>
+                  {/* Shipper-specific menu items */}
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/shipper/dashboard"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Shipper Dashboard
+                      </NavLink>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                      <NavLink
+                        to={"/shipper/orders"}
+                        className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                      >
+                        Orders for Shipper
+                      </NavLink>
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </aside>
