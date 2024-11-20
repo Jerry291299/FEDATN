@@ -211,7 +211,7 @@ const Dashboard = (props: Props) => {
                         {product.soLuong}
                       </td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                        {product.moTa.length > 50 ? `${product.moTa.substring(0, 40)}...` : product.moTa}
+                        {product.moTa.length > 50 ? `${product.moTa.substring(0, 20)}...` : product.moTa}
                       </td>
                       <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                         <img className="w-[100px]" src={product?.img[0]} alt="" />
