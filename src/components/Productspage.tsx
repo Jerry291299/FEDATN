@@ -118,11 +118,12 @@ const Productspage = (props: Props) => {
       <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
       <p className="text-xl font-bold text-red-600">${product.price}</p>
     </div>
-
+    <NavLink to={`/product/${product._id}`}>
     {/* Nút "View Details" */}
     <button className="w-full py-2 text-center mt-4 bg-gray-100 rounded-lg hover:bg-gray-200">
       View Details
     </button>
+    </NavLink>
   </div>
 </article>
 
