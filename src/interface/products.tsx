@@ -12,5 +12,5 @@ export interface Iproduct {
 }
 export type IProductLite = Pick<
     Iproduct,
-    "_id" | "name" | "img" | "price" | "category" | "status"
+    "_id" | "name" | "img" | "price" | "category" | "status" | "moTa"
 >;
