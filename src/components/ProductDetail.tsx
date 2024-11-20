@@ -83,8 +83,8 @@ const ProductDetail = () => {
                   <img
                     key={index}
                     className={`w-[150px] h-[150px] object-cover rounded-lg border ${selectedImage === image
-                        ? "border-blue-500"
-                        : "border-gray-200"
+                      ? "border-blue-500"
+                      : "border-gray-200"
                       } cursor-pointer`}
                     src={image}
                     alt={`Product image ${index + 1}`}
@@ -112,10 +112,10 @@ const ProductDetail = () => {
               <div className="my-4">
                 <div className="flex items-baseline">
                   <span className="text-2xl font-semibold text-black-600">
-                  {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(product.price)}
                   </span>
                 </div>
                 <p className="font-bold text-gray-600">
@@ -191,16 +191,24 @@ const ProductDetail = () => {
           {product && (
             <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
               <h2 className="text-2xl font-bold text-black mb-4">Mô tả sản phẩm</h2>
-              {/* Hiển thị nội dung mô tả */}
               {product.moTa ? (
-                <div
-                  className="text-gray-800 text-base leading-relaxed">
-                    <div className="img flex gap-2">
-                      <img className="w-[50%]" src={product.img[2]} alt="" />
-                      <img className="w-[50%]" src={product.img[3]} alt="" />
-                    </div>
-                    <div className="mota">{product.moTa}</div>
+                <div className="text-gray-800 text-base leading-relaxed space-y-4">
+                  <div className="img flex flex-wrap gap-4">
+                    {product.img.slice(2, 4).map((image, index) => (
+                      <img
+                        key={index}
+                        className="w-[48%] object-cover rounded-lg border border-gray-200 shadow-md"
+                        src={image}
+                        alt={`Mô tả sản phẩm ${index + 1}`}
+                      />
+                    ))}
                   </div>
+                  <div className="mota">
+                    <p className="text-justify text-gray-700">
+                      {product.moTa}
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <p className="text-gray-500 italic">Chưa có mô tả cho sản phẩm này.</p>
               )}
@@ -227,12 +235,12 @@ const ProductDetail = () => {
                   />
                   <div className="p-4">
                     <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-                    <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
+                    <p className="text-sm text-gray-500">{truncateText(product.moTa, 30)}</p>
                     <p className="text-xl font-bold text-red-600">
-                    {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(product.price)}
                     </p>
                   </div>
                   <div className="p-4">

@@ -58,33 +58,33 @@ const Content = (props: Props) => {
       
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
                     {products.slice(0, 8).map((product: Iproduct, index: number) => (
-                         <article
-                         key={product._id}
-                         className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
-                       >
-                         <NavLink to={`/product/${product._id}`}>
-                           <img
-                             src={product.img[0]}
-                             alt={product.name}
-                             className="h-56 w-full object-cover rounded-t-lg"
-                           />
-                           <div className="p-4">
-                             <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-                             <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
-                             <p className="text-xl font-bold text-red-600">
-                             {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                             </p>
-                           </div>
-                           <div className="p-4">
-                             <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-                               View Details
-                           </button>
-                           </div>
-                         </NavLink>
-                       </article>
+                        <article
+                        key={`${product._id}_${product.category._id}`}
+                        className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all flex flex-col justify-between"
+                      >
+                        <NavLink to={`/product/${product._id}`}>
+                          <img
+                            src={product.img[0]}
+                            alt={product.name}
+                            className="h-56 w-full object-cover rounded-t-lg"
+                          />
+                        </NavLink>
+                        <div className="p-4 flex flex-col justify-between flex-grow">
+                          {/* Container chứa các thông tin sản phẩm */}
+                          <div className="flex flex-col space-y-2">
+                            <h2 className="text-base font-semibold">{product.name}</h2>
+                            <p className="text-sm text-gray-500">{product.category.name}</p>
+                            <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
+                            <p className="text-xl font-bold text-red-600">${product.price}</p>
+                          </div>
+                      
+                          {/* Nút "View Details" */}
+                          <button className="w-full py-2 text-center mt-4 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            View Details
+                          </button>
+                        </div>
+                      </article>
+                      
                     ))}
                 </div>
       <div className="grid grid-cols-2 gap-4">
