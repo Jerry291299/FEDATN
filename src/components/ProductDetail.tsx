@@ -63,7 +63,12 @@ const ProductDetail = () => {
     };
     fetchProducts();
   }, []);
-
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length > maxLength) {
+      return text.slice(0, maxLength) + '...';
+    }
+    return text;
+  };
   return (
     <>
       <Header />
@@ -77,11 +82,10 @@ const ProductDetail = () => {
                 product.img.map((image, index) => (
                   <img
                     key={index}
-                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${
-                      selectedImage === image
+                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${selectedImage === image
                         ? "border-blue-500"
                         : "border-gray-200"
-                    } cursor-pointer`}
+                      } cursor-pointer`}
                     src={image}
                     alt={`Product image ${index + 1}`}
                     onClick={() => setSelectedImage(image)} // Đặt ảnh được chọn
@@ -180,43 +184,53 @@ const ProductDetail = () => {
             </div>
           </div>
         )}
-
+        <div>
+          {product && (
+            <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-black mb-4">Mô tả sản phẩm</h2>
+              {/* Hiển thị nội dung mô tả */}
+              {product.moTa ? (
+                <div
+                  className="text-gray-800 text-base leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: product.moTa }}
+                ></div>
+              ) : (
+                <p className="text-gray-500 italic">Chưa có mô tả cho sản phẩm này.</p>
+              )}
+            </div>
+          )}
+        </div>
         {/* Danh sách sản phẩm tương tự */}
         <div className="border-t-2 border-black mt-[40px]"></div>
         <section className="py-10">
           <h1 className="mb-12 text-center font-sans text-4xl font-bold">
             Sản phẩm tương tự
           </h1>
-          <div className="container mx-auto grid grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
             {products.slice(0, 8).map((product: Iproduct, index: number) => (
               <article
-                key={index}
-                className="relative flex flex-col overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105"
+                key={product._id}
+                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
               >
-                <NavLink
-                  to={`/product/${product._id}`}
-                  className="flex-shrink-0"
-                >
+                <NavLink to={`/product/${product._id}`}>
                   <img
                     src={product.img[0]}
                     alt={product.name}
-                    className="h-56 w-full object-cover"
+                    className="h-56 w-full object-cover rounded-t-lg"
                   />
+                  <div className="p-4">
+                    <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+                    <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
+                    <p className="text-xl font-bold text-red-600">
+                      ${product.price}
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                      View Details
+                    </button>
+                  </div>
                 </NavLink>
-                <div className="flex flex-col p-4 bg-white">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {product.name}
-                  </h2>
-                  <p className="mt-2 text-lg font-bold text-green-600">
-                    ${product.price}
-                  </p>
-                  <NavLink
-                    to={`/product/${product._id}`}
-                    className="mt-auto inline-block rounded-lg bg-blue-500 px-4 py-2 text-center text-white transition-all duration-200 hover:bg-blue-600"
-                  >
-                    Chi tiết
-                  </NavLink>
-                </div>
               </article>
             ))}
           </div>
