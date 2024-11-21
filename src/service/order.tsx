@@ -14,6 +14,48 @@ export interface IOrderData {
       notes: string;
     };
   }
+  export interface IOrder {
+    _id: string;
+    userId: { name: string; email: string };
+    items: {
+      productId: { name: string; price: number; img: string[] };
+      name: string;
+      price: number;
+      quantity: number;
+    }[];
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+    customerDetails: {
+      name: string;
+      phone: string;
+      email: string;
+      address: string;
+      notes?: string;
+    };
+  }
+  export interface IOrderShipper {
+    _id: string;
+    userId: { name: string; email: string };
+    items: {
+      productId: { name: string; price: number; img: string[] };
+      name: string;
+      price: number;
+      quantity: number;
+    }[];
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+    customerDetails: {
+      name: string;
+      phone: string;
+      email: string;
+      address: string;
+      notes?: string;
+    };
+    paymentMethod: string;
+  }
+  
   
 
 // Function to submit the order
