@@ -11,252 +11,307 @@ import { Icart } from "../interface/cart";
 import CommentSection from "../interface/comment";
 
 const ProductDetail = () => {
-  const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
-  const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
-  const { id } = useParams<{ id: string }>(); // Lấy id sản phẩm từ URL
-  const [product, setProduct] = useState<Iproduct | undefined>(undefined);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); // Ảnh đang hiển thị lớn
-  const Globalstate = useContext(Cartcontext);
-  const [user, setUser] = useState<IUser | null>(null);
+    const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
+    const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
+    const { id } = useParams<{ id: string }>(); // Lấy id sản phẩm từ URL
+    const [product, setProduct] = useState<Iproduct | undefined>(undefined);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null); // Ảnh đang hiển thị lớn
+    const Globalstate = useContext(Cartcontext);
+    const [user, setUser] = useState<IUser | null>(null);
 
-  const dispatch = Globalstate.dispatch;
+    const dispatch = Globalstate.dispatch;
 
-  // Lấy thông tin người dùng từ sessionStorage
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser: IUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    } else {
-      console.error("User not found in sessionStorage.");
-    }
-  }, []);
-
-  // Lấy dữ liệu sản phẩm chi tiết
-  useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const data = await getProductByID(id);
-        setProduct(data);
-        if (Array.isArray(data.img) && data.img.length > 0) {
-          setSelectedImage(data.img[0]); // Đặt ảnh đầu tiên làm ảnh chính
+    // Lấy thông tin người dùng từ sessionStorage
+    useEffect(() => {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser: IUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+        } else {
+            console.error("User not found in sessionStorage.");
         }
-      } catch (error) {
-        console.log("Failed to fetch product by ID", error);
-      }
+    }, []);
+
+    // Lấy dữ liệu sản phẩm chi tiết
+    useEffect(() => {
+        const fetchProductData = async () => {
+            try {
+                const data = await getProductByID(id);
+                setProduct(data);
+                if (Array.isArray(data.img) && data.img.length > 0) {
+                    setSelectedImage(data.img[0]); // Đặt ảnh đầu tiên làm ảnh chính
+                }
+            } catch (error) {
+                console.log("Failed to fetch product by ID", error);
+            }
+        };
+        fetchProductData();
+    }, [id]);
+
+    // Lấy danh sách các sản phẩm khác
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const sanpham = await getAllproducts({ limit: 4, page: 1 });
+                setProducts(sanpham.docs || []);
+            } catch (error) {
+                console.log("Failed to fetch products", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+    const truncateText = (text: string, maxLength: number): string => {
+        if (text.length > maxLength) {
+            return text.slice(0, maxLength) + "...";
+        }
+        return text;
     };
-    fetchProductData();
-  }, [id]);
+    return (
+        <>
+            <Header />
 
-  // Lấy danh sách các sản phẩm khác
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const sanpham = await getAllproducts({ limit: 4, page: 1 });
-        setProducts(sanpham.docs || []);
-      } catch (error) {
-        console.log("Failed to fetch products", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-  const truncateText = (text: string, maxLength: number): string => {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + '...';
-    }
-    return text;
-  };
-  return (
-    <>
-      <Header />
+            <div className="container mx-auto w-[1400px] pt-[100px]">
+                {product && (
+                    <div className="container mx-auto w-[1300px] flex">
+                        {/* Danh sách ảnh nhỏ */}
+                        <div className="flex flex-col gap-4">
+                            {Array.isArray(product?.img) &&
+                                product.img.map((image, index) => (
+                                    <img
+                                        key={index}
+                                        className={`w-[150px] h-[150px] object-cover rounded-lg border ${
+                                            selectedImage === image
+                                                ? "border-blue-500"
+                                                : "border-gray-200"
+                                        } cursor-pointer`}
+                                        src={image}
+                                        alt={`Product image ${index + 1}`}
+                                        onClick={() => setSelectedImage(image)} // Đặt ảnh được chọn
+                                    />
+                                ))}
+                        </div>
 
-      <div className="container mx-auto w-[1400px] pt-[100px]">
-        {product && (
-          <div className="container mx-auto w-[1300px] flex">
-            {/* Danh sách ảnh nhỏ */}
-            <div className="flex flex-col gap-4">
-              {Array.isArray(product?.img) &&
-                product.img.map((image, index) => (
-                  <img
-                    key={index}
-                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${selectedImage === image
-                        ? "border-blue-500"
-                        : "border-gray-200"
-                      } cursor-pointer`}
-                    src={image}
-                    alt={`Product image ${index + 1}`}
-                    onClick={() => setSelectedImage(image)} // Đặt ảnh được chọn
-                  />
-                ))}
-            </div>
+                        {/* Ảnh lớn */}
+                        <div className="ml-[40px] mr-[30px]">
+                            {selectedImage && (
+                                <img
+                                    className="w-[690px] h-[690px] object-cover rounded-lg border border-gray-200"
+                                    src={selectedImage}
+                                    alt={product.name}
+                                />
+                            )}
+                        </div>
 
-            {/* Ảnh lớn */}
-            <div className="ml-[40px] mr-[30px]">
-              {selectedImage && (
-                <img
-                  className="w-[690px] h-[690px] object-cover rounded-lg border border-gray-200"
-                  src={selectedImage}
-                  alt={product.name}
-                />
-              )}
-            </div>
+                        {/* Thông tin sản phẩm */}
+                        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+                            <h1 className="text-xl font-bold text-black-800">
+                                {product.name}
+                            </h1>
+                            <div className="my-4">
+                                <div className="flex items-baseline">
+                                    <span className="text-2xl font-semibold text-black-600">
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(product.price)}
+                                    </span>
+                                </div>
+                                <div className="font-bold text-gray-600">
+                                    Chất liệu:{" "}
+                                    <span className="text-red-600">
+                                        {product?.material?.name}
+                                    </span>
+                                </div>
+                                <p className="font-bold text-gray-600">
+                                    Tiết kiệm:{" "}
+                                    <span className="text-red-600">
+                                        50.000 ₫
+                                    </span>
+                                </p>
+                                <p className="font-bold text-gray-500 mt-2">
+                                    Tình trạng:{" "}
+                                    <span className="font-semibold text-green-600">
+                                        Còn hàng
+                                    </span>
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
+                                onClick={async () => {
+                                    if (!product || !product._id) {
+                                        alert("Product ID is invalid.");
+                                        return;
+                                    }
+                                    if (!user || !user.id) {
+                                        alert(
+                                            "Bạn phải đăng nhập thì mới mua được hàng?"
+                                        );
+                                        return;
+                                    }
 
-            {/* Thông tin sản phẩm */}
-            <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
-              <h1 className="text-xl font-bold text-black-800">
-                {product.name}
-              </h1>
-              <div className="my-4">
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-semibold text-black-600">
-                  {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                  </span>
-                </div>
-                <p className="font-bold text-gray-600">
-                  Tiết kiệm: <span className="text-red-600">50.000 ₫</span>
-                </p>
-                <p className="font-bold text-gray-500 mt-2">
-                  Tình trạng:{" "}
-                  <span className="font-semibold text-green-600">Còn hàng</span>
-                </p>
-              </div>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
-                onClick={async () => {
-                  if (!product || !product._id) {
-                    alert("Product ID is invalid.");
-                    return;
-                  }
-                  if (!user || !user.id) {
-                    alert("Bạn phải đăng nhập thì mới mua được hàng?");
-                    return;
-                  }
-
-                  const cartItem: Icart = {
-                    userId: user.id,
-                    items: [
-                      {
-                        productId: String(product._id),
-                        name: product.name,
-                        price: product.price,
-                        img: product.img[0],
-                        quantity: 1,
-                      },
-                    ],
-                  };
-                  try {
-                    const response = await addtoCart(cartItem);
-                    dispatch({ type: actions.ADD, payload: response });
-                    alert("Added to cart successfully");
-                  } catch (error) {
-                    console.error("Failed to add products to cart", error);
-                  }
-                }}
-              >
-                Add to cart
-              </button>
-              <div className="my-4 font-bold">
-                <p className="text-gray-700">
-                  Gọi đặt mua:
-                  <a href="tel:0829721097" className="text-blue-600">
-                    0829721097
-                  </a>
-                  <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
-                </p>
-              </div>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                <li>
-                  MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
-                  <span className="font-bold">từ 10.000.000Đ</span>
-                </li>
-                <li>
-                  BẢO HÀNH <span className="font-bold">1 đổi 1</span> DO LỖI NHÀ
-                  SẢN XUẤT
-                </li>
-                <li>
-                  CAM KẾT <span className="font-bold">100% chính hãng</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-        <div>
-          {product && (
-            <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold text-black mb-4">Mô tả sản phẩm</h2>
-              {/* Hiển thị nội dung mô tả */}
-              {product.moTa ? (
-                <div
-                  className="text-gray-800 text-base leading-relaxed">
-                    <div className="img flex gap-2">
-                      <img className="w-[50%]" src={product.img[2]} alt="" />
-                      <img className="w-[50%]" src={product.img[3]} alt="" />
+                                    const cartItem: Icart = {
+                                        userId: user.id,
+                                        items: [
+                                            {
+                                                productId: String(product._id),
+                                                name: product.name,
+                                                price: product.price,
+                                                img: product.img[0],
+                                                quantity: 1,
+                                            },
+                                        ],
+                                    };
+                                    try {
+                                        const response = await addtoCart(
+                                            cartItem
+                                        );
+                                        dispatch({
+                                            type: actions.ADD,
+                                            payload: response,
+                                        });
+                                        alert("Added to cart successfully");
+                                    } catch (error) {
+                                        console.error(
+                                            "Failed to add products to cart",
+                                            error
+                                        );
+                                    }
+                                }}
+                            >
+                                Add to cart
+                            </button>
+                            <div className="my-4 font-bold">
+                                <p className="text-gray-700">
+                                    Gọi đặt mua:
+                                    <a
+                                        href="tel:0829721097"
+                                        className="text-blue-600"
+                                    >
+                                        0829721097
+                                    </a>
+                                    <span className="text-gray-600">
+                                        (miễn phí 8:30 - 21:30)
+                                    </span>
+                                </p>
+                            </div>
+                            <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                                <li>
+                                    MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
+                                    <span className="font-bold">
+                                        từ 10.000.000Đ
+                                    </span>
+                                </li>
+                                <li>
+                                    BẢO HÀNH{" "}
+                                    <span className="font-bold">1 đổi 1</span>{" "}
+                                    DO LỖI NHÀ SẢN XUẤT
+                                </li>
+                                <li>
+                                    CAM KẾT{" "}
+                                    <span className="font-bold">
+                                        100% chính hãng
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div className="mota">{product.moTa}</div>
-                  </div>
-              ) : (
-                <p className="text-gray-500 italic">Chưa có mô tả cho sản phẩm này.</p>
-              )}
+                )}
+                <div>
+                    {product && (
+                        <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
+                            <h2 className="text-2xl font-bold text-black mb-4">
+                                Mô tả sản phẩm
+                            </h2>
+                            {/* Hiển thị nội dung mô tả */}
+                            {product.moTa ? (
+                                <div className="text-gray-800 text-base leading-relaxed">
+                                    <div className="img flex gap-2">
+                                        <img
+                                            className="w-[50%]"
+                                            src={product.img[2]}
+                                            alt=""
+                                        />
+                                        <img
+                                            className="w-[50%]"
+                                            src={product.img[3]}
+                                            alt=""
+                                        />
+                                    </div>
+                                    <div className="mota">{product.moTa}</div>
+                                </div>
+                            ) : (
+                                <p className="text-gray-500 italic">
+                                    Chưa có mô tả cho sản phẩm này.
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
+                {/* Danh sách sản phẩm tương tự */}
+                <div className="border-t-2 border-black mt-[40px]"></div>
+                <section className="py-10">
+                    <h1 className="mb-12 text-center font-sans text-4xl font-bold">
+                        Sản phẩm tương tự
+                    </h1>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
+                        {products
+                            .slice(0, 8)
+                            .map((product: Iproduct, index: number) => (
+                                <article
+                                    key={product._id}
+                                    className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
+                                >
+                                    <NavLink to={`/product/${product._id}`}>
+                                        <img
+                                            src={product.img[0]}
+                                            alt={product.name}
+                                            className="h-56 w-full object-cover rounded-t-lg"
+                                        />
+                                        <div className="p-4">
+                                            <h2 className="text-lg font-serif mb-2">
+                                                {product.name}
+                                            </h2>
+                                            <p className="text-sm text-gray-500">
+                                                {truncateText(product.moTa, 40)}
+                                            </p>
+                                            <p className="text-xl font-bold text-red-600">
+                                                {new Intl.NumberFormat(
+                                                    "vi-VN",
+                                                    {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }
+                                                ).format(product.price)}
+                                            </p>
+                                        </div>
+                                        <div className="p-4">
+                                            <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                                                View Details
+                                            </button>
+                                        </div>
+                                    </NavLink>
+                                </article>
+                            ))}
+                    </div>
+                </section>
+                <div className="pt-[50px]">
+                    {user ? (
+                        <CommentSection productId={id || ""} user={user} />
+                    ) : (
+                        <p className="text-gray-500">
+                            Bạn cần đăng nhập để bình luận.
+                        </p>
+                    )}
+                </div>
             </div>
-          )}
-        </div>
-        {/* Danh sách sản phẩm tương tự */}
-        <div className="border-t-2 border-black mt-[40px]"></div>
-        <section className="py-10">
-          <h1 className="mb-12 text-center font-sans text-4xl font-bold">
-            Sản phẩm tương tự
-          </h1>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
-            {products.slice(0, 8).map((product: Iproduct, index: number) => (
-              <article
-                key={product._id}
-                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
-              >
-                <NavLink to={`/product/${product._id}`}>
-                  <img
-                    src={product.img[0]}
-                    alt={product.name}
-                    className="h-56 w-full object-cover rounded-t-lg"
-                  />
-                  <div className="p-4">
-                    <h2 className="text-lg font-serif mb-2">{product.name}</h2>
-                    <p className="text-sm text-gray-500">{truncateText(product.moTa, 40)}</p>
-                    <p className="text-xl font-bold text-red-600">
-                    {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                    </p>
-                  </div>
-                  <div className="p-4">
-                    <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-                      View Details
-                    </button>
-                  </div>
-                </NavLink>
-              </article>
-            ))}
-          </div>
-        </section>
-        <div className="pt-[50px]">
-          {user ? (
-            <CommentSection productId={id || ""} user={user} />
-          ) : (
-            <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
-          )}
-        </div>
-      </div>
-      <Footer />
-      {/* <CommentSection /> */}
-    </>
-  );
+            <Footer />
+            {/* <CommentSection /> */}
+        </>
+    );
 };
 
 export default ProductDetail;
