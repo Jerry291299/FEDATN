@@ -2,30 +2,23 @@ import React from "react";
 import { axiosservice } from "../config/API";
 import { IProductLite } from "../interface/products";
 
-export const getAllproducts = async ({
-    limit = 10,
-    page = 1,
-}: {
-    limit: number;
-    page: number;
-}) => {
-    try {
-        const { data } = await axiosservice.get(
-            `product-test?page=${page}&limit=${limit}`
-        );
-        return data;
+export const getAllproducts = async ({limit = 10 , page = 1 , category} : {limit: number, page: number , category?: string;}) => {
+    try{
+      const {data} = await axiosservice.get(`product-test?page=${page}&limit=${limit}`)
+      return data    
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-};
-export const getProductByID = async (id?: string) => {
+  }
+  export const getProductByID = async(id?:string) =>{
     try {
-        const { data } = await axiosservice.get(`/product/${id}`);
-        return data;
-    } catch (error) {
-        console.log(error);
+      const {data} = await axiosservice.get(`/product/${id}`)
+      return data
+    } catch (error){
+      console.log(error);
+  
     }
-};
+  }
 
 export const addProduct = async (product: IProductLite) => {
     try {
