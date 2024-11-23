@@ -157,13 +157,13 @@ const Users = (props: Props) => {
 
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {/* Edit button */}
-                          <button
+                          {/* <button
                             type="button"
                             onClick={() => updateUser(user._id, user.role)}
                             className="focus:outline-none text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                           >
                             Edit Role
-                          </button>
+                          </button> */}
                           {user.status === "active" ? (
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"

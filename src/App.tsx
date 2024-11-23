@@ -89,7 +89,7 @@ function App() {
             
             <Route path="dashboard/update/:id" Component={Update}></Route>
 
-            <Route path="users/updateuser/:id" Component={UpdateUser}></Route>
+            {/* <Route path="users/updateuser/:id" Component={UpdateUser}></Route> */}
             <Route
               path="listcategory/updatecategory/:id"
               Component={Updatecategory}
