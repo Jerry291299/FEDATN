@@ -38,7 +38,7 @@ export interface IOrderData {
     _id: string;
     userId: { name: string; email: string };
     items: {
-      productId: { name: string; price: number; img: string[] };
+      productId: { _id: string;name: string; price: number; img: string[] };
       name: string;
       price: number;
       quantity: number;
