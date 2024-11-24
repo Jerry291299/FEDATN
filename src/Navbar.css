@@ -1,0 +1,53 @@
+/* Navbar.css */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .toggle-button {
+    font-size: 1.5rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .navbar {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #333;
+    color: white;
+    width: 200px;
+    height: 100vh;
+    transform: translateX(-100%); /* Mặc định ẩn */
+    transition: transform 0.3s ease;
+    padding: 10px;
+  }
+  
+  .navbar.open {
+    transform: translateX(0); /* Hiện thanh navbar */
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 0;
+    font-size: 1rem;
+  }
+  
+  .navbar a:hover {
+    background-color: #575757;
+  }
+  
+  .navbar-container.open .navbar {
+    transform: translateX(0);
+  }
+  
+  .navbar-container.closed .navbar {
+    transform: translateX(-100%);
+  }
+  
