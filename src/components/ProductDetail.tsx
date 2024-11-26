@@ -98,7 +98,7 @@ const ProductDetail = () => {
                         <div className="ml-[40px] mr-[30px]">
                             {selectedImage && (
                                 <img
-                                    className="w-[690px] h-[690px] object-cover rounded-lg border border-gray-200"
+                                    className="w-[690px] h-[650px] object-cover rounded-lg border border-gray-200"
                                     src={selectedImage}
                                     alt={product.name}
                                 />
