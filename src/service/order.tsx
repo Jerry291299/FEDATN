@@ -68,3 +68,15 @@ export const placeOrder = async (orderData: IOrderData) => {
     throw error;
   }
 };
+
+
+
+export const getOrdersByUserId = async (userId: string) => {
+  try {
+    const response = await axiosservice.get(`/orders/${userId}`);
+    return response.data.orders;
+  } catch (error) {
+    console.error("Error fetching order history:", error);
+    throw error;
+  }
+};

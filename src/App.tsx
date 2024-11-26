@@ -29,11 +29,13 @@ import ListMaterial from "./components/admin/Material";
 import AddMaterial from "./components/admin/modaladd/addmaterial";
 import { updateMaterial } from "./service/material";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
-import OrderList from "./components/OrderList";
-import Donhang from "./components/Order";
+
+import Donhang from "./components/Orderlisthistory";
 import Shipper from "./layout/Shipper";
 import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
 import OrdersShipper from "./components/admin/shipper/OrdersShipper";
+import Orderlist from "./components/Orderlisthistory";
+import Orderlisthistory from "./components/Orderlisthistory";
 
 function App() {
   return (
@@ -41,7 +43,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          
+
           <Route path="/products" element={<Productspage />} />
           <Route path="/products/categories/:id" element={<Productspage />} />
           <Route path="/search/:searchTerm" element={<SearchResults />} />
@@ -60,10 +62,10 @@ function App() {
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
           <Route path="/gioithieu" element={<Gioithieu />} />
           <Route path="/order" element={<OrderPayment />} />
-          <Route path="/donhang" element={<Donhang/>} />
+          <Route path="/donhang" element={<Orderlisthistory />} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
-          
+
           <Route
             path="/admin"
             element={
@@ -81,7 +83,7 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
-            
+
             <Route
               path="Listcategory/updatecategory/:id"
               Component={Updatecategory}
@@ -90,20 +92,19 @@ function App() {
               path="Material/updateMaterial/:id"
               Component={UpdateMaterial}
             ></Route>
-            
           </Route>
           <Route
-          path="/shipper"
-          element={
-            <Privaterouter>
-              <Shipper />
-            </Privaterouter>
-          }
-        >
-          <Route path="/shipper/dashboard" element={<ShipperDashboard />} />
-          {/* {/* <Route path="orders" element={<ShipperOrders />} /> */}
-          <Route path="/shipper/orders" element={<OrdersShipper />} /> 
-        </Route>
+            path="/shipper"
+            element={
+              <Privaterouter>
+                <Shipper />
+              </Privaterouter>
+            }
+          >
+            <Route path="/shipper/dashboard" element={<ShipperDashboard />} />
+            {/* {/* <Route path="orders" element={<ShipperOrders />} /> */}
+            <Route path="/shipper/orders" element={<OrdersShipper />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
