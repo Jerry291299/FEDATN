@@ -6,37 +6,27 @@ interface Comment {
   user: string; 
   text: string; 
   createdAt: string; 
-  // email: string;
   name: string;
 }
 
 const CommentSection: React.FC<{ 
   productId: string; 
-  user: IUser | any
+  user: IUser | any;
 }> = ({ 
   productId, 
   user
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
-  const [editCommentId, setEditCommentId] = useState<number | null>(null);
-  const [editCommentText, setEditCommentText] = useState<string>("");
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
 
   useEffect(() => {
     const storedComments = localStorage.getItem(`comments_${productId}`);
     if (storedComments) {
-       const cmts = JSON.parse(storedComments)
-       setComments(cmts);
+      const cmts = JSON.parse(storedComments);
+      setComments(cmts);
     }   
   }, [productId]);
-
-//   useEffect(() => {
-//     if (user) {
-//         const {info} = user as any;
-//         console.log('info', info);
-//         setComments(info);
-//     }
-//   }, [user]);
 
   const saveComments = (updatedComments: Comment[]) => {
     setComments(updatedComments);
@@ -47,37 +37,34 @@ const CommentSection: React.FC<{
     if (newComment.trim()) {
       const newCommentObj: Comment = {
         id: comments.length > 0 ? comments[comments.length - 1].id + 1 : 1,
-        user: '', 
-        // email: user?.info.email,
+        user: user.role === "admin" ? "Admin" : user.info.name,
         text: newComment.trim(),
         createdAt: new Date().toLocaleString(),
         name: user.info.name,
       };
-        const map = [...comments, newCommentObj];
-      saveComments(map);
+      saveComments([...comments, newCommentObj]);
       setNewComment("");
     }
   };
 
-  const handleEditComment = (id: number, text: string) => {
-    setEditCommentId(id);
-    setEditCommentText(text);
+  const handleEditComment = (comment: Comment) => {
+    setEditingComment(comment);
   };
 
   const handleUpdateComment = () => {
-    if (editCommentId !== null && editCommentText.trim()) {
+    if (editingComment && editingComment.text.trim()) {
       const updatedComments = comments.map((comment) =>
-        comment.id === editCommentId ? { ...comment, text: editCommentText.trim() } : comment
+        comment.id === editingComment.id
+          ? { ...comment, text: editingComment.text.trim() }
+          : comment
       );
       saveComments(updatedComments);
-      setEditCommentId(null);
-      setEditCommentText("");
+      setEditingComment(null);
     }
   };
 
   const handleCancelEdit = () => {
-    setEditCommentId(null);
-    setEditCommentText("");
+    setEditingComment(null);
   };
 
   const handleDeleteComment = (id: number) => {
@@ -92,11 +79,11 @@ const CommentSection: React.FC<{
         {comments.length > 0 ? (
           comments.map((comment) => (
             <div key={comment.id} className="comment flex items-center p-4 bg-white rounded-lg shadow-md">
-              {editCommentId === comment.id ? (
+              {editingComment && editingComment.id === comment.id ? (
                 <div className="flex flex-col w-full space-y-2">
                   <textarea
-                    value={editCommentText}
-                    onChange={(e) => setEditCommentText(e.target.value)}
+                    value={editingComment.text}
+                    onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
                     className="border border-gray-300 rounded-md p-2 w-full"
                   />
                   <div className="flex space-x-2">
@@ -113,21 +100,22 @@ const CommentSection: React.FC<{
                 </div>
               ) : (
                 <div className="flex flex-col w-full">
-                  <span className="text-lg font-semibold">{comment.user}</span>
                   <span className="text-lg font-semibold">{comment.name}</span>
                   <p className="text-gray-700">{comment.text}</p>
                   <p className="text-xs text-gray-500">{comment.createdAt}</p>
-                  <div className="flex space-x-2 mt-2">
-                    <button
-                      className="text-yellow-500"
-                      onClick={() => handleEditComment(comment.id, comment.text)}
-                    >
-                      Chỉnh sửa
-                    </button>
-                    <button className="text-red-500" onClick={() => handleDeleteComment(comment.id)}>
-                      Xóa
-                    </button>
-                  </div>
+                  {(user.info.name === comment.name || user.role === "admin") && ( 
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        className="text-yellow-500"
+                        onClick={() => handleEditComment(comment)}
+                      >
+                        Chỉnh sửa
+                      </button>
+                      <button className="text-red-500" onClick={() => handleDeleteComment(comment.id)}>
+                        Xóa
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
