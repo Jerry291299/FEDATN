@@ -1,5 +1,5 @@
 import React from "react";
-import Order from "./Order";
+import Order from "./Orderlisthistory";
 
 const PlacedOrders = () => {
   // Dữ liệu mẫu cho các đơn hàng đã đặt
@@ -37,21 +37,39 @@ const PlacedOrders = () => {
         <table className="w-full table-auto border-collapse border border-gray-200">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2 text-left">Mã đơn hàng</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Ngày đặt</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Thành tiền</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Trạng thái thanh toán</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Vận chuyển</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Mã đơn hàng
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Ngày đặt
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Thành tiền
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Trạng thái thanh toán
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Vận chuyển
+              </th>
             </tr>
           </thead>
           <tbody>
             {placedOrders.map((order, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2">{order.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.date}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.amount}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.paymentStatus}</td>
-                <td className="border border-gray-300 px-4 py-2">{order.shippingStatus}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.date}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.amount}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.paymentStatus}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.shippingStatus}
+                </td>
               </tr>
             ))}
           </tbody>

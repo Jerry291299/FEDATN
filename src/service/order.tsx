@@ -38,7 +38,7 @@ export interface IOrderData {
     _id: string;
     userId: { name: string; email: string };
     items: {
-      productId: { name: string; price: number; img: string[] };
+      productId: { _id: string;name: string; price: number; img: string[] };
       name: string;
       price: number;
       quantity: number;
@@ -65,6 +65,18 @@ export const placeOrder = async (orderData: IOrderData) => {
     return response.data; // Returns the order confirmation or status
   } catch (error) {
     console.error("Error placing order:", error);
+    throw error;
+  }
+};
+
+
+
+export const getOrdersByUserId = async (userId: string) => {
+  try {
+    const response = await axiosservice.get(`/orders/${userId}`);
+    return response.data.orders;
+  } catch (error) {
+    console.error("Error fetching order history:", error);
     throw error;
   }
 };

@@ -35,11 +35,13 @@ import Updatecategory from "./components/admin/modaladd/updatecategory";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
 import UpdateUser from "./components/admin/modaladd/updateuser";
 
-import OrderList from "./components/OrderList";
-import Donhang from "./components/Order";
+import OrderList from "./components/Orderlisthistory";
+import Donhang from "./components/OrderPayment";
 import Shipper from "./layout/Shipper";
 import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
 import OrdersShipper from "./components/admin/shipper/OrdersShipper";
+import Orderlist from "./components/Orderlisthistory";
+import Orderlisthistory from "./components/Orderlisthistory";
 
 function App() {
   return (
