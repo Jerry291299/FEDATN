@@ -33,6 +33,82 @@ const OrdersShipper = (props: Props) => {
     fetchOrders();
   }, []);
 
+  // Update order status and payment method
+  const handleOrderUpdate = async (orderId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.put(
+        `http://localhost:28017/orders-list/${orderId}`,
+        {
+          status: "delivered", // Trạng thái đơn hàng
+          paymentMethod: "Đã Thanh Toán", // Phương thức thanh toán
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId
+              ? {
+                  ...order,
+                  status: "delivered",
+                  paymentMethod: "Đã Thanh Toán",
+                }
+              : order
+          )
+        );
+      } else {
+        setError(
+          "Không thể cập nhật trạng thái đơn hàng và phương thức thanh toán"
+        );
+      }
+    } catch (err) {
+      setError(
+        "Không thể cập nhật trạng thái đơn hàng và phương thức thanh toán"
+      );
+      console.error("Error updating order status and payment method:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // Cancel
+  const handleCancelOrder = async (orderId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.put(
+        `http://localhost:28017/orders-list/${orderId}`,
+        {
+          status: "cancelledOrder",
+          paymentMethod: "cash_on_delivery", // Cập nhật phương thức thanh toán
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId
+              ? {
+                  ...order,
+                  status: "cancelledOrder",
+                  paymentMethod: "cash_on_delivery",
+                }
+              : order
+          )
+        );
+      } else {
+        setError("Không thể hủy đơn hàng");
+      }
+    } catch (err) {
+      setError("Không thể hủy đơn hàng");
+      console.error("Error canceling order:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Pagination logic
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
@@ -46,7 +122,9 @@ const OrdersShipper = (props: Props) => {
         Danh sách đơn hàng cho shipper
       </h1>
 
-      {isLoading && <p className="text-center text-gray-500">Đang tải đơn hàng...</p>}
+      {isLoading && (
+        <p className="text-center text-gray-500">Đang tải đơn hàng...</p>
+      )}
       {error && <p className="text-center text-red-500">{error}</p>}
 
       {currentOrders.length > 0 ? (
@@ -54,22 +132,36 @@ const OrdersShipper = (props: Props) => {
           <table className="min-w-full table-auto border-collapse">
             <thead className="bg-blue-100 text-gray-700">
               <tr>
-                {["Khách hàng", "Sản phẩm", "Số điện thoại", "Địa chỉ", "Tổng số tiền", "Trạng thái", "Phương thức thanh toán", "Hành động"].map(
-                  (header) => (
-                    <th key={header} className="border-b px-4 py-2 text-left font-semibold">
-                      {header}
-                    </th>
-                  )
-                )}
+                {[
+                  "Khách hàng",
+                  "Sản phẩm",
+                  "Số điện thoại",
+                  "Địa chỉ",
+                  "Tổng số tiền",
+                  "Trạng thái",
+                  "Phương thức thanh toán",
+                  "Hành động",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="border-b px-4 py-2 text-left font-semibold"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {currentOrders.map((order, index) => (
                 <tr
                   key={order._id}
-                  className={`hover:bg-gray-50 transition-colors duration-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                  className={`hover:bg-gray-50 transition-colors duration-200 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
                 >
-                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">{order.customerDetails.name}</td>
+                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">
+                    {order.customerDetails.name}
+                  </td>
                   <td className="border-b px-4 py-2 text-sm font-semibold text-gray-600">
                     {order.items && order.items.length > 0
                       ? order.items.slice(0, 10).map((item, idx) => (
@@ -86,8 +178,12 @@ const OrdersShipper = (props: Props) => {
                         ))
                       : "Không có sản phẩm"}
                   </td>
-                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">{order.customerDetails.phone}</td>
-                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">{order.customerDetails.address}</td>
+                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">
+                    {order.customerDetails.phone}
+                  </td>
+                  <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">
+                    {order.customerDetails.address}
+                  </td>
                   <td className="border-b px-4 py-2 font-semibold text-sm text-gray-600">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
@@ -95,42 +191,55 @@ const OrdersShipper = (props: Props) => {
                     }).format(order.totalAmount)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex items-center">
-                          <span
-                            className={`px-4 py-1 text-sm font-semibold rounded-lg shadow-sm text-white ${order.status === "pending"
-                                ? "bg-yellow-500"
-                                : order.status === "delivered"
-                                  ? "bg-green-500"
-                                  : order.status === "cancelledOrder"
-                                    ? "bg-red-500"
-                                    : "bg-gray-400"
-                              }`}
-                          >
-                            {order.status === "pending"
-                              ? "Đang xử lý"
-                              : order.status === "delivered"
-                                ? "Đã giao"
-                                : order.status === "cancelledOrder"
-                                  ? "Đã hủy"
-                                  : "Không xác định"}
-                          </span>
-                        </div>
-                      </td>
+                    <div className="flex items-center">
+                      <span
+                        className={`px-4 py-1 text-sm font-semibold rounded-lg shadow-sm text-white ${
+                          order.status === "pending"
+                            ? "bg-yellow-500"
+                            : order.status === "delivered"
+                            ? "bg-green-500"
+                            : order.status === "cancelledOrder"
+                            ? "bg-red-500"
+                            : "bg-gray-400"
+                        }`}
+                      >
+                        {order.status === "pending"
+                          ? "Đang xử lý"
+                          : order.status === "delivered"
+                          ? "Đã giao"
+                          : order.status === "cancelledOrder"
+                          ? "Đã hủy"
+                          : "Không xác định"}
+                      </span>
+                    </div>
+                  </td>
                   <td className="border-b px-4 py-2 text-sm font-semibold text-gray-600">
-                    {order.paymentMethod === "cash_on_delivery" ? "Chưa thanh toán" : "Đã Thanh Toán"}
+                    {order.paymentMethod === "cash_on_delivery"
+                      ? "Chưa thanh toán"
+                      : "Đã Thanh Toán"}
                   </td>
                   <td className="border-b px-4 py-2 text-sm font-semibold text-gray-600">
                     {order.status === "pending" ? (
                       <div className="flex justify-center gap-x-2">
-                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                        <button
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                          onClick={() => handleOrderUpdate(order._id)}
+                        >
                           Đã giao và thanh toán
                         </button>
-                        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                          onClick={() => handleCancelOrder(order._id)}
+                        >
                           Hủy
                         </button>
                       </div>
                     ) : (
-                      <span className="text-gray-500">{order.status === "cancelledOrder" ? "Đã hủy" : "Đã giao"}</span>
+                      <span className="text-gray-500">
+                        {order.status === "cancelledOrder"
+                          ? "Đã hủy"
+                          : "Đã giao"}
+                      </span>
                     )}
                   </td>
                 </tr>
@@ -143,17 +252,21 @@ const OrdersShipper = (props: Props) => {
       )}
 
       <div className="mt-4 flex justify-center">
-        {Array.from({ length: Math.ceil(orders.length / itemsPerPage) }).map((_, index) => (
-          <button
-            key={index}
-            onClick={() => paginate(index + 1)}
-            className={`px-4 py-2 mx-1 rounded ${
-              currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-700"
-            }`}
-          >
-            {index + 1}
-          </button>
-        ))}
+        {Array.from({ length: Math.ceil(orders.length / itemsPerPage) }).map(
+          (_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
       </div>
     </div>
   );
