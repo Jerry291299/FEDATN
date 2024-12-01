@@ -126,23 +126,46 @@ const ProductDetail = () => {
                   </span>
                 </div>
                 <p className="font-bold text-gray-600">
-                  Tiết kiệm: <span className="text-red-600">50.000 ₫</span>
+                  Số lượng:{" "}
+                  <span
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {product.soLuong > 0
+                      ? `${product.soLuong} sản phẩm`
+                      : "Hết hàng"}
+                  </span>
                 </p>
                 <p className="font-bold text-gray-500 mt-2">
                   Tình trạng:{" "}
-                  <span className="font-semibold text-green-600">Còn hàng</span>
+                  <span
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {product.soLuong > 0 ? "Còn hàng" : "Hết hàng"}
+                  </span>
                 </p>
               </div>
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
+                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
+                  product.soLuong > 0
+                    ? "bg-gray-900 hover:bg-orange-400"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
                 onClick={async () => {
                   if (!product || !product._id) {
                     alert("Product ID is invalid.");
                     return;
                   }
                   if (!user || !user._id) {
-                    alert("Bạn phải đăng nhập thì mới mua được hàng?");
+                    alert("Bạn phải đăng nhập để mua hàng.");
+                    return;
+                  }
+                  if (product.soLuong <= 0) {
+                    alert("Sản phẩm đã hết hàng.");
                     return;
                   }
 
@@ -164,36 +187,18 @@ const ProductDetail = () => {
                       type: actions.ADD,
                       payload: response,
                     });
-                    alert("Added to cart successfully");
+                    alert("Đã thêm vào giỏ hàng thành công!");
                   } catch (error) {
-                    console.error("Failed to add products to cart", error);
+                    console.error(
+                      "Không thể thêm sản phẩm vào giỏ hàng",
+                      error
+                    );
                   }
                 }}
+                disabled={product.soLuong <= 0}
               >
-                Add to cart
+                {product.soLuong > 0 ? "Add to cart" : "Out of Stock"}
               </button>
-              <div className="my-4 font-bold">
-                <p className="text-gray-700">
-                  Gọi đặt mua:
-                  <a href="tel:0829721097" className="text-blue-600">
-                    0829721097
-                  </a>
-                  <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
-                </p>
-              </div>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                <li>
-                  MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
-                  <span className="font-bold">từ 10.000.000Đ</span>
-                </li>
-                <li>
-                  BẢO HÀNH <span className="font-bold">1 đổi 1</span> DO LỖI NHÀ
-                  SẢN XUẤT
-                </li>
-                <li>
-                  CAM KẾT <span className="font-bold">100% chính hãng</span>
-                </li>
-              </ul>
             </div>
           </div>
         )}

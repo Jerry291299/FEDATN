@@ -4,10 +4,11 @@ import Footer from "./Footer";
 import Header from "./Header";
 import { getOrdersByUserId } from "../service/order"; // Adjust the import path as needed
 import { NavLink } from "react-router-dom";
+import LoadingComponent from "./Loading";
 
 const Orderlisthistory = () => {
   const [orders, setOrders] = useState([]); // Orders state
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null); // Error state
 
   useEffect(() => {
@@ -35,7 +36,13 @@ const Orderlisthistory = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading orders...</p>;
+    return (
+      <>
+      <Header/>
+      {loading && <LoadingComponent />}
+      <Footer/>
+      </>
+    );
   }
 
   if (error) {

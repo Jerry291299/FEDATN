@@ -15,6 +15,8 @@ type Props = {};
 const Dashboard = (props: Props) => {
   const [products, setProduct] = useState<Iproduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [filterMaterial, setFilterMaterial] = useState<string>(""); // State để lọc theo chất liệu
+  const [filterPrice, setFilterPrice] = useState<[number, number]>([0, 100000]); // State để lọc theo giá (ví dụ giá từ 0 đến 100000)
 
   const [filterName, setFilterName] = useState<string>(""); // State để lưu giá trị lọc theo tên
   const navigate = useNavigate();
@@ -96,17 +98,17 @@ const Dashboard = (props: Props) => {
   const uniqueCategories = Array.from(
     new Set(products.map((product) => product.category.name))
   );
-//   const csvData = filteredProducts.map((products) => ({
-//     ID: products._id,
-//     "Tên sản phẩm": products.name,
-//     "Gía sản phẩm": products.price,
-//     "Tên danh mục": products.category.name,
-//     "Tên chất liệu": products.material,
-//     "Số lượng sản phẩm": products.soLuong,
-//     "Mô tả sản phẩm": products.moTa,
-//     "Anh sản phẩm": products.img,
-//     "Trạng thái": products.status === "active" ? "Hoạt động" : "Vô hiệu hóa",
-//   }));
+  //   const csvData = filteredProducts.map((products) => ({
+  //     ID: products._id,
+  //     "Tên sản phẩm": products.name,
+  //     "Gía sản phẩm": products.price,
+  //     "Tên danh mục": products.category.name,
+  //     "Tên chất liệu": products.material,
+  //     "Số lượng sản phẩm": products.soLuong,
+  //     "Mô tả sản phẩm": products.moTa,
+  //     "Anh sản phẩm": products.img,
+  //     "Trạng thái": products.status === "active" ? "Hoạt động" : "Vô hiệu hóa",
+  //   }));
 
   return (
     <>

@@ -42,6 +42,8 @@ import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
 import OrdersShipper from "./components/admin/shipper/OrdersShipper";
 import Orderlist from "./components/Orderlisthistory";
 import Orderlisthistory from "./components/Orderlisthistory";
+import NewsTable from "./components/admin/tintuc";
+import AddNews from "./components/admin/modaladd/addtintuc";
 
 function App() {
   return (
@@ -81,6 +83,7 @@ function App() {
             }
           >
             <Route path="add" element={<Add />} />
+            <Route path="addNews" element={<AddNews />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Listcategory" element={<Listcategory />} />
             <Route path="addcategory" element={<Addcategory />} />
