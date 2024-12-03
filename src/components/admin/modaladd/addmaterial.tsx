@@ -5,7 +5,7 @@ import { addMaterial } from '../../../service/material';
 import { IMaterial } from '../../../interface/material';
 
 const AddMaterial = () => {
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage(); // useMessage Hook
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
@@ -23,14 +23,13 @@ const AddMaterial = () => {
 
       if (material) {
         console.log("Added Material:", material);
-        info();
+        info(); // Call success message
         message.success("Thêm Chất Liệu thành công!");
         form.resetFields();
         navigate("/admin/Material"); // Điều hướng người dùng đến trang ListMaterial sau khi thêm thành công
       } else {
         messageApi.error("Failed to add material");
       }
-
     } catch (error) {
       console.error("Error adding material:", error);
       messageApi.error("Server Error: Could not add material.");
@@ -39,6 +38,7 @@ const AddMaterial = () => {
 
   return (
     <>
+      {contextHolder} {/* Render context for messages */}
       <div className="pt-[20px] px-[30px]">
         <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
           <Form form={form} initialValues={{ material: "1" }} onFinish={onFinish}>

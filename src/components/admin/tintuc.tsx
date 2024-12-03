@@ -1,35 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Pagination, Popconfirm } from "antd";
- // Đảm bảo đường dẫn đúng
-import LoadingComponent from "../Loading"; // Tùy thuộc bạn đã có component này
-import { Inews } from "../../interface/news";
+import { Popconfirm } from "antd";
+import LoadingComponent from "../Loading"; // Đảm bảo đường dẫn đúng
+import { InewsLite } from "../../interface/news";
 import { deletePost, getAllPosts } from "../../service/new";
 
 type Props = {};
 
 const DashboardNews = (props: Props) => {
-    const [news, setNews] = useState<Inews[]>([]);
+    const [news, setNews] = useState<InewsLite[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [pageConfig, setPageConfig] = useState<any>();
-    const [page, setPage] = useState<any>({
-        limit: 5,
-        currentPage: 1,
-    });
 
     const navigate = useNavigate();
 
-    const fetchNews = async (currentPage: number) => {
+    const fetchNews = async () => {
         try {
             setLoading(true);
-            const data = await getAllPosts({
-                limit: page.limit,
-                page: currentPage,
-            });
-            console.log(data)
+            const data = await getAllPosts(); // Không truyền tham số
             setNews(data || []);
-
-            setPageConfig(data);
         } catch (error) {
             console.log("Error fetching news:", error);
         } finally {
@@ -38,18 +26,15 @@ const DashboardNews = (props: Props) => {
     };
 
     useEffect(() => {
-        fetchNews(1); // Lấy dữ liệu trang đầu tiên khi render component
+        fetchNews(); // Gọi API khi component được render
     }, []);
-
-    const handlePageChange = (currentPage: number) => {
-        setPage((prev: any) => ({ ...prev, currentPage }));
-        fetchNews(currentPage);
-    };
 
     const deleteSelectedNews = async (id: string) => {
         try {
-            await deletePost(id);
-            setNews((prev) => prev.filter((item) => item._id !== id));
+            const message = await deletePost(id);
+            if (message) {
+                setNews((prev) => prev.filter((item) => item._id !== id));
+            }
         } catch (error) {
             console.log("Error deleting news:", error);
         }
@@ -88,9 +73,6 @@ const DashboardNews = (props: Props) => {
                                             Mô tả
                                         </th>
                                         <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                                            Nội dung
-                                        </th>
-                                        <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
                                             Hành động
                                         </th>
                                     </tr>
@@ -121,14 +103,6 @@ const DashboardNews = (props: Props) => {
                                                           50
                                                       )}...`
                                                     : item.descriptions}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">
-                                                {item.content.length > 50
-                                                    ? `${item.content.substring(
-                                                          0,
-                                                          50
-                                                      )}...`
-                                                    : item.content}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-900">
                                                 <button
@@ -162,12 +136,6 @@ const DashboardNews = (props: Props) => {
                     </div>
                 </div>
             </div>
-            <Pagination
-                onChange={handlePageChange}
-                pageSize={pageConfig?.limit}
-                total={pageConfig?.totalDocs || 0}
-                current={page.currentPage}
-            />
         </>
     );
 };

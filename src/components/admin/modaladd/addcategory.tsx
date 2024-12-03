@@ -1,82 +1,71 @@
-import React, { useState } from 'react'
-import { Form, FormProps, Input, message, Popconfirm, Select, SelectProps } from "antd";
+import React, { useState } from 'react';
+import { Form, Input, notification } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { addCategory } from '../../../service/category';
 import { Icategory } from '../../../interface/category';
-type Props = {}
+
+type Props = {};
 
 const Addcategory = (props: Props) => {
-    const [name, setName] = useState<string>("");
   const [category, setCategory] = useState<Icategory[]>([]);
-//   const [products, setProducts] = useState<Iproduct[]>([]);
-  const [messageApi, contextHolder] = message.useMessage();
-  
-  const navigate = useNavigate();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-  
-
-  const info = () => {
-    messageApi.open({
-      type: "success",
-      content: "Category added successfully",
+  const openNotification = (type: "success" | "error", message: string, description: string) => {
+    notification[type]({
+      message: message,
+      description: description,
+      placement: "topRight",
     });
   };
 
   const onFinish = async (values: any) => {
-    console.log("Success:", values);
-     
-    const payload =  {
-      ...values,
-     
+    try {
+      const payload = {
+        ...values,
+      };
+
+      const category = await addCategory(payload);
+      setCategory([category]); // Cập nhật danh mục mới
+
+      openNotification("success", "Thành công", "Danh mục đã được thêm thành công!");
+      form.resetFields();
+    } catch (error) {
+      console.error("Error adding category:", error);
+      openNotification("error", "Lỗi", "Không thể thêm danh mục. Vui lòng thử lại.");
     }
-    const category = await addCategory(payload);
-    console.log(category);
-
-    const necategory = [category];
-    setCategory(necategory);
-    setName("");
-     
-    info();
-    message.success("Thêm Danh Mục thành công !");
-
-
-    form.resetFields();
-
   };
+
   return (
-   <>
-   <div className="pt-[20px] px-[30px]">
+    <div className="pt-[20px] px-[30px]">
       <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
         <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>
           <div>
             <label className="mb-2 text-2xl text-black block">
-              Category name:
+              Tên danh mục:
             </label>
             <Form.Item
               name="name"
               rules={[
-                { required: true, message: "Please input your product category!!" },
+                { required: true, message: "Vui lòng nhập tên danh mục!" },
               ]}
             >
               <Input
                 className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter Category name"
+                placeholder="Nhập tên danh mục"
               />
             </Form.Item>
           </div>
-         
           <button
             type="submit"
             className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Thêm mới Danh Mục
+            Thêm mới danh mục
           </button>
         </Form>
       </div>
-      </div>
-   </>
-  )
-}
+    </div>
+  );
+};
 
-export default Addcategory
+export default Addcategory;
