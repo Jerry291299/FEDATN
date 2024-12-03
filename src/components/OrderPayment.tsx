@@ -7,12 +7,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { IOrderData, placeOrder } from "../service/order";
 import { createVNPayPayment } from "../service/payment";
 
-
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [order,setOrder] = useState<IOrderData[]>([])
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
-  const [user, setUser] = useState<string>('');
+  const [order, setOrder] = useState<IOrderData[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
+  const [user, setUser] = useState<string>("");
   const [customerDetails, setCustomerDetails] = useState({
     name: "",
     phone: "",
@@ -46,7 +46,9 @@ function OrderPayment() {
     setSelectedPaymentMethod(method);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setCustomerDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
   };
@@ -64,11 +66,11 @@ function OrderPayment() {
       alert("Vui lòng chọn phương thức thanh toán.");
       return;
     }
-  
+
     const totalAmount = cartItems.reduce((total, item) => {
       return total + (item.price || 0) * (item.quantity || 0);
     }, 0);
-  
+
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
@@ -76,7 +78,7 @@ function OrderPayment() {
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
-  
+
     try {
       if (selectedPaymentMethod === "bank_transfer" || selectedPaymentMethod === "cash_on_delivery") {
         await placeOrder(orderData);
@@ -93,7 +95,6 @@ function OrderPayment() {
       alert("Xác nhận đơn hàng thất bại. Vui lòng thử lại.");
     }
   };
-  
 
   return (
     <>
@@ -116,7 +117,9 @@ function OrderPayment() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium">Số điện thoại *</label>
+                <label className="block text-sm font-medium">
+                  Số điện thoại *
+                </label>
                 <input
                   type="tel"
                   name="phone"
@@ -130,7 +133,9 @@ function OrderPayment() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium">Địa chỉ email *</label>
+                <label className="block text-sm font-medium">
+                  Địa chỉ email *
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -166,56 +171,71 @@ function OrderPayment() {
             </div>
           </form>
 
-
-
-
-
-
-
-
           <h2 className="text-lg font-bold mt-8">Phương thức thanh toán</h2>
           <div className="flex gap-4 mt-4">
-  <button
-    onClick={() => handlePaymentMethodChange("bank_transfer")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "bank_transfer" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">Thanh toán online</span>
-  </button>
-  <button
-    onClick={() => handlePaymentMethodChange("cash_on_delivery")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "cash_on_delivery" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">Thanh toán khi nhận hàng</span>
-  </button>
-  <button
-    onClick={() => handlePaymentMethodChange("vnpay")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "vnpay" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">VNPay</span>
-  </button>
-</div>
+            <button
+              onClick={() => handlePaymentMethodChange("bank_transfer")}
+              className={`w-full border p-4 rounded-md flex items-center justify-center ${
+                selectedPaymentMethod === "bank_transfer"
+                  ? "bg-gray-200"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <span className="text-lg font-medium">
+                Chuyển khoản ngân hàng
+              </span>
+            </button>
+            <button
+              onClick={() => handlePaymentMethodChange("cash_on_delivery")}
+              className={`w-full border p-4 rounded-md flex items-center justify-center ${
+                selectedPaymentMethod === "cash_on_delivery"
+                  ? "bg-gray-200"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <span className="text-lg font-medium">
+                Thanh toán khi nhận hàng
+              </span>
+            </button>
+          </div>
 
           {/* Bank transfer details if selected */}
-          
+          {selectedPaymentMethod === "bank_transfer" && (
+            <div className="mt-4">
+              <h3 className="text-sm font-bold">Ngân hàng Vietcombank</h3>
+              <p>Số tài khoản: 0071000745809</p>
+              <p>
+                Tên chủ tài khoản: CT CP NOI THAT AKA VIETCOMBANK – CHI NHÁNH
+                TP.HCM
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Right Column */}
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-lg font-semibold mb-4">Giỏ hàng ({cartItems.length} sản phẩm)</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Giỏ hàng ({cartItems.length} sản phẩm)
+          </h2>
           {cartItems.map((item) => (
-            <div key={item.productId} className="flex items-center justify-between mb-4">
+            <div
+              key={item.productId}
+              className="flex items-center justify-between mb-4"
+            >
               <div className="flex items-center">
-                <img src={item.img[0]} alt={item.name} className="w-16 h-16 rounded-md mr-4" />
+                <img
+                  src={item.img[0]}
+                  alt={item.name}
+                  className="w-16 h-16 rounded-md mr-4"
+                />
                 <span>{item.name}</span>
               </div>
               <span className="font-semibold">
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.price)} x {item.quantity}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(item.price)}{" "}
+                x {item.quantity}
               </span>
             </div>
           ))}
@@ -223,15 +243,25 @@ function OrderPayment() {
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng cộng</span>
               <span>
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(total)}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(total)}
               </span>
             </div>
           </div>
 
           {/* Order confirmation button */}
           <div className="mt-6 flex justify-between items-center">
-            <NavLink to={`/Cart/${user}`} className="text-blue-500">Quay về giỏ hàng</NavLink>
-            <button onClick={handleOrderSubmit} className="bg-blue-500 text-white px-6 py-3 rounded-lg">Xác nhận</button>
+            <NavLink to={`/Cart/${user}`} className="text-blue-500">
+              Quay về giỏ hàng
+            </NavLink>
+            <button
+              onClick={handleOrderSubmit}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg"
+            >
+              Xác nhận
+            </button>
           </div>
         </div>
       </div>
@@ -244,4 +274,3 @@ export default OrderPayment;
 function confirmOrder(orderData: any) {
   throw new Error("Function not implemented.");
 }
-

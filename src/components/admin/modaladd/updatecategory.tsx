@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, notification } from "antd";
+import { Form, Input, message, notification } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCategoryByID, updateCategory } from "../../../service/category";
 import { Icategory } from "../../../interface/category";
+import { getCategoryByID, updateCategory } from "../../../service/category";
 
-const Updatecategory = () => {
+type Props = {};
+
+const Updatecategory = (props: Props) => {
+  const [name, setName] = useState<string>("");
+  const [category, setCategory] = useState<Icategory[]>([]);
+  const [messageApi] = message.useMessage();
+
+  const Navigate = useNavigate();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -43,29 +50,20 @@ const Updatecategory = () => {
 
   const onFinish = async (values: any) => {
     try {
-      const updatedCategory = await updateCategory(id, values);
+      const categoryData = { ...values };
+      const updatedCategory = await updateCategory(id, categoryData);
 
       if (updatedCategory) {
-        showNotification(
-          "success",
-          "Danh mục cập nhật thành công!",
-          `Tên danh mục mới: ${updatedCategory.name}`
-        );
+        console.log("Updated Category:", updatedCategory);
+        message.success("Cập nhật danh mục thành công");
+        form.resetFields();
         navigate("/admin/Listcategory");
       } else {
-        showNotification(
-          "error",
-          "Lỗi",
-          "Cập nhật danh mục thất bại, vui lòng thử lại!"
-        );
+        message.error("Không thể cập nhật danh mục");
       }
     } catch (error) {
-      console.error("Error updating category:", error);
-      showNotification(
-        "error",
-        "Lỗi máy chủ",
-        "Không thể cập nhật danh mục, vui lòng liên hệ quản trị viên!"
-      );
+      console.error("Lỗi khi cập nhật danh mục:", error);
+      message.error("Lỗi máy chủ: Không thể cập nhật danh mục.");
     }
   };
 

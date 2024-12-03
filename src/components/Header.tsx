@@ -177,33 +177,7 @@ const Header = () => {
             <Link to="/" className="hover:border-b-2 border-black">
               Trang chủ
             </Link>
-            <div className="relative">
-              <button
-                onClick={toggleCategories}
-                className="hover:border-b-2 border-black"
-              >
-                Danh Mục
-              </button>
-              {isCategoriesOpen && (
-                <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {categories
-                    .filter((category) => category.status === "active")
-                    .map((category) => (
-                      <li key={category._id} className="hover:bg-gray-100">
-                        <Link
-                          to={`/categories/${category.name}`} // Use category name in the path
-                          onClick={() => handleCategoryFilter(category.name)}
-                          className="block px-4 py-2"
-                          
-                        >
-                          {category.name}
-                         
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
-              )}
-            </div>
+            
             <NavLink to={"/products"} className="hover:border-b-2 border-black">
               Sản phẩm
             </NavLink>

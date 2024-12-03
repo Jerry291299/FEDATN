@@ -1,70 +1,79 @@
-import React, { useState } from 'react';
-import { Form, Input, notification } from "antd";
-import { useNavigate } from 'react-router-dom';
-import { addCategory } from '../../../service/category';
-import { Icategory } from '../../../interface/category';
+import React, { useState } from "react";
+import { Form, Input, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { addCategory } from "../../../service/category";
+import { Icategory } from "../../../interface/category";
 
 type Props = {};
 
 const Addcategory = (props: Props) => {
-  const [category, setCategory] = useState<Icategory[]>([]);
+  const [name, setName] = useState<string>("");
+  const [messageApi] = message.useMessage();
+
+  const Navigate = useNavigate();
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const openNotification = (type: "success" | "error", message: string, description: string) => {
-    notification[type]({
-      message: message,
-      description: description,
-      placement: "topRight",
+  const info = () => {
+    messageApi.open({
+      type: "success",
+      content: "Thêm danh mục thành công",
     });
   };
 
   const onFinish = async (values: any) => {
     try {
-      const payload = {
-        ...values,
-      };
-
+      const payload = { ...values };
       const category = await addCategory(payload);
-      setCategory([category]); // Cập nhật danh mục mới
 
-      openNotification("success", "Thành công", "Danh mục đã được thêm thành công!");
-      form.resetFields();
+      if (category) {
+        setName("");
+        info();
+        message.success("Thêm Danh Mục thành công!");
+
+        form.resetFields();
+        navigate("/admin/Listcategory"); // Quay lại trang danh sách danh mục
+      } else {
+        message.error("Không thể thêm danh mục");
+      }
     } catch (error) {
-      console.error("Error adding category:", error);
-      openNotification("error", "Lỗi", "Không thể thêm danh mục. Vui lòng thử lại.");
+      console.error("Lỗi khi thêm danh mục:", error);
+      message.error("Lỗi máy chủ: Không thể thêm danh mục.");
     }
   };
 
   return (
-    <div className="pt-[20px] px-[30px]">
-      <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-        <Form form={form} initialValues={{ category: "1" }} onFinish={onFinish}>
-          <div>
-            <label className="mb-2 text-2xl text-black block">
-              Tên danh mục:
-            </label>
-            <Form.Item
-              name="name"
-              rules={[
-                { required: true, message: "Vui lòng nhập tên danh mục!" },
-              ]}
+    <>
+      <div className="pt-[20px] px-[30px]">
+        <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
+          <Form form={form} onFinish={onFinish}>
+            <div>
+              <label className="mb-2 text-2xl text-black block">
+                Tên danh mục:
+              </label>
+              <Form.Item
+                name="name"
+                rules={[
+                  { required: true, message: "Vui lòng nhập tên danh mục!" },
+                ]}
+              >
+                <Input
+                  className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
+                  placeholder="Nhập tên danh mục"
+                />
+              </Form.Item>
+            </div>
+
+            <button
+              type="submit"
+              className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              <Input
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Nhập tên danh mục"
-              />
-            </Form.Item>
-          </div>
-          <button
-            type="submit"
-            className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Thêm mới danh mục
-          </button>
-        </Form>
+              Thêm mới Danh Mục
+            </button>
+          </Form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
