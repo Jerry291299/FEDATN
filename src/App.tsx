@@ -29,6 +29,7 @@ import ListMaterial from "./components/admin/Material";
 import AddMaterial from "./components/admin/modaladd/addmaterial";
 import { updateMaterial } from "./service/material";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
+import CommentDashboard from "./components/admin/CommentDashboard";
 
 import Donhang from "./components/Orderlisthistory";
 import Shipper from "./layout/Shipper";
@@ -49,6 +50,7 @@ function App() {
           <Route path="/products" element={<Productspage />} />
           <Route path="/products/categories/:id" element={<Productspage />} />
           <Route path="/search/:searchTerm" element={<SearchResults />} />
+          
           <Route
             path="/Cart/:id"
             element={
@@ -76,6 +78,7 @@ function App() {
               </Privaterouter>
             }
           >
+            <Route path="comments" element={<CommentDashboard />} />
             <Route path="add" element={<Add />} />
             <Route path="addNews" element={<AddNews />} />
             <Route path="dashboard" element={<Dashboard />} />
