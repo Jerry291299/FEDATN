@@ -5,6 +5,7 @@ import { getCartByID } from "../service/cart";
 import { CartItem } from "../interface/cart";
 import { NavLink, useNavigate } from "react-router-dom";
 import { IOrderData, placeOrder } from "../service/order";
+import { createVNPayPayment } from "../service/payment";
 
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -59,8 +60,10 @@ function OrderPayment() {
   }, 0);
 
   const handleOrderSubmit = async () => {
+    console.log("Order ID being sent:", user); // Kiểm tra giá trị
+  
     if (!selectedPaymentMethod) {
-      alert("Please select a payment method.");
+      alert("Vui lòng chọn phương thức thanh toán.");
       return;
     }
 
@@ -77,12 +80,19 @@ function OrderPayment() {
     };
 
     try {
-      const response = await placeOrder(orderData);
-      alert("Order confirmed successfully!");
-      setCartItems([]);
-      navigate("/success", { state: { orderData } });
+      if (selectedPaymentMethod === "bank_transfer" || selectedPaymentMethod === "cash_on_delivery") {
+        await placeOrder(orderData);
+        alert("Đơn hàng đã được xác nhận thành công!");
+        setCartItems([]);
+        navigate("/success", { state: { orderData } });
+        console.log("Order data:", orderData);
+      } else if (selectedPaymentMethod === "vnpay") {
+        console.log("Order data:", orderData);
+        const paymentUrl = await createVNPayPayment(orderData.userId, totalAmount);
+        window.location.href = paymentUrl; // Redirect to VNPay
+      }
     } catch (error) {
-      alert("Failed to confirm order. Please try again.");
+      alert("Xác nhận đơn hàng thất bại. Vui lòng thử lại.");
     }
   };
 
