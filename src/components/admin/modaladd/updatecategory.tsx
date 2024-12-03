@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, message } from "antd";
+import { Form, Input, message, notification } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icategory } from "../../../interface/category";
 import { getCategoryByID, updateCategory } from "../../../service/category";
@@ -11,9 +11,23 @@ const Updatecategory = (props: Props) => {
   const [category, setCategory] = useState<Icategory[]>([]);
   const [messageApi] = message.useMessage();
 
-  const navigate = useNavigate();
+  const Navigate = useNavigate();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const { id } = useParams();
+
+  // Utility function for notifications
+  const showNotification = (
+    type: "success" | "error",
+    message: string,
+    description?: string
+  ) => {
+    notification[type]({
+      message,
+      description,
+      placement: "topRight", // You can adjust the placement: 'topLeft', 'topRight', etc.
+    });
+  };
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -22,8 +36,14 @@ const Updatecategory = (props: Props) => {
         form.setFieldsValue({
           name: response.name,
         });
-        console.log(response);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching category:", error);
+        showNotification(
+          "error",
+          "Lỗi",
+          "Không thể tải danh mục, vui lòng thử lại!"
+        );
+      }
     };
     fetchCategory();
   }, [id, form]);
@@ -71,7 +91,6 @@ const Updatecategory = (props: Props) => {
                 />
               </Form.Item>
             </div>
-
             <button
               type="submit"
               className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"

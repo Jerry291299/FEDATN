@@ -10,8 +10,9 @@ const Addcategory = (props: Props) => {
   const [name, setName] = useState<string>("");
   const [messageApi] = message.useMessage();
 
-  const navigate = useNavigate();
+  const Navigate = useNavigate();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const info = () => {
     messageApi.open({
