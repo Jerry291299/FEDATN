@@ -1,4 +1,4 @@
-import { Form, Input, Select, Upload } from "antd";
+import { Form, Input, Select, Upload, notification } from "antd";
 import React, { useEffect, useState } from "react";
 import { getProductByID, updateProduct } from "../../../service/products";
 import { Iproduct } from "../../../interface/products";
@@ -7,15 +7,26 @@ import { getAllCategories } from "../../../service/category";
 import { Icategory } from "../../../interface/category";
 import { UploadOutlined } from "@ant-design/icons";
 
-type Props = {};
-
-const Update = (props: Props) => {
+const Update = () => {
   const [categories, setCategories] = useState<Icategory[]>([]);
   const [images, setImages] = useState<string[]>([]); // Existing images
   const [fileList, setFileList] = useState<any[]>([]); // Newly uploaded files
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
+
+  // Utility function for notifications
+  const showNotification = (
+    type: "success" | "error",
+    title: string,
+    description: string
+  ) => {
+    notification[type]({
+      message: title,
+      description,
+      placement: "topRight",
+    });
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -31,6 +42,11 @@ const Update = (props: Props) => {
         });
       } catch (error) {
         console.error("Error fetching product:", error);
+        showNotification(
+          "error",
+          "Lỗi",
+          "Không thể tải thông tin sản phẩm, vui lòng thử lại!"
+        );
       }
     };
 
@@ -40,6 +56,11 @@ const Update = (props: Props) => {
         setCategories(response.data || response);
       } catch (error) {
         console.error("Error fetching categories:", error);
+        showNotification(
+          "error",
+          "Lỗi",
+          "Không thể tải danh mục, vui lòng thử lại!"
+        );
       }
     };
 
@@ -49,7 +70,6 @@ const Update = (props: Props) => {
 
   const onFinish = async (values: Iproduct) => {
     try {
-      // Combine existing images and new uploaded images
       const newImages = fileList.map((file) => file.url || file.response.url);
       const updatedProduct = {
         ...values,
@@ -57,10 +77,15 @@ const Update = (props: Props) => {
       };
 
       await updateProduct(id, updatedProduct);
-      alert("Product updated successfully!");
+      showNotification("success", "Cập nhật sản phẩm thành công!" ,`Tên sản phẩm mới: ${updatedProduct.name}`);
       navigate("/admin/dashboard");
     } catch (error) {
       console.error("Error updating product:", error);
+      showNotification(
+        "error",
+        "Lỗi",
+        "Không thể cập nhật sản phẩm, vui lòng thử lại!"
+      );
     }
   };
 
