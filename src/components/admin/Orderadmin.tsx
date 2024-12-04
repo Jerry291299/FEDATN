@@ -6,8 +6,10 @@ interface Props { }
 
 const Order = (props: Props) => {
   const [orders, setOrders] = useState<IOrder[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Hàm định dạng tiền tệ VNĐ
   const formatCurrency = (value: number) => {
@@ -17,13 +19,14 @@ const Order = (props: Props) => {
     }).format(value);
   };
 
-  // Gọi API lấy danh sách đơn hàng với polling
+  // Gọi API lấy danh sách đơn hàng
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
         const response = await axiosservice.get("/orders");
         setOrders(response.data);
+        setFilteredOrders(response.data); // Khởi tạo danh sách lọc là toàn bộ danh sách
         setLoading(false);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách đơn hàng:", error);
@@ -33,13 +36,34 @@ const Order = (props: Props) => {
     };
 
     fetchOrders();
-
-    // Polling để cập nhật trạng thái sau mỗi 10 giây
-
   }, []);
+
+  // Xử lý tìm kiếm
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = event.target.value;
+    setSearchTerm(searchValue);
+
+    if (searchValue) {
+      const filtered = orders.filter((order) =>
+        order._id.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setFilteredOrders(filtered);
+    } else {
+      setFilteredOrders(orders); // Hiển thị lại toàn bộ danh sách nếu không có tìm kiếm
+    }
+  };
 
   return (
     <div className="mb-[20px] flex flex-col w-full">
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo mã đơn"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+        />
+      </div>
       <div className="overflow-x-auto">
         <div className="py-2 inline-block w-full px-0">
           <div className="overflow-hidden">
@@ -61,7 +85,7 @@ const Order = (props: Props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, index) => (
+                  {filteredOrders.map((order, index) => (
                     <tr key={order._id} className="bg-gray-100 border-b">
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{index + 1}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{order._id}</td>
@@ -82,12 +106,12 @@ const Order = (props: Props) => {
                         <div className="flex items-center">
                           <span
                             className={`px-4 py-1 text-sm font-semibold rounded-lg shadow-sm text-white ${order.status === "pending"
-                                ? "bg-yellow-500"
-                                : order.status === "delivered"
-                                  ? "bg-green-500"
-                                  : order.status === "cancelledOrder"
-                                    ? "bg-red-500"
-                                    : "bg-gray-400"
+                              ? "bg-yellow-500"
+                              : order.status === "delivered"
+                                ? "bg-green-500"
+                                : order.status === "cancelledOrder"
+                                  ? "bg-red-500"
+                                  : "bg-gray-400"
                               }`}
                           >
                             {order.status === "pending"
@@ -100,8 +124,6 @@ const Order = (props: Props) => {
                           </span>
                         </div>
                       </td>
-                      `
-
                     </tr>
                   ))}
                 </tbody>

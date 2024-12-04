@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, message, Upload } from "antd";
+import { Form, Input, Select, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { addProduct } from "../../../service/products";
 import { Icategory } from "../../../interface/category";
@@ -11,11 +11,23 @@ import { getAllMaterials } from "../../../service/material";
 const Add = () => {
     const [category, setCategory] = useState<Icategory[]>([]);
     const [material, setMaterial] = useState<Icategory[]>([]);
-    const [messageApi, contextHolder] = message.useMessage();
     const [files, setFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
+
+    // Utility function for notifications
+    const showNotification = (
+        type: "success" | "error",
+        title: string,
+        description: string
+    ) => {
+        notification[type]({
+            message: title,
+            description,
+            placement: "topRight",
+        });
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -24,6 +36,11 @@ const Add = () => {
                 setCategory(data);
             } catch (error) {
                 console.error("Error fetching categories:", error);
+                showNotification(
+                    "error",
+                    "Lỗi",
+                    "Không thể tải danh mục, vui lòng thử lại!"
+                );
             }
         };
         fetchCategories();
@@ -32,9 +49,13 @@ const Add = () => {
             try {
                 const data = await getAllMaterials();
                 setMaterial(data);
-                console.log(data, " hihih");
             } catch (error) {
                 console.error("Error fetching material:", error);
+                showNotification(
+                    "error",
+                    "Lỗi",
+                    "Không thể tải chất liệu, vui lòng thử lại!"
+                );
             }
         };
         fetchMaterial();
@@ -49,27 +70,29 @@ const Add = () => {
         const newFiles = Array.from(e.target.files);
         setFiles((prev) => [...prev, ...newFiles]);
 
-        // Generate image previews
         const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
         setPreviews((prev) => [...prev, ...newPreviews]);
     };
 
     const uploadImages = async (files: File[]): Promise<string[]> => {
         const urls: string[] = [];
-
         for (const file of files) {
             const formData = new FormData();
             formData.append("images", file);
 
             try {
                 const response = await upload(formData);
-                const imageUrl = response.payload[0].url; // Adjust based on your API structure
+                const imageUrl = response.payload[0].url;
                 urls.push(imageUrl);
             } catch (error) {
                 console.error("Error uploading image:", error);
+                showNotification(
+                    "error",
+                    "Lỗi tải ảnh",
+                    "Không thể tải ảnh lên, vui lòng thử lại!"
+                );
             }
         }
-
         return urls;
     };
 
@@ -78,27 +101,28 @@ const Add = () => {
 
         try {
             const imageUrls = await uploadImages(files);
-
             const payload = {
                 ...values,
                 moTa: values.moTa,
                 soLuong: values.soLuong,
-                img: imageUrls, // Array of image URLs
+                img: imageUrls,
                 categoryID: values.category,
                 materialID: values.material,
-                status: true, // Default status is active
+                status: true,
             };
 
-            console.log("pay", payload);
-
             await addProduct(payload);
-            message.success("Product added successfully!");
+            showNotification("success", "Thành công", "Thêm sản phẩm thành công!");
             form.resetFields();
             setFiles([]);
             setPreviews([]);
         } catch (error) {
             console.error("Error adding product:", error);
-            message.error("Something went wrong. Please try again.");
+            showNotification(
+                "error",
+                "Lỗi",
+                "Không thể thêm sản phẩm, vui lòng thử lại!"
+            );
         } finally {
             setLoading(false);
         }
@@ -112,7 +136,6 @@ const Add = () => {
     return (
         <>
             {loading && <LoadingComponent />}
-            {contextHolder}
             <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
                 <Form form={form} onFinish={onFinish}>
                     <div>
@@ -151,6 +174,7 @@ const Add = () => {
                             />
                         </Form.Item>
                     </div>
+
                     <label className="mb-2 text-2xl text-black block">
                         Giá sản phẩm:
                     </label>
