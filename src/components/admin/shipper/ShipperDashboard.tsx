@@ -33,7 +33,7 @@ const ShipperDashboard = (props: Props) => {
 
   const pendingOrders = orders.filter((order) => order.status === "pending").length;
   const deliveredOrders = orders.filter((order) => order.status === "delivered").length;
-  const cancelledOrders = orders.filter((order) => order.status === "cancelledOrder").length; 
+  const cancelledOrders = orders.filter((order) => order.status === "failed").length; 
   const totalOrders = orders.length;
 
   const handleFilterChange = (status: string) => {
@@ -66,7 +66,7 @@ const ShipperDashboard = (props: Props) => {
             <p className="text-3xl font-bold mt-2">{deliveredOrders}</p>
           </div>
           <div className="bg-red-500 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <h2 className="text-xl font-semibold">Đơn hàng đã hủy</h2>
+            <h2 className="text-xl font-semibold">Đơn hàng thất bại</h2>
             <p className="text-3xl font-bold mt-2">{cancelledOrders}</p>
           </div>
         </div>
