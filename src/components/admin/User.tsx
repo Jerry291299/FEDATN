@@ -36,19 +36,19 @@ const Users = (props: Props) => {
     fetchData();
   }, []);
 
-  const deactivateUserById = async (_id: string) => {
+  const deactivateUserById = async (id: string) => {
     try {
-      await deactivateUser(_id);
-      message.success(`Người dùng với ID ${_id} đã được vô hiệu hóa.`);
+      await deactivateUser(id);
+      message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
       const updatedUsers = users.map((user) =>
-        user._id === _id
+        user.id === id
           ? { ...user, status: "deactive" as const, isActive: false }
           : user
       );
 
       console.log(
         `Updated User after Deactivation:`,
-        updatedUsers.find((user) => user._id === _id)
+        updatedUsers.find((user) => user.id === id)
       );
 
       setUser(updatedUsers);
@@ -59,19 +59,19 @@ const Users = (props: Props) => {
     }
   };
 
-  const activateUserById = async (_id: string) => {
+  const activateUserById = async (id: string) => {
     try {
-      await activateUser(_id);
-      message.success(`Người dùng với ID ${_id} đã được kích hoạt lại.`);
+      await activateUser(id);
+      message.success(`Người dùng với ID ${id} đã được kích hoạt lại.`);
       const updatedUsers = users.map((user) =>
-        user._id === _id
+        user.id === id
           ? { ...user, status: "active" as const, isActive: true }
           : user
       );
 
       console.log(
         `Updated User after Activation:`,
-        updatedUsers.find((user) => user._id === _id)
+        updatedUsers.find((user) => user.id === id)
       );
 
       setUser(updatedUsers);
@@ -134,7 +134,7 @@ const Users = (props: Props) => {
                 <tbody>
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((user: IUser, index: number) => (
-                      <tr className="bg-gray-100 border-b" key={user._id}>
+                      <tr className="bg-gray-100 border-b" key={user.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {index + 1}
                         </td>
@@ -168,7 +168,7 @@ const Users = (props: Props) => {
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"
                               description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
-                              onConfirm={() => deactivateUserById(user._id)}
+                              onConfirm={() => deactivateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -183,7 +183,7 @@ const Users = (props: Props) => {
                             <Popconfirm
                               title="Kích hoạt lại người dùng"
                               description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
-                              onConfirm={() => activateUserById(user._id)}
+                              onConfirm={() => activateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >

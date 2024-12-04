@@ -160,7 +160,7 @@ const ProductDetail = () => {
                     alert("Product ID is invalid.");
                     return;
                   }
-                  if (!user || !user._id) {
+                  if (!user || !user.id) {
                     alert("Bạn phải đăng nhập để mua hàng.");
                     return;
                   }
@@ -170,7 +170,7 @@ const ProductDetail = () => {
                   }
 
                   const cartItem: Icart = {
-                    userId: user._id,
+                    userId: user.id,
                     items: [
                       {
                         productId: String(product._id),
