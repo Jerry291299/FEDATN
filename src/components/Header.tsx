@@ -10,7 +10,7 @@ import iconarrow from "./icons/down-arrow_5082780.png";
 
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string; email: string; id: string };
+    info: { role: string; name:string; email: string; id: string };
     id: string;
   } | null>(null);
   const [categories, setCategories] = useState<Icategory[]>([]);
@@ -89,7 +89,7 @@ const Header = () => {
               >
                 <img src={nguoi} alt="Hồ sơ" className="w-5 h-5" />
                 <p className="ml-2 flex gap-2">
-                  {user.info.email}
+                  {user.info.name}
                   <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
                 </p>
               </div>

@@ -10,9 +10,9 @@ import Register from "./components/user/register";
 import Update from "./components/admin/modaladd/update";
 import Users from "./components/admin/User";
 import Listcategory from "./components/admin/listcategory";
-import ListMaterial from "./components/admin/Material";
+import Addcategory from "./components/admin/modaladd/addcategory";
 import Login from "./components/user/login";
-
+import Updatecategory from "./components/admin/modaladd/updatecategory";
 import Productspage from "./components/Productspage";
 import ProductDetail from "./components/ProductDetail";
 import Privaterouter from "./components/privaterouter";
@@ -25,22 +25,12 @@ import OrderPayment from "./components/OrderPayment";
 import Order from "./components/admin/Orderadmin";
 import Success from "./components/success";
 import Donhangpage from "./components/Donhangpage";
-
-
+import ListMaterial from "./components/admin/Material";
 import AddMaterial from "./components/admin/modaladd/addmaterial";
-import Addcategory from "./components/admin/modaladd/addcategory";
-
-// import { updateMaterial } from "./service/material";
-import Updatecategory from "./components/admin/modaladd/updatecategory";
+import { updateMaterial } from "./service/material";
 import UpdateMaterial from "./components/admin/modaladd/updatemaerial";
-
 import CommentDashboard from "./components/admin/CommentDashboard";
-
-import UpdateUser from "./components/admin/modaladd/updateuser";
-
-
-import OrderList from "./components/Orderlisthistory";
-import Donhang from "./components/OrderPayment";
+import Donhang from "./components/Orderlisthistory";
 import Shipper from "./layout/Shipper";
 import ShipperDashboard from "./components/admin/shipper/ShipperDashboard";
 import OrdersShipper from "./components/admin/shipper/OrdersShipper";
@@ -59,7 +49,6 @@ function App() {
           <Route path="/products" element={<Productspage />} />
           <Route path="/products/categories/:id" element={<Productspage />} />
           <Route path="/search/:searchTerm" element={<SearchResults />} />
-          
           <Route
             path="/Cart/:id"
             element={
@@ -75,7 +64,7 @@ function App() {
           <Route path="/tintuc/:id" element={<Tintucdetail />} />
           <Route path="/gioithieu" element={<Gioithieu />} />
           <Route path="/order" element={<OrderPayment />} />
-          <Route path="/donhang" element={<Donhang />} />
+          <Route path="/donhang" element={<Orderlisthistory />} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
 
@@ -87,7 +76,7 @@ function App() {
               </Privaterouter>
             }
           >
-            <Route path="comments" element={<CommentDashboard />} />
+             <Route path="comments" element={<CommentDashboard />} />
             <Route path="add" element={<Add />} />
             <Route path="addNews" element={<AddNews />} />
             <Route path="dashboard" element={<Dashboard />} />
@@ -97,16 +86,15 @@ function App() {
             <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
-            
+            <Route path="tintuc" element={<NewsTable />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
 
-            {/* <Route path="users/updateuser/:id" Component={UpdateUser}></Route> */}
             <Route
-              path="listcategory/updatecategory/:id"
+              path="Listcategory/updatecategory/:id"
               Component={Updatecategory}
             ></Route>
             <Route
-              path="material/updatematerial/:id"
+              path="Material/updateMaterial/:id"
               Component={UpdateMaterial}
             ></Route>
           </Route>
