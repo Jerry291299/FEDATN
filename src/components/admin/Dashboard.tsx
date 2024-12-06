@@ -28,7 +28,13 @@ const Dashboard = (props: Props) => {
     limit: 5,
     currentPage: 1,
   });
-
+  const filterByName = (products: Iproduct[], name: string): Iproduct[] => {
+    return name.trim() === ""
+      ? products
+      : products.filter((product) =>
+        product.name.toLowerCase().includes(name.toLowerCase())
+      );
+  };
   const fetchData = async (currentPage: number) => {
     try {
       setLoading(true);
@@ -76,9 +82,9 @@ const Dashboard = (props: Props) => {
       const updatedProducts = products.map((product) =>
         product._id === id
           ? {
-              ...product,
-              status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
-            }
+            ...product,
+            status: !status, // Đảo ngược trạng thái boolean: từ "active" sang "deactive" và ngược lại
+          }
           : product
       );
 
@@ -109,9 +115,9 @@ const Dashboard = (props: Props) => {
     return material === ""
       ? products
       : products.filter(
-          (product) =>
-            product.material?.name?.toLowerCase() === material.toLowerCase()
-        );
+        (product) =>
+          product.material?.name?.toLowerCase() === material.toLowerCase()
+      );
   };
 
   // Lọc sản phẩm theo danh mục
@@ -122,9 +128,9 @@ const Dashboard = (props: Props) => {
     return category === ""
       ? products
       : products.filter(
-          (product) =>
-            product.category?.name?.toLowerCase() === category.toLowerCase()
-        );
+        (product) =>
+          product.category?.name?.toLowerCase() === category.toLowerCase()
+      );
   };
   const getFilteredProducts = () => {
     let filtered = [...products];
@@ -137,7 +143,8 @@ const Dashboard = (props: Props) => {
 
     // Lọc theo danh mục
     filtered = filterByCategory(filtered, selectedCategory);
-
+    // Lọc theo tên
+    filtered = filterByName(filtered, filterName);
     return filtered;
   };
 
@@ -235,10 +242,20 @@ const Dashboard = (props: Props) => {
             className="p-2 border border-gray-300 rounded w-[120px]"
           />
         </div>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên sản phẩm"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            className="p-2 border border-gray-300 rounded w-full"
+          />
+          
+        </div>
       </div>
 
       <div className="mb-[20px] flex flex-col w-full">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto"> 
           <div className="py-2 inline-block w-full px-0">
             <div className="overflow-hidden">
               <table className="min-w-full table-auto">
@@ -344,11 +361,10 @@ const Dashboard = (props: Props) => {
                           />
                         </td>
                         <td
-                          className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${
-                            product.status === true
+                          className={`text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap ${product.status === true
                               ? "text-green-700"
                               : "text-red-700"
-                          }`}
+                            }`}
                         >
                           {product.status === true
                             ? "Hoạt động"
@@ -374,11 +390,10 @@ const Dashboard = (props: Props) => {
                           >
                             <button
                               type="button"
-                              className={`focus:outline-none text-white ${
-                                product.status === true
+                              className={`focus:outline-none text-white ${product.status === true
                                   ? "bg-red-700 hover:bg-red-800"
                                   : "bg-green-700 hover:bg-green-800"
-                              } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
+                                } focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2`}
                             >
                               {product.status === true ? "Deactive" : "Active"}
                             </button>
