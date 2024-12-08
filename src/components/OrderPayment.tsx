@@ -72,13 +72,13 @@ function OrderPayment() {
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
-      totalAmount,
+      amount: totalAmount,
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
   
     try {
-      if (selectedPaymentMethod === "bank_transfer" || selectedPaymentMethod === "cash_on_delivery") {
+      if ( selectedPaymentMethod === "cash_on_delivery") {
         await placeOrder(orderData);
         alert("Đơn hàng đã được xác nhận thành công!");
         setCartItems([]);
@@ -86,8 +86,14 @@ function OrderPayment() {
         console.log("Order data:", orderData);
       } else if (selectedPaymentMethod === "vnpay") {
         console.log("Order data:", orderData);
-        const paymentUrl = await createVNPayPayment(orderData.userId, totalAmount);
+        await placeOrder(orderData);
+        setCartItems([]);
+        const paymentUrl = await createVNPayPayment({ userId: user, paymentMethod: selectedPaymentMethod, customerDetails: customerDetails,   items: cartItems, amount: totalAmount});
+        
         window.location.href = paymentUrl; // Redirect to VNPay
+        
+
+
       }
     } catch (error) {
       alert("Xác nhận đơn hàng thất bại. Vui lòng thử lại.");
@@ -175,14 +181,7 @@ function OrderPayment() {
 
           <h2 className="text-lg font-bold mt-8">Phương thức thanh toán</h2>
           <div className="flex gap-4 mt-4">
-  <button
-    onClick={() => handlePaymentMethodChange("bank_transfer")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "bank_transfer" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">Thanh toán online</span>
-  </button>
+  
   <button
     onClick={() => handlePaymentMethodChange("cash_on_delivery")}
     className={`w-full border p-4 rounded-md flex items-center justify-center ${

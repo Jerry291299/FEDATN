@@ -4,7 +4,7 @@ import { CartItem } from '../interface/cart';
 export interface IOrderData {
     userId: string;
     items: CartItem[];
-    totalAmount: number;
+    amount: number;
     paymentMethod: string;
     customerDetails: {   // Add customer details to the interface
       name: string;
@@ -23,7 +23,7 @@ export interface IOrderData {
       price: number;
       quantity: number;
     }[];
-    totalAmount: number;
+    amount: number;
     status: string;
     createdAt: string;
     customerDetails: {
@@ -43,7 +43,7 @@ export interface IOrderData {
       price: number;
       quantity: number;
     }[];
-    totalAmount: number;
+    amount: number;
     status: string;
     createdAt: string;
     customerDetails: {

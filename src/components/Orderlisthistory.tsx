@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import PlacedOrders from "./PlacedOrders";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getOrdersByUserId } from "../service/order"; // Adjust the import path as needed
+import { getOrdersByUserId } from "../service/order"; 
 import { NavLink } from "react-router-dom";
 import LoadingComponent from "./Loading";
 
 const Orderlisthistory = () => {
-  const [orders, setOrders] = useState([]); // Orders state
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); // Error state
-
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -21,9 +20,10 @@ const Orderlisthistory = () => {
           return;
         }
 
-        const { id } = JSON.parse(userData); // Assuming user data includes `id`
+        const { id } = JSON.parse(userData); 
         const fetchedOrders = await getOrdersByUserId(id);
         setOrders(fetchedOrders);
+        
       } catch (error) {
         setError("Failed to fetch orders.");
         console.error("Error fetching orders:", error);
@@ -33,6 +33,8 @@ const Orderlisthistory = () => {
     };
 
     fetchOrders();
+  console.log(fetchOrders,"orders");
+
   }, []);
 
   if (loading) {
@@ -87,6 +89,7 @@ const Orderlisthistory = () => {
                 <th className="border border-gray-300 px-4 py-2 text-left">Mã đơn hàng</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Ngày đặt</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Thành tiền</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Phương thức thanh toán</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Trạng thái thanh toán</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Vận chuyển</th>
               </tr>
@@ -102,9 +105,10 @@ const Orderlisthistory = () => {
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(order.totalAmount)}
+                    }).format(order.amount)}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">{order.paymentMethod}</td>
+                  <td className="border border-gray-300 px-4 py-2">{order.paymentStatus}</td>
                   <td className="border border-gray-300 px-4 py-2">{order.status}</td>
                 </tr>
               ))}

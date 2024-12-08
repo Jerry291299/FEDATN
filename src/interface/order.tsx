@@ -9,6 +9,7 @@ export interface IOrder {
     }[];
     totalAmount: number;
     status: string;
+    paymentstatus: string;
     createdAt: string;
     customerDetails: {
       name: string;

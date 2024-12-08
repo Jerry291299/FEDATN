@@ -240,7 +240,7 @@ const OrdersShipper = (props: Props) => {
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(order.totalAmount)}
+                    }).format(order.amount)}
                   </td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center">
