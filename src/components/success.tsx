@@ -87,7 +87,7 @@ const Success = () => {
           vnp_SecureHash,
           customerDetails,
           items: cartItems,
-          paymentMethod: "vnpay", // Adjust as needed
+          paymentMethod: "vnpay", 
         }
       );
 

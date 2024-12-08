@@ -108,7 +108,7 @@ const Orderlisthistory = () => {
                     }).format(order.amount)}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">{order.paymentMethod}</td>
-                  <td className="border border-gray-300 px-4 py-2">{order.paymentStatus}</td>
+                  <td className="border border-gray-300 px-4 py-2">{order.paymentstatus}</td>
                   <td className="border border-gray-300 px-4 py-2">{order.status}</td>
                 </tr>
               ))}
