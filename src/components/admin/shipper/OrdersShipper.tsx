@@ -269,7 +269,7 @@ const OrdersShipper = (props: Props) => {
                           ? "Đã hủy"
                           : order.status === "failed"
                           ? "Thất bại"
-                          : "Không xác định"}
+                          : "Thất bại"}
                       </span>
                     </div>
                   </td>

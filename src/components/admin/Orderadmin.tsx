@@ -120,7 +120,7 @@ const Order = (props: Props) => {
                                 ? "Đã giao"
                                 : order.status === "cancelledOrder"
                                   ? "Đã hủy"
-                                  : "Không xác định"}
+                                  : "Thất bại"}
                           </span>
                         </div>
                       </td>
