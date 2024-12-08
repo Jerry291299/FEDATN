@@ -38,6 +38,8 @@ import Orderlist from "./components/Orderlisthistory";
 import Orderlisthistory from "./components/Orderlisthistory";
 import NewsTable from "./components/admin/tintuc";
 import AddNews from "./components/admin/modaladd/addtintuc";
+import UpdateNews from "./components/admin/modaladd/updatetintuc";
+import DashboardNews from "./components/admin/tintuc";
 
 function App() {
   return (
@@ -86,8 +88,9 @@ function App() {
             <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
-            <Route path="tintuc" element={<NewsTable />} />
+            <Route path="tintuc" element={<DashboardNews />} />
             <Route path="dashboard/update/:id" Component={Update}></Route>
+            <Route path="News/updatenews/:id" Component={UpdateNews}></Route>
 
             <Route
               path="Listcategory/updatecategory/:id"
