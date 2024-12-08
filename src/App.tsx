@@ -40,6 +40,7 @@ import NewsTable from "./components/admin/tintuc";
 import AddNews from "./components/admin/modaladd/addtintuc";
 import UpdateNews from "./components/admin/modaladd/updatetintuc";
 import DashboardNews from "./components/admin/tintuc";
+import AdminDashboard from "./components/admin/AdminDashboard";
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
             }
           >
              <Route path="comments" element={<CommentDashboard />} />
+             <Route path="thongke" element={<AdminDashboard />} />
             <Route path="add" element={<Add />} />
             <Route path="addNews" element={<AddNews />} />
             <Route path="dashboard" element={<Dashboard />} />

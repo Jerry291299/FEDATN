@@ -88,7 +88,16 @@ const Navbar = (props: Props) => {
                     to={"/"}
                     className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                   >
-                    Home
+                    Trang chủ
+                  </NavLink>
+                </span>
+
+                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
+                  <NavLink
+                    to={"/admin/thongke"}
+                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
+                  >
+                    Thống kê
                   </NavLink>
                 </span>
               </div>
@@ -99,7 +108,7 @@ const Navbar = (props: Props) => {
                     onClick={handleLogout}
                     className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-700/75 text-stone-500 hover:text-dark"
                   >
-                    Log out
+                    Đăng xuất
                   </button>
                 </span>
               </div>
@@ -109,7 +118,7 @@ const Navbar = (props: Props) => {
                   <div className="block pt-5 pb-[.15rem]">
                     <div className="px-4 py-[.65rem]">
                       <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
-                        Applications
+                        Chức năng:
                       </span>
                     </div>
                   </div>
@@ -121,7 +130,7 @@ const Navbar = (props: Props) => {
                         to={"/admin/users"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Users
+                        Người dùng
                       </NavLink>
                     </span>
                   </div>
@@ -133,7 +142,7 @@ const Navbar = (props: Props) => {
                         // href="javascript:;"
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Orders
+                        Đơn hàng
                       </NavLink>
                     </span>
                   </div>
@@ -145,7 +154,7 @@ const Navbar = (props: Props) => {
                         // href="javascript:;"
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Comment
+                        Bình Luận
                       </NavLink>
                     </span>
                   </div>
@@ -156,7 +165,7 @@ const Navbar = (props: Props) => {
                         to={"/admin/Listcategory"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Category list
+                        Danh mục
                       </NavLink>
                     </span>
                   </div>
@@ -167,7 +176,7 @@ const Navbar = (props: Props) => {
                         to={"/admin/Material"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Material list
+                        Chất Liệu
                       </NavLink>
                     </span>
                   </div>
@@ -179,7 +188,7 @@ const Navbar = (props: Props) => {
                         to={"/admin/dashboard"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Products list
+                        Sản Phẩm
                       </NavLink>
                     </span>
                   </div>
@@ -200,7 +209,7 @@ const Navbar = (props: Props) => {
                   <div className="block pt-5 pb-[.15rem]">
                     <div className="px-4 py-[.65rem]">
                       <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
-                        Applications
+                        Chức Năng:
                       </span>
                     </div>
                   </div>
@@ -211,7 +220,7 @@ const Navbar = (props: Props) => {
                         to={"/shipper/dashboard"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Shipper Dashboard
+                        Thống kê
                       </NavLink>
                     </span>
                   </div>
@@ -221,7 +230,7 @@ const Navbar = (props: Props) => {
                         to={"/shipper/orders"}
                         className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
                       >
-                        Orders for Shipper
+                        Đơn hàng
                       </NavLink>
                     </span>
                   </div>

@@ -14,7 +14,6 @@ export const Context = (props) => {
     switch (action.type) {
       case actions.ADD:
         const existingItem = state.find((item) => action.payload._id === item._id);
-        console.log(existingItem);
         console.log(state, action , "stateDP"); 
         
         if (existingItem) {

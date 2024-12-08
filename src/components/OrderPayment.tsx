@@ -87,8 +87,8 @@ function OrderPayment() {
       } else if (selectedPaymentMethod === "vnpay") {
         
         console.log("Order data:", orderData);
-        // await placeOrder(orderData);
-        const paymentUrl = await createVNPayPayment({ userId: user, paymentMethod: selectedPaymentMethod, customerDetails: customerDetails,   items: cartItems, amount: totalAmount});
+        await placeOrder(orderData);
+        const paymentUrl = await createVNPayPayment({ userId: user, paymentMethod: selectedPaymentMethod, amount: totalAmount});
         setCartItems([]);
         
         window.location.href = paymentUrl; // Redirect to VNPay

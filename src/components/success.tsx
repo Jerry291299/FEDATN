@@ -62,16 +62,12 @@ const Success = () => {
 
   const handleConfirmPayment = async () => {
     try {
-      const cartItems = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
       const userData = sessionStorage.getItem("user");
       if(!userData) {
         return
       }
-      console.log(cartItems, "gio hang");
       console.log(Globalstate, "globalstate");
-      
-      
-      
+ 
       const customerDetails = JSON.parse(
         sessionStorage.getItem("customerDetails") || "{}"
       );
@@ -85,13 +81,13 @@ const Success = () => {
           vnp_ResponseCode,
           vnp_TransactionNo,
           vnp_SecureHash,
-          customerDetails,
-          items: cartItems,
+          // customerDetails,
+          // items: cartItems,
           paymentMethod: "vnpay", 
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("Order placed successfully:", response.data);
         // Clear session cart data
         sessionStorage.removeItem("cartItems");

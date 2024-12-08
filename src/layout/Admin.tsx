@@ -15,7 +15,7 @@ const Admin = (props: Props) => {
 
   <div className="ml-[300px] w-full">
     <Outlet/>
- <AdminDashboard/>
+ 
   </div>
 </div>
   </>
