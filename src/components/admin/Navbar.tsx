@@ -52,7 +52,7 @@ const Navbar = (props: Props) => {
 
       {/* Navigation Links */}
       <nav className="flex-1 px-4 py-6 overflow-y-auto">
-        <ul className="space-y-2 text-sm">
+        <ul className="space-y-2 text-md">
           <li>
             <NavLink
               to="/"
@@ -81,10 +81,10 @@ const Navbar = (props: Props) => {
 
         {user?.info?.role === "admin" && (
           <>
-            <h2 className="px-4 mt-6 mb-2 text-sm font-semibold text-gray-500 uppercase">
+            <h2 className="px-4 mt-6 mb-2 text-md font-semibold text-gray-500 uppercase">
               Chức năng:
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-md">
               <li>
                 <NavLink
                   to="/admin/users"
@@ -147,10 +147,10 @@ const Navbar = (props: Props) => {
 
         {user?.info?.role === "shipper" && (
           <>
-            <h2 className="px-4 mt-6 mb-2 text-sm font-semibold text-gray-500 uppercase">
+            <h2 className="px-4 mt-6 mb-2 text-md font-semibold text-gray-500 uppercase">
               Chức năng:
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-md">
               <li>
                 <NavLink
                   to="/shipper/dashboard"

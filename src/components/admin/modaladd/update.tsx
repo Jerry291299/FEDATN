@@ -120,9 +120,7 @@ const Update = () => {
             );
         }
     };
-    const activeCategory = categories.filter(
-        (category) => category.status === "active"
-    );
+
     const handleUploadChange = ({ fileList: newFileList }: any) => {
         setFileList(newFileList);
     };
@@ -224,7 +222,7 @@ const Update = () => {
                     ]}
                 >
                     <Select placeholder="Select category" className="rounded">
-                        {activeCategory.map((category) => (
+                        {activeCategories.map((category) => (
                             <Select.Option
                                 key={category._id}
                                 value={category._id}
