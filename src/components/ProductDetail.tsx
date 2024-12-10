@@ -9,7 +9,8 @@ import Footer from "./Footer";
 import { actions, Cartcontext } from "./contexts/cartcontext";
 import { Icart } from "../interface/cart";
 import CommentSection from "../interface/comment";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const ProductDetail = () => {
   const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
   const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
@@ -72,7 +73,7 @@ const ProductDetail = () => {
   return (
     <>
       <Header />
-
+      <ToastContainer />
       <div className="container mx-auto w-[1400px] pt-[100px]">
         {product && (
           <div className="container mx-auto w-[1300px] flex">
@@ -149,56 +150,80 @@ const ProductDetail = () => {
                 </p>
               </div>
               <button
-                type="button"
-                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
-                  product.soLuong > 0
-                    ? "bg-gray-900 hover:bg-orange-400"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-                onClick={async () => {
-                  if (!product || !product._id) {
-                    alert("Product ID is invalid.");
-                    return;
-                  }
-                  if (!user || !user.id) {
-                    alert("Bạn phải đăng nhập để mua hàng.");
-                    return;
-                  }
-                  if (product.soLuong <= 0) {
-                    alert("Sản phẩm đã hết hàng.");
-                    return;
-                  }
+  type="button"
+  className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
+    product.soLuong > 0
+      ? "bg-gray-900 hover:bg-orange-400"
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+  onClick={async () => {
+    if (!product || !product._id) {
+      toast.error("Mã sản phẩm không hợp lệ!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
+    if (!user || !user.id) {
+      toast.info("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
+    if (product.soLuong <= 0) {
+      toast.warning("Sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác.", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
 
-                  const cartItem: Icart = {
-                    userId: user.id,
-                    items: [
-                      {
-                        productId: String(product._id),
-                        name: product.name,
-                        price: product.price,
-                        img: product.img[0],
-                        quantity: 1,
-                      },
-                    ],
-                  };
-                  try {
-                    const response = await addtoCart(cartItem);
-                    dispatch({
-                      type: actions.ADD,
-                      payload: response,
-                    });
-                    alert("Đã thêm vào giỏ hàng thành công!");
-                  } catch (error) {
-                    console.error(
-                      "Không thể thêm sản phẩm vào giỏ hàng",
-                      error
-                    );
-                  }
-                }}
-                disabled={product.soLuong <= 0}
-              >
-                {product.soLuong > 0 ? "Add to cart" : "Out of Stock"}
-              </button>
+    const cartItem: Icart = {
+      userId: user.id,
+      items: [
+        {
+          productId: String(product._id),
+          name: product.name,
+          price: product.price,
+          img: product.img[0],
+          quantity: 1,
+        },
+      ],
+    };
+
+    try {
+      const response = await addtoCart(cartItem);
+      dispatch({
+        type: actions.ADD,
+        payload: response,
+      });
+
+      // Hiển thị thông báo thành công
+      toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+    } catch (error) {
+      toast.error("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      console.error("Không thể thêm sản phẩm vào giỏ hàng", error);
+    }
+  }}
+  disabled={product.soLuong <= 0}
+>
+  {product.soLuong > 0 ? "Add to cart" : "Out of Stock"}
+</button>
+
+
+
             </div>
           </div>
         )}
