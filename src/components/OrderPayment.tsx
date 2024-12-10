@@ -6,7 +6,8 @@ import { CartItem } from "../interface/cart";
 import { NavLink, useNavigate } from "react-router-dom";
 import { IOrderData, placeOrder } from "../service/order";
 import { createVNPayPayment } from "../service/payment";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -61,7 +62,12 @@ function OrderPayment() {
     console.log("Order ID being sent:", user); // Kiểm tra giá trị
   
     if (!selectedPaymentMethod) {
-      alert("Vui lòng chọn phương thức thanh toán.");
+      toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+
       return;
     }
   
@@ -80,7 +86,8 @@ function OrderPayment() {
     try {
       if ( selectedPaymentMethod === "cash_on_delivery") {
         await placeOrder(orderData);
-        alert("Đơn hàng đã được xác nhận thành công!");
+        toast.success("Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.", { position: "top-right" });
+
         setCartItems([]);
         navigate("/success", { state: { orderData } });
         console.log("Order data:", orderData);
@@ -97,7 +104,8 @@ function OrderPayment() {
 
       }
     } catch (error) {
-      alert("Xác nhận đơn hàng thất bại. Vui lòng thử lại.");
+      toast.error("Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.", { position: "top-right" });
+
     }
   };
   
@@ -105,6 +113,7 @@ function OrderPayment() {
   return (
     <>
       <Header />
+      <ToastContainer />
       <div className="flex flex-col lg:flex-row gap-8 p-4 lg:p-8 bg-gray-100">
         {/* Left Column */}
         <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
