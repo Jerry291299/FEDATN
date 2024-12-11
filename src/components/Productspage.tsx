@@ -34,6 +34,7 @@ const Productspage = (props: Props) => {
                 limit: page.limit,
                 page: currentPage,
                 category: selectedCategory || undefined,
+                admin: "true",
             });
             setProducts(data?.docs || []);
             setPageConfig(data);
