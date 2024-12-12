@@ -136,7 +136,9 @@ const ProductUpdate = () => {
       const imageUrls = await uploadImages(files);
   
       // Combine new images with existing images (previews)
-      const updatedImages = imageUrls.length > 0 ? [...previews, ...imageUrls] : previews;
+      const updatedImages = imageUrls.length > 0 ? [
+        ...new Set([...previews, ...imageUrls]) // Ensure no duplicate images
+      ] : previews;
   
       // Prepare the payload with combined images
       const payload = {
@@ -156,15 +158,12 @@ const ProductUpdate = () => {
       setPreviews(updatedImages); // Update previews with the combined image list
     } catch (error) {
       console.error("Error updating product:", error);
-      showNotification(
-        "error",
-        "Lỗi",
-        "Không thể cập nhật sản phẩm, vui lòng thử lại!"
-      );
+      showNotification("error", "Lỗi", "Không thể cập nhật sản phẩm, vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
   };
+  
   
  
 
