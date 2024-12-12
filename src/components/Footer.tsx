@@ -39,7 +39,7 @@ const Footer = (props: Props) => {
     </div>
     <div className="Subcribe w-[500px] ml-[140px]">
       <p className='font-bold pb-[10px]'>Subscribe</p>
-      <p className='py-[10px]'>Join our newsletter to stay up to date on features and releases.</p>
+      <p className='py-[10px]'>Join our newsletter to stay up to date on features and releases..</p>
       <div className="w-full text-center">
         <form action="#">
           <div className="max-w-s flex">

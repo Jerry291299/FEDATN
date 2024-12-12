@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
-import { deactivateMaterial, activateMaterial, getAllMaterials } from '../../service/material';
-import { IMaterial } from '../../interface/material'; 
-import { Popconfirm } from 'antd';
-import LoadingComponent from '../Loading';
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import {
+  deactivateMaterial,
+  activateMaterial,
+  getAllMaterials,
+} from "../../service/material";
+import { IMaterial } from "../../interface/material";
+import { Popconfirm } from "antd";
+import LoadingComponent from "../Loading";
+import { CSVLink } from "react-csv";
 
-type Props = {}
+type Props = {};
 
 const ListMaterial = (props: Props) => {
-  const [materials, setMaterial] = useState<IMaterial[]>([]); 
-  const [searchTerm, setSearchTerm] = useState(''); // Trạng thái cho ô tìm kiếm
+  const [materials, setMaterial] = useState<IMaterial[]>([]);
+  const [searchTerm, setSearchTerm] = useState(""); // Trạng thái cho ô tìm kiếm
   const param = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,7 +39,9 @@ const ListMaterial = (props: Props) => {
     try {
       await deactivateMaterial(id); //  deactivateMaterial
       const updatedMaterials = materials.map((material) =>
-        material._id === id ? { ...material, status: 'deactive' as 'deactive' } : material
+        material._id === id
+          ? { ...material, status: "deactive" as "deactive" }
+          : material
       );
       setMaterial(updatedMaterials); // setMaterial
       console.log(`Material with id ${id} deactivated successfully`);
@@ -47,7 +54,9 @@ const ListMaterial = (props: Props) => {
     try {
       await activateMaterial(id); //  activateMaterial
       const updatedMaterials = materials.map((material) =>
-        material._id === id ? { ...material, status: 'active' as 'active' } : material
+        material._id === id
+          ? { ...material, status: "active" as "active" }
+          : material
       );
       setMaterial(updatedMaterials); //  setMaterial
       console.log(`Material with id ${id} activated successfully`);
@@ -61,16 +70,34 @@ const ListMaterial = (props: Props) => {
   };
 
   // Kiểm tra materials có tồn tại và là mảng trước khi filter
-  const filteredMaterials = Array.isArray(materials) ? materials.filter(material =>
-    material.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredMaterials = Array.isArray(materials)
+    ? materials.filter((material) =>
+        material.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+  const csvData = filteredMaterials.map((materials) => ({
+    ID: materials._id,
+    "Tên danh mục": materials.name,
+    "Trạng thái": materials.status === "active" ? "Hoạt động" : "Vô hiệu hóa",
+  }));
 
   return (
     <>
       {loading && <LoadingComponent />}
-      <NavLink to={'/admin/addmaterial'}> 
-        <button className='focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'>Thêm mới</button>
+      <NavLink to={"/admin/addmaterial"}>
+        <button className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+          Thêm mới
+        </button>
       </NavLink>
+      {/* Export button */}
+      <CSVLink
+        data={csvData}
+        filename={"materials.csv"}
+        className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        target="_blank"
+      >
+        Xuất file chất liệu
+      </CSVLink>
 
       {/* Ô tìm kiếm vật liệu */}
       <input
@@ -88,70 +115,93 @@ const ListMaterial = (props: Props) => {
               <table className="min-w-full table-auto">
                 <thead className="bg-white border-b">
                   <tr>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Stt</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Tên vật liệu</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Handle</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Stt
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Tên vật liệu
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Trạng thái
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Handle
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredMaterials.length > 0 ? (
-                    filteredMaterials.map((material: IMaterial, index: number) => (
-                      <tr className="bg-gray-100 border-b" key={material._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{material.name}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {material.status === 'active' ? (
-                            <span className="text-green-600">Hoạt động</span>
-                          ) : (
-                            <span className="text-red-600">Vô hiệu hóa</span>
-                          )}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          <button
-                            type="button"
-                            className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                            onClick={() => updateMaterial(material._id)}
-                          >
-                            Edit
-                          </button>
-                          {material.status === 'active' ? (
-                            <Popconfirm
-                              title="Vô hiệu hóa vật liệu"
-                              description="Bạn có chắc chắn muốn vô hiệu hóa vật liệu này không?"
-                              onConfirm={() => handleDeactivateMaterial(material._id)}
-                              okText="Có"
-                              cancelText="Không"
+                    filteredMaterials.map(
+                      (material: IMaterial, index: number) => (
+                        <tr className="bg-gray-100 border-b" key={material._id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {index + 1}
+                          </td>
+                          <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                            {material.name}
+                          </td>
+                          <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                            {material.status === "active" ? (
+                              <span className="text-green-600">Hoạt động</span>
+                            ) : (
+                              <span className="text-red-600">Vô hiệu hóa</span>
+                            )}
+                          </td>
+                          <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                            <button
+                              type="button"
+                              className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                              onClick={() => updateMaterial(material._id)}
                             >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                              Edit
+                            </button>
+                            {material.status === "active" ? (
+                              <Popconfirm
+                                title="Vô hiệu hóa vật liệu"
+                                description="Bạn có chắc chắn muốn vô hiệu hóa vật liệu này không?"
+                                onConfirm={() =>
+                                  handleDeactivateMaterial(material._id)
+                                }
+                                okText="Có"
+                                cancelText="Không"
                               >
-                                Deactivate
-                              </button>
-                            </Popconfirm>
-                          ) : (
-                            <Popconfirm
-                              title="Kích hoạt lại vật liệu"
-                              description="Bạn có chắc chắn muốn kích hoạt lại vật liệu này không?"
-                              onConfirm={() => handleActivateMaterial(material._id)}
-                              okText="Có"
-                              cancelText="Không"
-                            >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                <button
+                                  type="button"
+                                  className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                >
+                                  Deactivate
+                                </button>
+                              </Popconfirm>
+                            ) : (
+                              <Popconfirm
+                                title="Kích hoạt lại vật liệu"
+                                description="Bạn có chắc chắn muốn kích hoạt lại vật liệu này không?"
+                                onConfirm={() =>
+                                  handleActivateMaterial(material._id)
+                                }
+                                okText="Có"
+                                cancelText="Không"
                               >
-                                Activate
-                              </button>
-                            </Popconfirm>
-                          )}
-                        </td>
-                      </tr>
-                    ))
+                                <button
+                                  type="button"
+                                  className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                >
+                                  Activate
+                                </button>
+                              </Popconfirm>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    )
                   ) : (
                     <tr>
-                      <td colSpan={4} className="text-center text-gray-500 py-4">Không tìm thấy vật liệu nào.</td>
+                      <td
+                        colSpan={4}
+                        className="text-center text-gray-500 py-4"
+                      >
+                        Không tìm thấy vật liệu nào.
+                      </td>
                     </tr>
                   )}
                 </tbody>

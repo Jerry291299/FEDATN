@@ -5,7 +5,9 @@ import { getCartByID } from "../service/cart";
 import { CartItem } from "../interface/cart";
 import { NavLink, useNavigate } from "react-router-dom";
 import { IOrderData, placeOrder } from "../service/order";
-
+import { createVNPayPayment } from "../service/payment";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -57,8 +59,15 @@ function OrderPayment() {
   }, 0);
 
   const handleOrderSubmit = async () => {
+    console.log("Order ID being sent:", user); // Kiểm tra giá trị
+  
     if (!selectedPaymentMethod) {
-      alert("Please select a payment method.");
+      toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+
       return;
     }
   
@@ -69,18 +78,34 @@ function OrderPayment() {
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
-      totalAmount,
+      amount: totalAmount,
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
   
     try {
-      const response = await placeOrder(orderData);
-      alert("Order confirmed successfully!");
-      setCartItems([]);
-      navigate("/success", { state: { orderData } });
+      if ( selectedPaymentMethod === "cash_on_delivery") {
+        await placeOrder(orderData);
+        toast.success("Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.", { position: "top-right" });
+
+        setCartItems([]);
+        navigate("/success", { state: { orderData } });
+        console.log("Order data:", orderData);
+      } else if (selectedPaymentMethod === "vnpay") {
+        
+        console.log("Order data:", orderData);
+        await placeOrder(orderData);
+        const paymentUrl = await createVNPayPayment({ userId: user, paymentMethod: selectedPaymentMethod, amount: totalAmount});
+        setCartItems([]);
+        
+        window.location.href = paymentUrl; // Redirect to VNPay
+        
+
+
+      }
     } catch (error) {
-      alert("Failed to confirm order. Please try again.");
+      toast.error("Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.", { position: "top-right" });
+
     }
   };
   
@@ -88,6 +113,7 @@ function OrderPayment() {
   return (
     <>
       <Header />
+      <ToastContainer />
       <div className="flex flex-col lg:flex-row gap-8 p-4 lg:p-8 bg-gray-100">
         {/* Left Column */}
         <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
@@ -165,32 +191,27 @@ function OrderPayment() {
 
           <h2 className="text-lg font-bold mt-8">Phương thức thanh toán</h2>
           <div className="flex gap-4 mt-4">
-            <button
-              onClick={() => handlePaymentMethodChange("bank_transfer")}
-              className={`w-full border p-4 rounded-md flex items-center justify-center ${
-                selectedPaymentMethod === "bank_transfer" ? "bg-gray-200" : "hover:bg-gray-100"
-              }`}
-            >
-              <span className="text-lg font-medium">Chuyển khoản ngân hàng</span>
-            </button>
-            <button
-              onClick={() => handlePaymentMethodChange("cash_on_delivery")}
-              className={`w-full border p-4 rounded-md flex items-center justify-center ${
-                selectedPaymentMethod === "cash_on_delivery" ? "bg-gray-200" : "hover:bg-gray-100"
-              }`}
-            >
-              <span className="text-lg font-medium">Thanh toán khi nhận hàng</span>
-            </button>
-          </div>
+  
+  <button
+    onClick={() => handlePaymentMethodChange("cash_on_delivery")}
+    className={`w-full border p-4 rounded-md flex items-center justify-center ${
+      selectedPaymentMethod === "cash_on_delivery" ? "bg-gray-200" : "hover:bg-gray-100"
+    }`}
+  >
+    <span className="text-lg font-medium">Thanh toán khi nhận hàng</span>
+  </button>
+  <button
+    onClick={() => handlePaymentMethodChange("vnpay")}
+    className={`w-full border p-4 rounded-md flex items-center justify-center ${
+      selectedPaymentMethod === "vnpay" ? "bg-gray-200" : "hover:bg-gray-100"
+    }`}
+  >
+    <span className="text-lg font-medium">VNPay</span>
+  </button>
+</div>
 
           {/* Bank transfer details if selected */}
-          {selectedPaymentMethod === "bank_transfer" && (
-            <div className="mt-4">
-              <h3 className="text-sm font-bold">Ngân hàng Vietcombank</h3>
-              <p>Số tài khoản: 0071000745809</p>
-              <p>Tên chủ tài khoản: CT CP NOI THAT AKA VIETCOMBANK – CHI NHÁNH TP.HCM</p>
-            </div>
-          )}
+          
         </div>
 
         {/* Right Column */}

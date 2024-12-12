@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-
+import logo from './img/Black & White Minimalist Aesthetic Initials Font Logo.png'
 type Props = {};
 
 const Navbar = (props: Props) => {
@@ -24,164 +24,157 @@ const Navbar = (props: Props) => {
 
   return (
     <>
-      <div className="container flex flex-col mx-auto bg-white">
-        <aside
-          className="group/sidebar flex flex-col shrink-0 lg:w-[300px] w-[250px] transition-all duration-300 ease-in-out m-0 fixed z-40 inset-y-0 left-0 bg-white border-r border-r-dashed border-r-neutral-200 sidenav fixed-start loopple-fixed-start"
-          id="sidenav-main"
-        >
-          <div className="flex shrink-0 px-8 items-center justify-between h-[96px]">
-            Beautiful-House Admin
-          </div>
-          <div className="hidden border-b border-dashed lg:block dark:border-neutral-700/70 border-neutral-200" />
-          <div className="flex items-center justify-between px-8 py-5">
-            <div className="flex items-center mr-5">
-              <div className="mr-5"></div>
-              <div className="mr-2 ">
-                <div className="inline-block relative shrink-0 cursor-pointer rounded-[.95rem]">
-                  {/* Profile Icon and Name */}
-                  <div className="">
-                    <p className="ml-2">{user?.info?.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <a
-              className="inline-flex relative items-center group justify-end text-base font-medium leading-normal text-center align-middle cursor-pointer rounded-[.95rem] transition-colors duration-150 ease-in-out text-dark bg-transparent shadow-none border-0"
-              // href="javascript:void(0)"
-            >
-              <span className="leading-none transition-colors duration-200 ease-in-out peer shrink-0 group-hover:text-primary text-secondary-dark">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </span>
-            </a>
-          </div>
-          <div className="hidden border-b border-dashed lg:block dark:border-neutral-700/70 border-neutral-200" />
-          <div className="relative pl-3 my-5 overflow-y-scroll">
-            <div className="flex flex-col w-full font-medium">
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]"></span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Home
-                  </NavLink>
-                </span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-700/75 text-stone-500 hover:text-dark"
-                  >
-                    Log out
-                  </button>
-                </span>
-              </div>
-              {/* menu item */}
-              <div className="block pt-5 pb-[.15rem]">
-                <div className="px-4 py-[.65rem]">
-                  <span className="font-semibold text-[0.95rem] uppercase dark:text-neutral-500/80 text-secondary-dark">
-                    Applications
-                  </span>
-                </div>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/users"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Users
-                  </NavLink>
-                </span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/order"}
-                    // href="javascript:;"
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Orders
-                  </NavLink>
-                </span>
-              </div>
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <a
-                    // href="javascript:;"
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Comment
-                  </a>
-                </span>
-              </div>
-
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/Listcategory"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Category list
-                  </NavLink>
-                </span>
-              </div>
-
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/Material"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Material list
-                  </NavLink>
-                </span>
-              </div>
-
-              {/* menu item */}
-              <div>
-                <span className="select-none flex items-center px-4 py-[.775rem] cursor-pointer my-[.4rem] rounded-[.95rem]">
-                  <NavLink
-                    to={"/admin/dashboard"}
-                    className="flex items-center flex-grow text-[1.15rem] dark:text-neutral-400/75 text-stone-500 hover:text-dark"
-                  >
-                    Products list
-                  </NavLink>
-                </span>
-              </div>
-            </div>
-          </div>
-        </aside>
+  <div className="flex flex-col h-screen bg-gray-100">
+    <aside
+      className="fixed inset-y-0 left-0 z-40 w-[250px] lg:w-[270px] bg-white border-r border-gray-200 shadow-md transition-all duration-300"
+      id="sidenav-main"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 h-[96px] bg-amber-600 text-white">
+      <div className="logo w-[70px] mr-[19px]">
+      <img className='w-full' src={logo} alt="" />
+    </div>
+        <h1 className="text-lg font-semibold">
+          {user?.info?.role === "admin" && "Beautiful House Admin"}
+          {user?.info?.role === "shipper" && "Beautiful House Shipper"}
+        </h1>
       </div>
-    </>
+
+      {/* User Profile */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 bg-gray-300 rounded-full" />
+          <div>
+            <p className="font-medium text-gray-800">{user?.info?.email}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 px-4 py-6 overflow-y-auto">
+        <ul className="space-y-2 text-md">
+          <li>
+            <NavLink
+              to="/"
+              className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+            >
+              Trang chủ
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/thongke"
+              className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+            >
+              Thống kê
+            </NavLink>
+          </li>
+          <li>
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+            >
+              Đăng xuất
+            </button>
+          </li>
+        </ul>
+
+        {user?.info?.role === "admin" && (
+          <>
+            <h2 className="px-4 mt-6 mb-2 text-md font-semibold text-gray-500 uppercase">
+              Chức năng:
+            </h2>
+            <ul className="space-y-2 text-md">
+              <li>
+                <NavLink
+                  to="/admin/users"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Người dùng
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/order"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Đơn hàng
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/comments"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Bình luận
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/Listcategory"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Danh mục
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/Material"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Chất liệu
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/dashboard"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Sản phẩm
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/tintuc"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Tin tức
+                </NavLink>
+              </li>
+            </ul>
+          </>
+        )}
+
+        {user?.info?.role === "shipper" && (
+          <>
+            <h2 className="px-4 mt-6 mb-2 text-md font-semibold text-gray-500 uppercase">
+              Chức năng:
+            </h2>
+            <ul className="space-y-2 text-md">
+              <li>
+                <NavLink
+                  to="/shipper/dashboard"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Thống kê
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/shipper/orders"
+                  className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                >
+                  Đơn hàng
+                </NavLink>
+              </li>
+            </ul>
+          </>
+        )}
+      </nav>
+    </aside>
+  </div>
+</>
+
   );
 };
 

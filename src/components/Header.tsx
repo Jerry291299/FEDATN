@@ -10,7 +10,7 @@ import iconarrow from "./icons/down-arrow_5082780.png";
 
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string; email: string; id: string };
+    info: { role: string; name:string; email: string; id: string };
     id: string;
   } | null>(null);
   const [categories, setCategories] = useState<Icategory[]>([]);
@@ -89,16 +89,16 @@ const Header = () => {
               >
                 <img src={nguoi} alt="Hồ sơ" className="w-5 h-5" />
                 <p className="ml-2 flex gap-2">
-                  {user.info.email}
+                  {user.info.name}
                   <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
                 </p>
               </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {user.info.role === "admin" && (
+                  {(user.info.role === "admin" ||user.info.role === "shipper") && (
                     <li className="hover:bg-gray-100">
                       <Link
-                        to="/admin"
+                        to={user?.info?.role === "admin" ? "/admin/thongke" : "/shipper"}
                         className="block px-4 py-2"
                         onClick={() => setIsSubMenuOpen(false)}
                       >
@@ -107,7 +107,7 @@ const Header = () => {
                     </li>
                   )}
                   {(user.info.role === "user" ||
-                    user.info.role === "admin") && (
+                    user.info.role === "admin" ||user.info.role === "shipper") && (
                     <>
                       <li className="hover:bg-gray-100">
                         <Link
@@ -177,33 +177,7 @@ const Header = () => {
             <Link to="/" className="hover:border-b-2 border-black">
               Trang chủ
             </Link>
-            <div className="relative">
-              <button
-                onClick={toggleCategories}
-                className="hover:border-b-2 border-black"
-              >
-                Danh Mục
-              </button>
-              {isCategoriesOpen && (
-                <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {categories
-                    .filter((category) => category.status === "active")
-                    .map((category) => (
-                      <li key={category._id} className="hover:bg-gray-100">
-                        <Link
-                          to={`/categories/${category.name}`} // Use category name in the path
-                          onClick={() => handleCategoryFilter(category.name)}
-                          className="block px-4 py-2"
-                          
-                        >
-                          {category.name}
-                         
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
-              )}
-            </div>
+            
             <NavLink to={"/products"} className="hover:border-b-2 border-black">
               Sản phẩm
             </NavLink>

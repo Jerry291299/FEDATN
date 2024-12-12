@@ -15,7 +15,7 @@ export const getMaterialByID = async (id?: string) => {
     const { data } = await axiosservice.get(`/material/${id}`);
     return data;
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching material by ID:", error);
   }
 };
 

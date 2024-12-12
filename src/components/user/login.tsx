@@ -9,19 +9,17 @@ const Login = (props: Props) => {
   const { setIsAuthenticated } = useContext(AppContext);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  
+
     try {
       const user = await UserLogin({ email, password });
-  
-      console.log('user', user);
-  
+
       if (!user || !user.info) {
-        alert("Đăng nhập thất bại: Thông tin không hợp lệ");
+        setMessage({ type: "error", text: "Đăng nhập thất bại: Thông tin không hợp lệ" });
         return;
       } else {
         const { role } = user.info;
@@ -30,15 +28,28 @@ const Login = (props: Props) => {
         sessionStorage.setItem("role", role); 
         setIsAuthenticated(true);
         
-        alert("Đăng nhập thành công"); 
-        
-        navigate('/'); 
+        setMessage({ type: "success", text: "Đăng nhập thành công! Chào mừng bạn trở lại." });
+        setTimeout(() => navigate('/'), 2000); // Điều hướng sau 2 giây
       }
-  
+
     } catch (error) {
-      alert("Đăng nhập thất bại");
+      setMessage({ type: "error", text: "Đăng nhập thất bại. Vui lòng thử lại!" });
       console.error('Error during login:', error);
     }
+  };
+
+  const renderMessage = () => {
+    if (!message) return null;
+
+    const bgColor = message.type === "success" ? "bg-green-100" : "bg-red-100";
+    const textColor = message.type === "success" ? "text-green-700" : "text-red-700";
+    const borderColor = message.type === "success" ? "border-green-500" : "border-red-500";
+
+    return (
+      <div className={`border ${borderColor} ${bgColor} ${textColor} rounded-lg p-4 mt-4`}>
+        <p>{message.text}</p>
+      </div>
+    );
   };
 
   return (
@@ -88,7 +99,7 @@ const Login = (props: Props) => {
                   />
                 </div>
               </div>
-              {message && <div className="text-red-500 mt-4">{message}</div>}
+              {renderMessage()}
               <div className="flex items-center justify-between gap-2 mt-5">
                 <div className="flex items-center">
                   <input

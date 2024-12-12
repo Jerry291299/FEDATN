@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Popconfirm, message } from "antd";
-import { getAllusersAccount, activateUser, deactivateUser } from "../../service/user";
+import {
+  getAllusersAccount,
+  activateUser,
+  deactivateUser,
+} from "../../service/user";
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 type Props = {};
 
@@ -11,6 +15,7 @@ const Users = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUser] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,60 +33,70 @@ const Users = (props: Props) => {
       }
     };
 
-   
-      fetchData();
-    
+    fetchData();
   }, []);
 
-const deactivateUserById = async (_id: string) => {
-  try {
-    await deactivateUser(_id);
-    message.success(`Người dùng với ID ${_id} đã được vô hiệu hóa.`);
-    const updatedUsers = users.map((user) =>
-      user._id === _id 
-        ? { ...user, status: "deactive" as const, isActive: false }
-        : user
-    );
-    
-    console.log(`Updated User after Deactivation:`, updatedUsers.find(user => user._id === _id));
-    
-    setUser(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-  } catch (error) {
-    console.error("Error deactivating user:", error);
-    message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
-  }
-};
+  const deactivateUserById = async (id: string) => {
+    try {
+      await deactivateUser(id);
+      message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
+      const updatedUsers = users.map((user) =>
+        user.id === id
+          ? { ...user, status: "deactive" as const, isActive: false }
+          : user
+      );
 
-const activateUserById = async (_id: string) => {
-  try {
-    await activateUser(_id);
-    message.success(`Người dùng với ID ${_id} đã được kích hoạt lại.`);
-    const updatedUsers = users.map((user) =>
-      user._id === _id 
-        ? { ...user, status: "active" as const, isActive: true }
-        : user
-    );
+      console.log(
+        `Updated User after Deactivation:`,
+        updatedUsers.find((user) => user.id === id)
+      );
 
-    console.log(`Updated User after Activation:`, updatedUsers.find(user => user._id === _id));
-    
-    setUser(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-  } catch (error) {
-    console.error("Error activating user:", error);
-    message.error("Có lỗi xảy ra khi kích hoạt lại người dùng.");
-  }
-};
+      setUser(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+    } catch (error) {
+      console.error("Error deactivating user:", error);
+      message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
+    }
+  };
+
+  const activateUserById = async (id: string) => {
+    try {
+      await activateUser(id);
+      message.success(`Người dùng với ID ${id} đã được kích hoạt lại.`);
+      const updatedUsers = users.map((user) =>
+        user.id === id
+          ? { ...user, status: "active" as const, isActive: true }
+          : user
+      );
+
+      console.log(
+        `Updated User after Activation:`,
+        updatedUsers.find((user) => user.id === id)
+      );
+
+      setUser(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+    } catch (error) {
+      console.error("Error activating user:", error);
+      message.error("Có lỗi xảy ra khi kích hoạt lại người dùng.");
+    }
+  };
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const updateUser = (_id: string ,role:string) => {
+    localStorage.setItem("editingUserId", _id);
+    navigate(`/admin/users/updateuser/${_id}`);
+    console.log(`Chỉnh sửa vai trò của người dùng với ID: ${_id}`);
+    console.log({role});
+  };
+
   return (
     <>
       {loading && <LoadingComponent />}
-      
-      
+
       <div className="flex flex-col w-full">
         <input
           type="text"
@@ -96,22 +111,42 @@ const activateUserById = async (_id: string) => {
               <table className="min-w-full table-auto">
                 <thead className="bg-white border-b">
                   <tr>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Stt</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Họ và Tên</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Email</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Vai trò</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Handle</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Stt
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Họ và Tên
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Email
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Vai trò
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Trạng thái
+                    </th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                      Handle
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((user: IUser, index: number) => (
-                      <tr className="bg-gray-100 border-b" key={user._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.name}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.email}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.role}</td>
+                      <tr className="bg-gray-100 border-b" key={user.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.name}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.email}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.role}
+                        </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {user.status === "deactive" ? (
                             <span className="text-red-600">Vô hiệu hóa</span>
@@ -119,12 +154,21 @@ const activateUserById = async (_id: string) => {
                             <span className="text-green-600">Hoạt động</span>
                           )}
                         </td>
+
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {/* Edit button */}
+                          {/* <button
+                            type="button"
+                            onClick={() => updateUser(user._id, user.role)}
+                            className="focus:outline-none text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                          >
+                            Edit Role
+                          </button> */}
                           {user.status === "active" ? (
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"
                               description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
-                              onConfirm={() => deactivateUserById(user._id)}
+                              onConfirm={() => deactivateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -139,7 +183,7 @@ const activateUserById = async (_id: string) => {
                             <Popconfirm
                               title="Kích hoạt lại người dùng"
                               description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
-                              onConfirm={() => activateUserById(user._id)}
+                              onConfirm={() => activateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -156,7 +200,12 @@ const activateUserById = async (_id: string) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="text-center text-gray-500 py-4">Không tìm thấy người dùng nào.</td>
+                      <td
+                        colSpan={6}
+                        className="text-center text-gray-500 py-4"
+                      >
+                        Không tìm thấy người dùng nào.
+                      </td>
                     </tr>
                   )}
                 </tbody>

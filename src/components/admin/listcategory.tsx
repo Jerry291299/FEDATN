@@ -4,12 +4,13 @@ import { deactivateCategory, activateCategory, getAllCategories } from '../../se
 import { Icategory } from '../../interface/category';
 import { Popconfirm } from 'antd';
 import LoadingComponent from '../Loading';
+import { CSVLink } from 'react-csv';
 
 type Props = {}
 
 const Listcategory = (props: Props) => {
   const [categories, setCategory] = useState<Icategory[]>([]);
-  const [searchTerm, setSearchTerm] = useState(''); // Trạng thái cho ô tìm kiếm
+  const [searchTerm, setSearchTerm] = useState('');
   const param = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,7 +20,6 @@ const Listcategory = (props: Props) => {
       try {
         setLoading(true);
         const data = await getAllCategories();
-        console.log(data); // Kiểm tra dữ liệu
         setCategory(data);
       } catch (error) {
         console.log(error);
@@ -37,7 +37,6 @@ const Listcategory = (props: Props) => {
         category._id === id ? { ...category, status: 'deactive' as 'deactive' } : category
       );
       setCategory(updatedCategories);
-      console.log(`Category with id ${id} deactivated successfully`);
     } catch (error) {
       console.log("Error deactivating category:", error);
     }
@@ -50,7 +49,6 @@ const Listcategory = (props: Props) => {
         category._id === id ? { ...category, status: 'active' as 'active' } : category
       );
       setCategory(updatedCategories);
-      console.log(`Category with id ${id} activated successfully`);
     } catch (error) {
       console.log("Error activating category:", error);
     }
@@ -60,10 +58,16 @@ const Listcategory = (props: Props) => {
     navigate(`updatecategory/${id}`);
   };
 
-  // Kiểm tra categories có tồn tại và là mảng trước khi filter
   const filteredCategories = Array.isArray(categories) ? categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   ) : [];
+
+  // Prepare data for CSV export
+  const csvData = filteredCategories.map((category) => ({
+    'ID': category._id,
+    'Tên danh mục': category.name,
+    'Trạng thái': category.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
+  }));
 
   return (
     <>
@@ -72,7 +76,17 @@ const Listcategory = (props: Props) => {
         <button className='focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'>Thêm mới</button>
       </NavLink>
 
-      {/* Ô tìm kiếm danh mục */}
+      {/* Export button */}
+      <CSVLink
+        data={csvData}
+        filename={"categories.csv"}
+        className='focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'
+        target="_blank"
+      >
+        Xuất file danh mục
+      </CSVLink>
+
+      {/* Search input */}
       <input
         type="text"
         placeholder="Tìm kiếm danh mục"

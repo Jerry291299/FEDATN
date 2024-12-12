@@ -9,7 +9,8 @@ import Footer from "./Footer";
 import { actions, Cartcontext } from "./contexts/cartcontext";
 import { Icart } from "../interface/cart";
 import CommentSection from "../interface/comment";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const ProductDetail = () => {
   const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
   const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
@@ -63,11 +64,16 @@ const ProductDetail = () => {
     };
     fetchProducts();
   }, []);
-
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length > maxLength) {
+      return text.slice(0, maxLength) + "...";
+    }
+    return text;
+  };
   return (
     <>
       <Header />
-
+      <ToastContainer />
       <div className="container mx-auto w-[1400px] pt-[100px]">
         {product && (
           <div className="container mx-auto w-[1300px] flex">
@@ -108,115 +114,178 @@ const ProductDetail = () => {
               <div className="my-4">
                 <div className="flex items-baseline">
                   <span className="text-2xl font-semibold text-black-600">
-                    {product.price}₫
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(product.price)}
+                  </span>
+                </div>
+                <div className="font-bold text-gray-600">
+                  Chất liệu:{" "}
+                  <span className="text-red-600">
+                    {product?.material?.name}
                   </span>
                 </div>
                 <p className="font-bold text-gray-600">
-                  Tiết kiệm: <span className="text-red-600">50.000 ₫</span>
+                  Số lượng:{" "}
+                  <span
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {product.soLuong > 0
+                      ? `${product.soLuong} sản phẩm`
+                      : "Hết hàng"}
+                  </span>
                 </p>
                 <p className="font-bold text-gray-500 mt-2">
                   Tình trạng:{" "}
-                  <span className="font-semibold text-green-600">Còn hàng</span>
+                  <span
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {product.soLuong > 0 ? "Còn hàng" : "Hết hàng"}
+                  </span>
                 </p>
               </div>
               <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-md border-2 border-transparent bg-gray-900 bg-none px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out focus:shadow hover:bg-orange-400"
-                onClick={async () => {
-                  if (!product || !product._id) {
-                    alert("Product ID is invalid.");
-                    return;
-                  }
-                  if (!user || !user.id) {
-                    alert("Bạn phải đăng nhập thì mới mua được hàng?");
-                    return;
-                  }
+  type="button"
+  className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
+    product.soLuong > 0
+      ? "bg-gray-900 hover:bg-orange-400"
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+  onClick={async () => {
+    if (!product || !product._id) {
+      toast.error("Mã sản phẩm không hợp lệ!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
+    if (!user || !user.id) {
+      toast.info("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
+    if (product.soLuong <= 0) {
+      toast.warning("Sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác.", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return;
+    }
 
-                  const cartItem: Icart = {
-                    userId: user.id,
-                    items: [
-                      {
-                        productId: String(product._id),
-                        name: product.name,
-                        price: product.price,
-                        img: product.img,
-                        quantity: 1,
-                      },
-                    ],
-                  };
-                  try {
-                    const response = await addtoCart(cartItem);
-                    dispatch({ type: actions.ADD, payload: response });
-                    alert("Added to cart successfully");
-                  } catch (error) {
-                    console.error("Failed to add products to cart", error);
-                  }
-                }}
-              >
-                Add to cart
-              </button>
-              <div className="my-4 font-bold">
-                <p className="text-gray-700">
-                  Gọi đặt mua:
-                  <a href="tel:0829721097" className="text-blue-600">
-                    0829721097
-                  </a>
-                  <span className="text-gray-600">(miễn phí 8:30 - 21:30)</span>
-                </p>
-              </div>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                <li>
-                  MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG{" "}
-                  <span className="font-bold">từ 10.000.000Đ</span>
-                </li>
-                <li>
-                  BẢO HÀNH <span className="font-bold">1 đổi 1</span> DO LỖI NHÀ
-                  SẢN XUẤT
-                </li>
-                <li>
-                  CAM KẾT <span className="font-bold">100% chính hãng</span>
-                </li>
-              </ul>
+    const cartItem: Icart = {
+      userId: user.id,
+      items: [
+        {
+          productId: String(product._id),
+          name: product.name,
+          price: product.price,
+          img: product.img[0],
+          quantity: 1,
+        },
+      ],
+    };
+
+    try {
+      const response = await addtoCart(cartItem);
+      dispatch({
+        type: actions.ADD,
+        payload: response,
+      });
+
+      // Hiển thị thông báo thành công
+      toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+    } catch (error) {
+      toast.error("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      console.error("Không thể thêm sản phẩm vào giỏ hàng", error);
+    }
+  }}
+  disabled={product.soLuong <= 0}
+>
+  {product.soLuong > 0 ? "Add to cart" : "Out of Stock"}
+</button>
+
+
+
             </div>
           </div>
         )}
-
+        <div>
+          {product && (
+            <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-black mb-4">
+                Mô tả sản phẩm
+              </h2>
+              {/* Hiển thị nội dung mô tả */}
+              {product.moTa ? (
+                <div className="text-gray-800 text-base leading-relaxed">
+                  <div className="img flex gap-2">
+                    <img className="w-[50%]" src={product.img[2]} alt="" />
+                    <img className="w-[50%]" src={product.img[3]} alt="" />
+                  </div>
+                  <div className="mota">{product.moTa}</div>
+                </div>
+              ) : (
+                <p className="text-gray-500 italic">
+                  Chưa có mô tả cho sản phẩm này.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
         {/* Danh sách sản phẩm tương tự */}
         <div className="border-t-2 border-black mt-[40px]"></div>
         <section className="py-10">
           <h1 className="mb-12 text-center font-sans text-4xl font-bold">
             Sản phẩm tương tự
           </h1>
-          <div className="container mx-auto grid grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
             {products.slice(0, 8).map((product: Iproduct, index: number) => (
               <article
-                key={index}
-                className="relative flex flex-col overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105"
+                key={product._id}
+                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
               >
-                <NavLink
-                  to={`/product/${product._id}`}
-                  className="flex-shrink-0"
-                >
+                <NavLink to={`/product/${product._id}`}>
                   <img
                     src={product.img[0]}
                     alt={product.name}
-                    className="h-56 w-full object-cover"
+                    className="h-56 w-full object-cover rounded-t-lg"
                   />
+                  <div className="p-4">
+                    <h2 className="text-lg font-serif mb-2">{product.name}</h2>
+                    <p className="text-sm text-gray-500">
+                      {truncateText(product.moTa, 40)}
+                    </p>
+                    <p className="text-xl font-bold text-red-600">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(product.price)}
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                      View Details
+                    </button>
+                  </div>
                 </NavLink>
-                <div className="flex flex-col p-4 bg-white">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {product.name}
-                  </h2>
-                  <p className="mt-2 text-lg font-bold text-green-600">
-                    ${product.price}
-                  </p>
-                  <NavLink
-                    to={`/product/${product._id}`}
-                    className="mt-auto inline-block rounded-lg bg-blue-500 px-4 py-2 text-center text-white transition-all duration-200 hover:bg-blue-600"
-                  >
-                    Chi tiết
-                  </NavLink>
-                </div>
               </article>
             ))}
           </div>
