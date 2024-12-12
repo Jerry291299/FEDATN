@@ -91,6 +91,7 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
             <Route path="tintuc" element={<DashboardNews />} />
+            {/* <Route path="dashboard/update/:id" Component={Update}></Route> */}
             <Route path="dashboard/update/:id" Component={Update}></Route>
             <Route path="News/updatenews/:id" Component={UpdateNews}></Route>
 
