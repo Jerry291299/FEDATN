@@ -11,7 +11,6 @@ const OrdersShipper = (props: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(7);
 
-  // Fetch orders from API
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
@@ -33,7 +32,6 @@ const OrdersShipper = (props: Props) => {
     fetchOrders();
   }, []);
 
-  // Update order status to "in progress"
   const handleInProgressOrder = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
@@ -68,7 +66,6 @@ const OrdersShipper = (props: Props) => {
     }
   };
 
-  // Update order status to "delivered" and change payment method
   const handleConfirmDelivery = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
@@ -78,7 +75,7 @@ const OrdersShipper = (props: Props) => {
         `http://localhost:28017/orders-list/${orderId}`,
         {
           status: "delivered",
-          paymentMethod: "Đã Thanh Toán",
+          paymentstatus: "Đã Thanh Toán",
         }
       );
 
@@ -89,7 +86,7 @@ const OrdersShipper = (props: Props) => {
               ? {
                   ...order,
                   status: "delivered",
-                  paymentMethod: "Đã Thanh Toán",
+                  paymentstatus: "Đã Thanh Toán",
                 }
               : order
           )
@@ -105,13 +102,11 @@ const OrdersShipper = (props: Props) => {
     }
   };
 
-  // Handle unsuccessful delivery (order not delivered)
   const handleFailedDelivery = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Step 1: Find the order in the current state
       const orderToUpdate = orders.find((order) => order._id === orderId);
 
       if (!orderToUpdate) {
@@ -119,31 +114,28 @@ const OrdersShipper = (props: Props) => {
         return;
       }
 
-      // Step 2: Prepare the product quantities to return to inventory
       const returnedItems = orderToUpdate.items.map((item) => ({
         productId: item.productId,
-        quantity: item.quantity, // Quantity to return to inventory
+        quantity: item.quantity,
       }));
 
-      // Step 3: Send the request to update the order status to "failed"
       const response = await axios.put(
         `http://localhost:28017/orders-list/${orderId}`,
         {
           status: "failed",
-          paymentMethod: "cash_on_delivery",
-          returnedItems, // Send the items to be returned for inventory update
+          paymentstatus: "chưa thanh toán",
+          returnedItems,
         }
       );
 
       if (response.status === 200 && response.data) {
-        // Step 4: Update the orders in the local state
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId
               ? {
                   ...order,
                   status: "failed",
-                  paymentMethod: "cash_on_delivery",
+                  paymentStatus: "chưa thanh toán",
                 }
               : order
           )
@@ -161,7 +153,6 @@ const OrdersShipper = (props: Props) => {
     }
   };
 
-  // Pagination logic
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
@@ -191,7 +182,7 @@ const OrdersShipper = (props: Props) => {
                   "Địa chỉ",
                   "Tổng số tiền",
                   "Trạng thái",
-                  "Phương thức thanh toán",
+                  "Trạng thái đơn hàng",
                   "Hành động",
                 ].map((header) => (
                   <th
@@ -274,7 +265,7 @@ const OrdersShipper = (props: Props) => {
                     </div>
                   </td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
-                    {order.paymentMethod === "cash_on_delivery"
+                    {order.paymentstatus === "chưa thanh toán"
                       ? "Chưa thanh toán"
                       : "Đã thanh toán"}
                   </td>
