@@ -21,9 +21,9 @@ const ProductUpdate = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
-  const [product, setProduct] = useState<Iproduct | null>(null); // Set the state to hold Iproduct data
+  const [product, setProduct] = useState<Iproduct | null>(null); 
 
-  // Utility function for notifications
+  
   const showNotification = (
     type: "success" | "error",
     title: string,
@@ -93,12 +93,13 @@ const ProductUpdate = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-
+  
     const newFiles = Array.from(e.target.files);
-    setFiles((prev) => [...prev, ...newFiles]);
-
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-    setPreviews((prev) => [...prev, ...newPreviews]);
+  
+    
+    setFiles((prev) => [...prev, ...newFiles]);
+    setPreviews((prev) => Array.from(new Set([...prev, ...newPreviews])));
   };
 
   const uploadImages = async (files: File[]): Promise<string[]> => {
@@ -106,7 +107,7 @@ const ProductUpdate = () => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("images", file);
-
+  
       try {
         const response = await upload(formData);
         const imageUrl = response.payload[0].url;
@@ -120,6 +121,8 @@ const ProductUpdate = () => {
         );
       }
     }
+    
+    setPreviews((prev) => prev.map((preview) => (urls.includes(preview) ? preview : "")));
     return urls;
   };
 
@@ -132,30 +135,25 @@ const ProductUpdate = () => {
     setLoading(true);
   
     try {
-      // Upload the new images and get their URLs
       const imageUrls = await uploadImages(files);
   
-      // Combine new images with existing images (previews)
-      const updatedImages = imageUrls.length > 0 ? [
-        ...new Set([...previews, ...imageUrls]) // Ensure no duplicate images
-      ] : previews;
+      const updatedImages = Array.from(new Set([...previews, ...imageUrls]));
   
-      // Prepare the payload with combined images
       const payload = {
         ...values,
         moTa: values.moTa,
         soLuong: values.soLuong,
-        img: updatedImages, // Use combined images here
+        img: updatedImages, 
         categoryID: values.category,
         materialID: values.material,
         status: true,
       };
   
-      // Send the update request to the backend
       await updateProduct(id, payload);
       showNotification("success", "Thành công", "Cập nhật sản phẩm thành công!");
-      setFiles([]); // Clear uploaded files
-      setPreviews(updatedImages); // Update previews with the combined image list
+  
+      setFiles([]);
+      setPreviews(updatedImages); 
     } catch (error) {
       console.error("Error updating product:", error);
       showNotification("error", "Lỗi", "Không thể cập nhật sản phẩm, vui lòng thử lại!");

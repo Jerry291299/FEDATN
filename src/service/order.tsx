@@ -35,6 +35,7 @@ export interface IOrderData {
     };
   }
   export interface IOrderShipper {
+    paymentstatus: string;
     _id: string;
     userId: { name: string; email: string };
     items: {

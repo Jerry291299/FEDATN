@@ -4,37 +4,28 @@ import { CartItem } from "../../interface/cart";
 import { getCartByID, removeFromCart, updateCartQuantity } from "../../service/cart";
 import Header from "../Header";
 import Footer from "../Footer";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Cart = () => {
   const Globalstate = useContext(Cartcontext);
-  // const { state, dispatch } = Globalstate;
   const [userId, setUserId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const { id } = useParams();
-  const handleRemove = async (item: CartItem) => {
-    try {
-      const updatedCart = await removeFromCart(
-        userId as string,
-        item.productId
-      );
-      setCartItems(updatedCart.items); // Update the local cart state after removal
-      console.log(item.productId, "item id");
-    } catch (error) {
-      console.error("Failed to remove item:", error);
-    }
-  };
+  const [loading, setLoading] = useState<boolean>(false);  // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
 
+  // Fetch cart data based on user ID
   const fetchCartData = async (userId: string) => {
+    setLoading(true);
     try {
-      console.log(userId);
-
       const data = await getCartByID(userId);
       if (data) {
         setCartItems(data.items);
       }
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      setError("Failed to fetch cart data.");
+      console.error("Error fetching cart data:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,52 +33,51 @@ const Cart = () => {
     const userData = sessionStorage.getItem("user");
     if (userData) {
       const { id } = JSON.parse(userData);
-
-      console.log(id);
-
       if (id) {
-        fetchCartData(id);
         setUserId(id);
+        fetchCartData(id);
       }
-
     }
-  }, [userId]);
+  }, []);  // Run only once when the component is mounted
+
+  const handleRemove = async (item: CartItem) => {
+    try {
+      const updatedCart = await removeFromCart(userId as string, item.productId);
+      setCartItems(updatedCart.items);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
+  };
 
   const handleIncrease = async (item: CartItem) => {
     try {
-      // Update local cart state
       const updatedItems = cartItems.map((cartItem) =>
         cartItem.productId === item.productId
           ? { ...cartItem, quantity: (cartItem.quantity ?? 0) + 1 }
           : cartItem
       );
       setCartItems(updatedItems);
-  
-      // Update backend with the new quantity
-      await updateCartQuantity(userId as string, item.productId, item.quantity + 1);  // Add your API call here to update the backend
+      await updateCartQuantity(userId as string, item.productId, item.quantity + 1);
     } catch (error) {
       console.error("Failed to increase quantity:", error);
     }
   };
-  
+
   const handleDecrease = async (item: CartItem) => {
     try {
       if (item.quantity && item.quantity > 1) {
-        // Update local cart state
         const updatedItems = cartItems.map((cartItem) =>
           cartItem.productId === item.productId
             ? { ...cartItem, quantity: cartItem.quantity - 1 }
             : cartItem
         );
         setCartItems(updatedItems);
-  
-        // Update backend with the new quantity
-        await updateCartQuantity(userId as string, item.productId, item.quantity - 1);  // Add your API call here to update the backend
+        await updateCartQuantity(userId as string, item.productId, item.quantity - 1);
       } else {
         handleRemove(item);
       }
     } catch (error) {
-      console.error("Failed to decrease quantity::", error);
+      console.error("Failed to decrease quantity:", error);
     }
   };
 
@@ -101,6 +91,9 @@ const Cart = () => {
     <>
       <Header />
       <div className="w-full font-sans mt-6 md:max-w-7xl max-md:max-w-xl mx-auto bg-white py-8 px-4 md:px-8 rounded-lg shadow-md">
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 bg-gray-50 p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -121,89 +114,66 @@ const Cart = () => {
                       Quantity
                     </th>
                     <th className="p-4 font-semibold text-gray-700 uppercase">
-                     Total Price
+                      Total Price
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {cartItems.map((item, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-50 transition duration-300"
-                    >
-                      {/* Remove Button */}
-                      <td className="p-4 text-right">
-                        <button
-                          onClick={() => handleRemove(item)}
-                          className="text-red-500 hover:text-red-600 transition-colors duration-200 text-xl"
-                          aria-label={`Remove ${item.name}`}
-                        >
-                          &times;
-                        </button>
-                      </td>
-                      {/* Product Image */}
-                      <td className="p-4">
-                        <div className="w-20 h-20 shrink-0 bg-white p-2 rounded-md border border-gray-200">
-                          <img
-                            src={item?.img[0]}
-                            alt={item.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      </td>
-
-                      {/* Product Name */}
-                      <td className="p-4 text-gray-700 font-medium">
-                        {item.name}
-                      </td>
-
-                      {/* Quantity Controls */}
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <button
-                            className="rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition duration-200"
-                            onClick={() => handleDecrease(item)}
-                          >
-                            -
-                          </button>
-                          <span className="text-gray-800 font-medium">
-                            {item.quantity}
-                          </span>
-                          <button
-                            className="rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition duration-200"
-                            onClick={() => handleIncrease(item)}
-                          >
-                            +
-                          </button>
-                        </div>
-                      </td>
-
-                      {/* Price Display */}
-                      <td className="p-4 text-lg font-semibold text-gray-800">
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(item.price * item.quantity)}
-                      </td>
+                  {cartItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-4 text-center">Your cart is empty</td>
                     </tr>
-                  ))}
+                  ) : (
+                    cartItems.map((item, index) => (
+                      <tr key={index} className="hover:bg-gray-50 transition duration-300">
+                        <td className="p-4 text-right">
+                          <button
+                            onClick={() => handleRemove(item)}
+                            className="text-red-500 hover:text-red-600 transition-colors duration-200 text-xl"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            &times;
+                          </button>
+                        </td>
+                        <td className="p-4">
+                          <div className="w-20 h-20 shrink-0 bg-white p-2 rounded-md border border-gray-200">
+                            <img
+                              src={item?.img ? item.img[0] : "/default-image.png"}  // Handle null image
+                              alt={item.name}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </td>
+                        <td className="p-4 text-gray-700 font-medium">{item.name}</td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <button
+                              className="rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition duration-200"
+                              onClick={() => handleDecrease(item)}
+                            >
+                              -
+                            </button>
+                            <span className="text-gray-800 font-medium">{item.quantity}</span>
+                            <button
+                              className="rounded-full border border-gray-300 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition duration-200"
+                              onClick={() => handleIncrease(item)}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-4 text-lg font-semibold text-gray-800">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(item.price * item.quantity)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
-
               <hr className="border-gray-300 mb-6" />
-            </div>
-            <div className="flex items-center border border-blue-500 rounded-md overflow-hidden shadow-md mb-6 mt-6">
-              <input
-                type="text"
-                placeholder="Enter Promo Code"
-                className="w-full px-4 py-2 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-              <button
-                type="button"
-                className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
-              >
-                Apply
-              </button>
             </div>
           </div>
           <div className="bg-gray-50 p-6 rounded-lg shadow-md md:sticky top-0">
@@ -266,11 +236,11 @@ const Cart = () => {
               </NavLink>
             </div>
           </div>
-        </div></div>
+        </div>
+      </div>
       <Footer />
     </>
   );
 };
 
 export default Cart;
-
