@@ -1,29 +1,26 @@
 
 import React, { useEffect, useState } from "react";
 import { Form, Input, Select, notification } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { getProductByID, updateProduct } from "../../../service/products";  // Assuming you have these services
+import { getProductByID, updateProduct } from "../../../service/products";
 import { Icategory } from "../../../interface/category";
 import { getAllCategories } from "../../../service/category";
 import { upload } from "../../../service/upload";
 import LoadingComponent from "../../Loading";
 import { getAllMaterials } from "../../../service/material";
-import { Iproduct } from "../../../interface/products";  // Import Iproduct interface
-import { useParams } from "react-router-dom";
-
-
+import { Iproduct } from "../../../interface/products";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ProductUpdate = () => {
-    const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const [category, setCategory] = useState<Icategory[]>([]);
   const [material, setMaterial] = useState<Icategory[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
-  const [product, setProduct] = useState<Iproduct | null>(null); 
+  const [product, setProduct] = useState<Iproduct | null>(null);
+  const navigate = useNavigate();
 
-  
   const showNotification = (
     type: "success" | "error",
     title: string,
@@ -50,7 +47,6 @@ const ProductUpdate = () => {
         );
       }
     };
-    fetchCategories();
 
     const fetchMaterial = async () => {
       try {
@@ -65,26 +61,32 @@ const ProductUpdate = () => {
         );
       }
     };
-    fetchMaterial();
 
     const fetchProduct = async () => {
       try {
         const productData = await getProductByID(id);
         setProduct(productData);
+        setExistingImages(productData.img || []);
         form.setFieldsValue({
           name: productData.name,
           soLuong: productData.soLuong,
           price: productData.price,
           moTa: productData.moTa,
-          category: productData.category._id,  
-          material: productData.material._id, 
+          category: productData.category._id,
+          material: productData.material._id,
         });
-        setPreviews(productData.img || []);
       } catch (error) {
         console.error("Error fetching product:", error);
-        showNotification("error", "Lỗi", "Không thể tải sản phẩm, vui lòng thử lại!");
+        showNotification(
+          "error",
+          "Lỗi",
+          "Không thể tải sản phẩm, vui lòng thử lại!"
+        );
       }
     };
+
+    fetchCategories();
+    fetchMaterial();
     fetchProduct();
   }, [id]);
 
@@ -93,13 +95,12 @@ const ProductUpdate = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-  
     const newFiles = Array.from(e.target.files);
-    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-  
-    
     setFiles((prev) => [...prev, ...newFiles]);
-    setPreviews((prev) => Array.from(new Set([...prev, ...newPreviews])));
+  };
+
+  const handleRemoveImage = (url: string) => {
+    setExistingImages((prev) => prev.filter((img) => img !== url));
   };
 
   const uploadImages = async (files: File[]): Promise<string[]> => {
@@ -107,7 +108,7 @@ const ProductUpdate = () => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("images", file);
-  
+
       try {
         const response = await upload(formData);
         const imageUrl = response.payload[0].url;
@@ -121,24 +122,16 @@ const ProductUpdate = () => {
         );
       }
     }
-    
-    setPreviews((prev) => prev.map((preview) => (urls.includes(preview) ? preview : "")));
     return urls;
-  };
-
-  const removeImage = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onFinish = async (values: any) => {
     setLoading(true);
-  
+
     try {
-      const imageUrls = await uploadImages(files);
-  
-      const updatedImages = Array.from(new Set([...previews, ...imageUrls]));
-  
+      const newImageUrls = await uploadImages(files);
+      const updatedImages = [...existingImages, ...newImageUrls];
+
       const payload = {
         ...values,
         moTa: values.moTa,
@@ -148,12 +141,11 @@ const ProductUpdate = () => {
         materialID: values.material,
         status: true,
       };
-  
+
       await updateProduct(id, payload);
       showNotification("success", "Thành công", "Cập nhật sản phẩm thành công!");
-  
-      setFiles([]);
-      setPreviews(updatedImages); 
+      setFiles([]); 
+      navigate("/admin/dashboard", { state: { shouldRefetch: true } });
     } catch (error) {
       console.error("Error updating product:", error);
       showNotification("error", "Lỗi", "Không thể cập nhật sản phẩm, vui lòng thử lại!");
@@ -161,21 +153,17 @@ const ProductUpdate = () => {
       setLoading(false);
     }
   };
-  
-  
- 
 
   if (loading || !product) {
     return <LoadingComponent />;
   }
 
   return (
-    <>
-      <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-        <Form form={form} onFinish={onFinish}>
-          <div>
-            <label className="mb-2 text-2xl text-black block">Tên sản phẩm:</label>
-            <Form.Item
+    <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
+      <Form form={form} onFinish={onFinish}>
+      <div>
+             <label className="mb-2 text-2xl text-black block">Tên sản phẩm:</label>
+          <Form.Item
               name="name"
               rules={[{ required: true, message: "Bắt buộc nhập tên Sản Phẩm!" }]}
             >
@@ -216,32 +204,38 @@ const ProductUpdate = () => {
               <Input placeholder="Enter product description" />
             </Form.Item>
           </div>
-
-          <div>
-            <label className="mb-2 text-sm text-black block">Ảnh sản phẩm:</label>
-            <div className="flex flex-wrap gap-4 mb-4">
-              {previews.map((preview, index) => (
-                <div key={index} className="relative w-24 h-24">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index}`}
-                    className="w-full h-full object-cover rounded"
-                  />
-                  <button
-                    onClick={() => removeImage(index)}
-                    className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full"
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
-            </div>
-            <Input type="file" multiple onChange={handleFileChange} />
+        <div>
+          <label className="mt-10 mb-2 text-sm text-black block">Ảnh hiện tại:</label>
+          <div className="grid grid-cols-3 gap-4">
+            {existingImages.map((url) => (
+              <div key={url} className="relative">
+                <img
+                  src={url}
+                  alt="Product"
+                  className="w-full h-auto rounded-md border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(url)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
           </div>
+        </div>
 
-          <div>
-            <label className="mt-10 mb-2 text-sm text-black block">Danh mục:</label>
-            <Form.Item
+        {/* Upload New Images */}
+        <div>
+          <label className="mt-10 mb-2 text-sm text-black block">Thêm ảnh mới:</label>
+          <Input type="file" multiple onChange={handleFileChange} />
+        </div>
+
+        <div className="pt-[20px]">
+        <label className="mt-10 mb-2 text-sm text-black block">Danh mục</label>
+
+           <Form.Item
               name="category"
               rules={[{ required: true, message: "Please select a category!" }]}
             >
@@ -271,17 +265,16 @@ const ProductUpdate = () => {
             </Form.Item>
           </div>
 
-          <div className="mt-6 text-right">
-            <button
-              type="submit"
-              className="bg-[#2F6D7E] text-white py-3 px-6 rounded-md text-xl"
-            >
-              Cập nhật sản phẩm
-            </button>
-          </div>
-        </Form>
-      </div>
-    </>
+        <div className="mt-6 text-right">
+          <button
+            type="submit"
+            className="bg-[#2F6D7E] text-white py-3 px-6 rounded-md text-xl"
+          >
+            Cập nhật sản phẩm
+          </button>
+        </div>
+      </Form>
+    </div>
   );
 };
 

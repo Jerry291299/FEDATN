@@ -11,7 +11,7 @@ export interface Iproduct {
     category: Icategory;
     material: IMaterial;
     status: boolean;
-    // rating?: number; // Thêm trường đánh giá | "rating"
+    rating?: number; // Thêm trường đánh giá | "rating"
 }
 export type IProductLite = Pick<
     Iproduct,
