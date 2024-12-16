@@ -12,7 +12,7 @@ const Order = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Hàm định dạng tiền tệ VNĐ
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: any) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
@@ -25,8 +25,10 @@ const Order = (props: Props) => {
       setLoading(true);
       try {
         const response = await axiosservice.get("/orders");
+        console.log(response.data); 
+        
         setOrders(response.data);
-        setFilteredOrders(response.data); // Khởi tạo danh sách lọc là toàn bộ danh sách
+        setFilteredOrders(response.data); 
         setLoading(false);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách đơn hàng:", error);
@@ -35,10 +37,12 @@ const Order = (props: Props) => {
       }
     };
 
+
     fetchOrders();
   }, []);
 
-  // Xử lý tìm kiếm
+  console.log(Response, "Response");
+  
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
     setSearchTerm(searchValue);
@@ -49,7 +53,7 @@ const Order = (props: Props) => {
       );
       setFilteredOrders(filtered);
     } else {
-      setFilteredOrders(orders); // Hiển thị lại toàn bộ danh sách nếu không có tìm kiếm
+      setFilteredOrders(orders); 
     }
   };
 
@@ -100,7 +104,7 @@ const Order = (props: Props) => {
                         ))}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {formatCurrency(order.totalAmount)}
+                        {formatCurrency(order.amount)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         <div className="flex items-center">

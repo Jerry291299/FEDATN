@@ -7,7 +7,7 @@ export interface IOrder {
       price: number;
       quantity: number;
     }[];
-    totalAmount: number;
+    amount: number;
     status: string;
     paymentstatus: string;
     createdAt: string;
