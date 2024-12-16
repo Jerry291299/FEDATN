@@ -7,32 +7,43 @@ interface Comment {
   text: string;
   createdAt: string;
   name: string;
-  rating?: number; // Thêm trường đánh giá
+  rating?: number; // Optional rating field
 }
 
 const CommentSection: React.FC<{
   productId: string;
   user: IUser | any;
-}> = ({ productId, user }) => {
+  averageRating: number;
+}> = ({ productId, user, averageRating }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
-  const [newRating, setNewRating] = useState<number | null>(null); // Trạng thái cho đánh giá mới
+  const [newRating, setNewRating] = useState<number | null>(null); // New rating state
+  const [ratingCounts, setRatingCounts] = useState<number[]>(Array(5).fill(0)); // Rating counts
 
   useEffect(() => {
     const storedComments = localStorage.getItem(`comments_${productId}`);
     if (storedComments) {
       const cmts = JSON.parse(storedComments);
       setComments(cmts);
+      updateRatingCounts(cmts); // Update rating counts on load
     }
   }, [productId]);
 
+  const updateRatingCounts = (comments: Comment[]) => {
+    const counts = Array(5).fill(0);
+    comments.forEach(comment => {
+      if (comment.rating) {
+        counts[comment.rating - 1] += 1;
+      }
+    });
+    setRatingCounts(counts);
+  };
+
   const saveComments = (updatedComments: Comment[]) => {
     setComments(updatedComments);
-    localStorage.setItem(
-      `comments_${productId}`,
-      JSON.stringify(updatedComments)
-    );
+    localStorage.setItem(`comments_${productId}`, JSON.stringify(updatedComments));
+    updateRatingCounts(updatedComments); // Update counts after saving
   };
 
   const handleAddComment = () => {
@@ -43,11 +54,11 @@ const CommentSection: React.FC<{
         text: newComment.trim(),
         createdAt: new Date().toLocaleString(),
         name: user.info.name,
-        rating: newRating, // Lưu đánh giá
+        rating: newRating, // Save rating
       };
       saveComments([...comments, newCommentObj]);
       setNewComment("");
-      setNewRating(null); // Reset đánh giá
+      setNewRating(null); // Reset rating
     }
   };
 
@@ -83,6 +94,20 @@ const CommentSection: React.FC<{
   return (
     <div className="comment-section bg-gray-100 p-4 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4">Bình luận</h2>
+      <p className="text-lg font-semibold">
+        Số lần đánh giá: {averageRating}
+      </p>
+
+      <div className="rating-counts mb-4">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <div key={star} className="flex items-center">
+            <span className="text-yellow-400">{'★'.repeat(star)}</span>
+            <span className="ml-2 text-gray-700">
+              {ratingCounts[star - 1]} đánh giá
+            </span>
+          </div>
+        ))}
+      </div>
 
       <div className="comments mb-4 space-y-4">
         {comments.length > 0 ? (
@@ -112,16 +137,17 @@ const CommentSection: React.FC<{
                           name="rating"
                           value={star}
                           className="hidden"
-                        />
-                        <label
-                          htmlFor={`${star}-stars`}
-                          className="text-yellow-400 text-2xl cursor-pointer hover:scale-110"
-                          onClick={() =>
+                          checked={editingComment.rating === star}
+                          onChange={() =>
                             setEditingComment({
                               ...editingComment,
                               rating: star,
                             })
                           }
+                        />
+                        <label
+                          htmlFor={`${star}-stars`}
+                          className="text-yellow-400 text-2xl cursor-pointer hover:scale-110"
                         >
                           ★
                         </label>
@@ -192,11 +218,12 @@ const CommentSection: React.FC<{
                 name="newRating"
                 value={star}
                 className="hidden"
+                checked={newRating === star}
+                onChange={() => setNewRating(star)}
               />
               <label
                 htmlFor={`new-${star}-stars`}
                 className="text-yellow-400 text-2xl cursor-pointer hover:scale-110"
-                onClick={() => setNewRating(star)}
               >
                 ★
               </label>
