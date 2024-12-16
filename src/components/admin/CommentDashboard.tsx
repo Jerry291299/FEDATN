@@ -9,6 +9,7 @@ interface Comment {
   createdAt: string;
   productId: string;
   name: string;
+  rating?: number;
 }
 
 const CommentDashboard = () => {
@@ -80,6 +81,7 @@ const CommentDashboard = () => {
                     <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Người dùng</th>
                     <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Sản phẩm</th>
                     <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Nội dung</th>
+                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Số sao đánh giá</th>
                     <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Thời gian</th>
                     <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Hành động</th>
                   </tr>
@@ -99,6 +101,9 @@ const CommentDashboard = () => {
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {comment.text}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {comment.rating}
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {comment.createdAt}

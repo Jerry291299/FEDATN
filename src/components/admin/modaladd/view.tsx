@@ -97,6 +97,11 @@ const ProductView = () => {
       </p>
       <p>
         <strong>Đánh giá:</strong> {product.rating}
+
+      </p>
+      <p>
+        <strong>Số lượt đánh giá:</strong> {}
+        
       </p>
       <Link to="/admin/dashboard">
         <Button type="primary" style={{ marginBottom: 16 }}>

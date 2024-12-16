@@ -11,37 +11,39 @@ import { Icart } from "../interface/cart";
 import CommentSection from "../interface/comment";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const ProductDetail = () => {
-  const [products, setProducts] = useState<Iproduct[]>([]); // Sản phẩm khác
-  const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
-  const { id } = useParams<{ id: string }>(); // Lấy id sản phẩm từ URL
+  const [products, setProducts] = useState<Iproduct[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Iproduct | undefined>(undefined);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); // Ảnh đang hiển thị lớn
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const Globalstate = useContext(Cartcontext);
   const [user, setUser] = useState<IUser | null>(null);
+  const [comments, setComments] = useState<{ stars: number }[]>([]); // To hold comments with star ratings
 
   const dispatch = Globalstate.dispatch;
 
-  // Lấy thông tin người dùng từ sessionStorage
+  // Fetch user info
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       const parsedUser: IUser = JSON.parse(storedUser);
       setUser(parsedUser);
-    } else {
-      console.error("User not found in sessionStorage.");
     }
   }, []);
 
-  // Lấy dữ liệu sản phẩm chi tiết
+  // Fetch product details
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const data = await getProductByID(id);
         setProduct(data);
         if (Array.isArray(data.img) && data.img.length > 0) {
-          setSelectedImage(data.img[0]); // Đặt ảnh đầu tiên làm ảnh chính
+          setSelectedImage(data.img[0]);
         }
+        // Assuming comments are part of the product data
+        setComments(data.comments || []); // Adjust based on your data structure
       } catch (error) {
         console.log("Failed to fetch product by ID", error);
       }
@@ -49,7 +51,7 @@ const ProductDetail = () => {
     fetchProductData();
   }, [id]);
 
-  // Lấy danh sách các sản phẩm khác
+  // Fetch related products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -65,11 +67,20 @@ const ProductDetail = () => {
     fetchProducts();
   }, []);
   const truncateText = (text: string, maxLength: number): string => {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + "...";
-    }
-    return text;
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
+
+  const calculateAverageRating = (comments: { stars: number }[]) => {
+    if (!comments.length) return 0;
+    const totalStars = comments.reduce(
+      (acc, comment) => acc + comment.stars,
+      0
+    );
+    return totalStars / comments.length;
+  };
+
+  const averageRating = calculateAverageRating(comments);
+
   return (
     <>
       <Header />
@@ -77,9 +88,9 @@ const ProductDetail = () => {
       <div className="container mx-auto w-[1400px] pt-[100px]">
         {product && (
           <div className="container mx-auto w-[1300px] flex">
-            {/* Danh sách ảnh nhỏ */}
+            {/* Small images */}
             <div className="flex flex-col gap-4">
-              {Array.isArray(product?.img) &&
+              {Array.isArray(product.img) &&
                 product.img.map((image, index) => (
                   <img
                     key={index}
@@ -90,12 +101,12 @@ const ProductDetail = () => {
                     } cursor-pointer`}
                     src={image}
                     alt={`Product image ${index + 1}`}
-                    onClick={() => setSelectedImage(image)} // Đặt ảnh được chọn
+                    onClick={() => setSelectedImage(image)}
                   />
                 ))}
             </div>
 
-            {/* Ảnh lớn */}
+            {/* Large image */}
             <div className="ml-[40px] mr-[30px]">
               {selectedImage && (
                 <img
@@ -106,7 +117,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Thông tin sản phẩm */}
+            {/* Product info */}
             <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
               <h1 className="text-xl font-bold text-black-800">
                 {product.name}
@@ -122,9 +133,7 @@ const ProductDetail = () => {
                 </div>
                 <div className="font-bold text-gray-600">
                   Chất liệu:{" "}
-                  <span className="text-red-600">
-                    {product?.material?.name}
-                  </span>
+                  <span className="text-red-600">{product.material?.name}</span>
                 </div>
                 <p className="font-bold text-gray-600">
                   Số lượng:{" "}
@@ -149,6 +158,30 @@ const ProductDetail = () => {
                   </span>
                 </p>
               </div>
+
+              {/* Average rating display */}
+              <div className="my-2">
+                <span className="font-bold text-gray-600">Đánh giá: </span>
+                <span className="text-yellow-500">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <span
+                      key={index}
+                      className={
+                        index < averageRating
+                          ? "text-yellow-500"
+                          : "text-gray-400"
+                      }
+                    >
+                      &#9733; {/* Star character */}
+                    </span>
+                  ))}
+                </span>
+                <span className="text-gray-600">
+                  {" "}
+                  ({comments.length} đánh giá)
+                </span>
+              </div>
+
               <button
                 type="button"
                 className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
@@ -203,12 +236,7 @@ const ProductDetail = () => {
 
                   try {
                     const response = await addtoCart(cartItem);
-                    dispatch({
-                      type: actions.ADD,
-                      payload: response,
-                    });
-
-                    // Hiển thị thông báo thành công
+                    dispatch({ type: actions.ADD, payload: response });
                     toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
                       position: "top-right",
                       autoClose: 3000,
@@ -236,13 +264,14 @@ const ProductDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Product description */}
         <div>
           {product && (
             <div className="my-6 p-6 bg-gray-100 rounded-lg shadow-md">
               <h2 className="text-2xl font-bold text-black mb-4">
                 Mô tả sản phẩm
               </h2>
-              {/* Hiển thị nội dung mô tả */}
               {product.moTa ? (
                 <div className="text-gray-800 text-base leading-relaxed">
                   <div className="img flex gap-2">
@@ -259,14 +288,15 @@ const ProductDetail = () => {
             </div>
           )}
         </div>
-        {/* Danh sách sản phẩm tương tự */}
+
+        {/* Similar products */}
         <div className="border-t-2 border-black mt-[40px]"></div>
         <section className="py-10">
           <h1 className="mb-12 text-center font-sans text-4xl font-bold">
             Sản phẩm tương tự
           </h1>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8 mt-[30px] mb-[50px] px-[20px] md:px-[40px] lg:px-[60px]">
-            {products.slice(0, 8).map((product: Iproduct, index: number) => (
+            {products.slice(0, 8).map((product: Iproduct) => (
               <article
                 key={product._id}
                 className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition-all"
@@ -280,7 +310,7 @@ const ProductDetail = () => {
                   <div className="p-4">
                     <h2 className="text-lg font-serif mb-2">{product.name}</h2>
                     <p className="text-sm text-gray-500">
-                      {truncateText(product.moTa, 40)}
+                      {truncateText(product.moTa, 50)}
                     </p>
                     <p className="text-xl font-bold text-red-600">
                       {new Intl.NumberFormat("vi-VN", {
@@ -299,16 +329,20 @@ const ProductDetail = () => {
             ))}
           </div>
         </section>
+
         <div className="pt-[50px]">
           {user ? (
-            <CommentSection productId={id || ""} user={user} />
+            <CommentSection
+              productId={id || ""}
+              user={user}
+              averageRating={averageRating} // Pass average rating
+            />
           ) : (
             <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
           )}
         </div>
       </div>
       <Footer />
-      {/* <CommentSection /> */}
     </>
   );
 };
