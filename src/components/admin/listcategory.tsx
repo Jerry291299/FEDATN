@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { deactivateCategory, activateCategory, getAllCategories } from '../../service/category';
 import { Icategory } from '../../interface/category';
-import { Popconfirm } from 'antd';
+import { Popconfirm, Pagination } from 'antd';
 import LoadingComponent from '../Loading';
 import { CSVLink } from 'react-csv';
 
-type Props = {}
+type Props = {};
 
 const Listcategory = (props: Props) => {
   const [categories, setCategory] = useState<Icategory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const param = useParams();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; 
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,14 +24,14 @@ const Listcategory = (props: Props) => {
         const data = await getAllCategories();
         setCategory(data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
   }, []);
-  
+
   const handleDeactivateCategory = async (id: string) => {
     try {
       await deactivateCategory(id);
@@ -38,7 +40,7 @@ const Listcategory = (props: Props) => {
       );
       setCategory(updatedCategories);
     } catch (error) {
-      console.log("Error deactivating category:", error);
+      console.error('Error deactivating category:', error);
     }
   };
 
@@ -50,7 +52,7 @@ const Listcategory = (props: Props) => {
       );
       setCategory(updatedCategories);
     } catch (error) {
-      console.log("Error activating category:", error);
+      console.error('Error activating category:', error);
     }
   };
 
@@ -58,13 +60,19 @@ const Listcategory = (props: Props) => {
     navigate(`updatecategory/${id}`);
   };
 
-  const filteredCategories = Array.isArray(categories) ? categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredCategories = Array.isArray(categories)
+    ? categories.filter((category) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
-  // Prepare data for CSV export
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedCategories = filteredCategories.slice(startIndex, startIndex + itemsPerPage);
+
+  
   const csvData = filteredCategories.map((category) => ({
-    'ID': category._id,
+    ID: category._id,
     'Tên danh mục': category.name,
     'Trạng thái': category.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
   }));
@@ -73,20 +81,20 @@ const Listcategory = (props: Props) => {
     <>
       {loading && <LoadingComponent />}
       <NavLink to={'/admin/addcategory'}>
-        <button className='focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'>Thêm mới</button>
+        <button className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+          Thêm mới
+        </button>
       </NavLink>
 
-      {/* Export button */}
       <CSVLink
         data={csvData}
-        filename={"categories.csv"}
-        className='focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2'
+        filename={'categories.csv'}
+        className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
         target="_blank"
       >
         Xuất file danh mục
       </CSVLink>
 
-      {/* Search input */}
       <input
         type="text"
         placeholder="Tìm kiếm danh mục"
@@ -109,11 +117,15 @@ const Listcategory = (props: Props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCategories.length > 0 ? (
-                    filteredCategories.map((category: Icategory, index: number) => (
+                  {paginatedCategories.length > 0 ? (
+                    paginatedCategories.map((category, index) => (
                       <tr className="bg-gray-100 border-b" key={category._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{category.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {startIndex + index + 1}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {category.name}
+                        </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {category.status === 'active' ? (
                             <span className="text-green-600">Hoạt động</span>
@@ -165,11 +177,23 @@ const Listcategory = (props: Props) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="text-center text-gray-500 py-4">Không tìm thấy danh mục nào.</td>
+                      <td colSpan={4} className="text-center text-gray-500 py-4">
+                        Không tìm thấy danh mục nào.
+                      </td>
                     </tr>
                   )}
                 </tbody>
               </table>
+              {/* Ant Design Pagination */}
+              <div className="flex justify-center mt-4">
+                <Pagination
+                  current={currentPage}
+                  total={filteredCategories.length}
+                  pageSize={itemsPerPage}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false} 
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Popconfirm, message } from "antd";
+import { Popconfirm, message, Pagination } from "antd";
 import {
   getAllusersAccount,
   activateUser,
@@ -15,6 +15,9 @@ const Users = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUser] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10); 
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,12 +48,6 @@ const Users = (props: Props) => {
           ? { ...user, status: "deactive" as const, isActive: false }
           : user
       );
-
-      console.log(
-        `Updated User after Deactivation:`,
-        updatedUsers.find((user) => user.id === id)
-      );
-
       setUser(updatedUsers);
       localStorage.setItem("users", JSON.stringify(updatedUsers));
     } catch (error) {
@@ -68,12 +65,6 @@ const Users = (props: Props) => {
           ? { ...user, status: "active" as const, isActive: true }
           : user
       );
-
-      console.log(
-        `Updated User after Activation:`,
-        updatedUsers.find((user) => user.id === id)
-      );
-
       setUser(updatedUsers);
       localStorage.setItem("users", JSON.stringify(updatedUsers));
     } catch (error) {
@@ -82,15 +73,22 @@ const Users = (props: Props) => {
     }
   };
 
+ 
+
+  
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const updateUser = (_id: string ,role:string) => {
-    localStorage.setItem("editingUserId", _id);
-    navigate(`/admin/users/updateuser/${_id}`);
-    console.log(`Chỉnh sửa vai trò của người dùng với ID: ${_id}`);
-    console.log({role});
+  
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePageChange = (page: number, pageSize?: number) => {
+    setCurrentPage(page);
+    if (pageSize) setPageSize(pageSize);
   };
 
   return (
@@ -132,11 +130,11 @@ const Users = (props: Props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user: IUser, index: number) => (
+                  {paginatedUsers.length > 0 ? (
+                    paginatedUsers.map((user: IUser, index: number) => (
                       <tr className="bg-gray-100 border-b" key={user.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {index + 1}
+                          {index + 1 + (currentPage - 1) * pageSize}
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {user.name}
@@ -154,16 +152,7 @@ const Users = (props: Props) => {
                             <span className="text-green-600">Hoạt động</span>
                           )}
                         </td>
-
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {/* Edit button */}
-                          {/* <button
-                            type="button"
-                            onClick={() => updateUser(user._id, user.role)}
-                            className="focus:outline-none text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                          >
-                            Edit Role
-                          </button> */}
                           {user.status === "active" ? (
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"
@@ -213,6 +202,15 @@ const Users = (props: Props) => {
             </div>
           </div>
         </div>
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredUsers.length}
+          onChange={handlePageChange}
+          showSizeChanger={false} 
+          onShowSizeChange={handlePageChange}
+          className="mt-4"
+        />
       </div>
     </>
   );
