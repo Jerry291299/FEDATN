@@ -18,16 +18,18 @@ const Orderlisthistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
     completed: "Hoàn thành",
     cancelled: "Đã hủy",
     processing: "Đang xử lý",
-    in_progress: "Đã giao hàng",
+    in_progress: "Đang giao hàng",
     delivered: "Đã giao",
     deleted: "Đã hủy",
-    failed: "Đã hủy"
+    failed: "Đã hủy",
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -43,7 +45,7 @@ const Orderlisthistory = () => {
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
-          setError("User not logged in!");
+          setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử đơn hàng.");
           setLoading(false);
           return;
         }
@@ -52,7 +54,7 @@ const Orderlisthistory = () => {
         const fetchedOrders = await getOrdersByUserId(id);
         setOrders(fetchedOrders);
       } catch (error) {
-        setError("Failed to fetch orders.");
+        setError("Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.");
         console.error("Error fetching orders:", error);
       } finally {
         setLoading(false);
@@ -62,15 +64,16 @@ const Orderlisthistory = () => {
     fetchOrders();
   }, []);
 
-  const handleCancelOrder = async (orderId: string) => {
-    try {
-      const confirmed = window.confirm(
-        "Bạn có chắc chắn muốn hủy đơn hàng này?"
-      );
-      if (!confirmed) return;
+  const confirmCancelOrder = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setShowModal(true);
+  };
 
+  const handleCancelOrder = async () => {
+    if (!selectedOrderId) return;
+    try {
       const response = await fetch(
-        `http://localhost:28017/api/orders/${orderId}/cancel`,
+        `http://localhost:28017/api/orders/${selectedOrderId}/cancel`,
         {
           method: "POST",
           headers: {
@@ -80,25 +83,29 @@ const Orderlisthistory = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to cancel order");
+        throw new Error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
       }
 
       const updatedOrder = await response.json();
-      setOrders(
-        (prevOrders) =>
-          prevOrders
-            .map((order) =>
-              order._id === updatedOrder._id
-                ? { ...order, status: updatedOrder.status }
-                : order
-            )
-            .filter((order) => order.status !== "deleted")
+      setOrders((prevOrders) =>
+        prevOrders
+          .map((order) =>
+            order._id === updatedOrder._id
+              ? { ...order, status: updatedOrder.status }
+              : order
+          )
+          .filter((order) => order.status !== "deleted")
       );
 
-      alert("Đơn hàng đã được hủy thành công!");
+      // alert(
+      //   `\u2728 Đơn hàng #${selectedOrderId} đã được hủy thành công! \n\nNếu bạn cần thêm hỗ trợ, đừng ngần ngại liên hệ với đội ngũ chăm sóc khách hàng của chúng tôi. \nChúc bạn một ngày vui vẻ!`
+      // );
     } catch (error) {
       console.error("Error cancelling order:", error);
-      alert("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+      alert("Rất tiếc, không thể hủy đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
+    } finally {
+      setShowModal(false);
+      setSelectedOrderId(null);
     }
   };
 
@@ -113,7 +120,7 @@ const Orderlisthistory = () => {
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500 text-center mt-10">{error}</p>;
   }
 
   if (orders.length === 0) {
@@ -181,7 +188,7 @@ const Orderlisthistory = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {order.status === "pending" && (
                       <button
-                        onClick={() => handleCancelOrder(order._id)}
+                        onClick={() => confirmCancelOrder(order._id)}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
                       >
                         Hủy
@@ -197,6 +204,30 @@ const Orderlisthistory = () => {
           </table>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold">Xác nhận hủy đơn hàng</h3>
+            <p className="mt-2">Bạn có chắc chắn muốn hủy đơn hàng này? Sau khi hủy, bạn sẽ không thể khôi phục lại.</p>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );
