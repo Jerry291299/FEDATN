@@ -8,7 +8,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { actions, Cartcontext } from "./contexts/cartcontext";
 import { Icart } from "../interface/cart";
-import CommentSection from "../interface/comment";
+import CommentSection from "../components/CommentProduct";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -142,7 +142,7 @@ const ProductDetail = () => {
                       product.soLuong > 0 ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    {product.soLuong > 0
+                    {product.soLuong > 0  
                       ? `${product.soLuong} sản phẩm`
                       : "Hết hàng"}
                   </span>
