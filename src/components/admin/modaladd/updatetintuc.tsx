@@ -3,14 +3,15 @@ import { Form, Input, Upload, notification } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import { getPostById, updatePost } from "../../../service/new";
+import { upload } from "../../../service/upload";
 
 const UpdateNews = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams<string>(); // Chỉ định kiểu `id` là `string | undefined`
   const [images, setImages] = useState<string[]>([]); // Các hình ảnh hiện có
-  const [fileList, setFileList] = useState<any[]>([]); // Các tệp tải lên mới
-
+  const [files, setFiles] = useState<File[]>([]); // Các tệp tải lên mới
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   // Hàm tiện ích để hiển thị thông báo
   const showNotification = (
     type: "success" | "error",
@@ -36,6 +37,7 @@ const UpdateNews = () => {
         const post = await getPostById(id);
         if (post) {
           setImages(post.img || []);
+          setExistingImages(post.img || []); // Đồng bộ trạng thái ảnh cũ
           form.setFieldsValue({
             title: post.title,
             descriptions: post.descriptions,
@@ -56,6 +58,40 @@ const UpdateNews = () => {
   
     fetchPost();
   }, [id, form]);
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const newFiles = Array.from(e.target.files);
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const handleRemoveImage = (url: string) => {
+    setExistingImages((prev) => prev.filter((img) => img !== url));
+  };
+  
+
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    const urls: string[] = [];
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("images", file);
+
+      try {
+        const response = await upload(formData);
+        const imageUrl = response.payload[0].url;
+        urls.push(imageUrl);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        showNotification(
+          "error",
+          "Lỗi tải ảnh",
+          "Không thể tải ảnh lên, vui lòng thử lại!"
+        );
+      }
+    }
+    return urls;
+  };
+
   const onFinish = async (values: any) => {
     if (!id) {
       showNotification("error", "Lỗi", "ID bài viết bị thiếu.");
@@ -63,32 +99,37 @@ const UpdateNews = () => {
     }
   
     try {
-        const newImages = fileList.map((file) => file.url || file.response.url);
-        const updatedPost = {
-          ...values,
-          img: [...images, ...newImages],
-        };
-        
+      // Upload ảnh mới
+      const newImageUrls = await uploadImages(files);
   
-        const updatedPostData = await updatePost(id, updatedPost);
-        console.log(updatedPostData); // Kiểm tra phản hồi từ API
-        if (updatedPostData) {
-          showNotification("success", "Cập nhật bài viết thành công!", `Tiêu đề: ${updatedPost.title}`);
-          navigate("/admin/tintuc");
-        } else {
-          showNotification("error", "Lỗi", "Không thể cập nhật bài viết, vui lòng thử lại!");
-        }
-        
+      // Kết hợp ảnh cũ và ảnh mới
+      const updatedImages = [...existingImages, ...newImageUrls];
+  
+      // Payload để gửi API
+      const payload = {
+        ...values,
+        img: updatedImages, // Gửi cả ảnh cũ và ảnh mới
+      };
+  
+      const updatedPostData = await updatePost(id, payload);
+  
+      if (updatedPostData) {
+        showNotification("success", "Thành công", "Bài viết đã được cập nhật!");
+        navigate("/admin/tintuc");
+      } else {
+        showNotification("error", "Lỗi", "Không thể cập nhật bài viết, vui lòng thử lại!");
+      }
     } catch (error) {
       console.error("Lỗi khi cập nhật bài viết:", error);
       showNotification("error", "Lỗi", "Không thể cập nhật bài viết, vui lòng thử lại!");
     }
   };
   
+  
 
-  const handleUploadChange = ({ fileList: newFileList }: any) => {
-    setFileList(newFileList);
-  };
+  // const handleUploadChange = ({ fileList: newFileList }: any) => {
+  //   setFiles(newFileList);
+  // };
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md space-y-6 font-[sans-serif]">
@@ -125,34 +166,36 @@ const UpdateNews = () => {
 
         {/* Hình ảnh */}
         <div>
-          <label className="block mb-2 text-lg font-semibold text-gray-800">Hình ảnh</label>
-          <div className="flex flex-wrap gap-4 mb-4">
-            {images.map((img, index) => (
-              <div key={index} className="relative w-24 h-24">
+          
+          
+          <div>
+          <label className="mt-10 mb-2 text-sm text-black block">Ảnh hiện tại:</label>
+          <div className="grid grid-cols-3 gap-4">
+            {existingImages.map((url) => (
+              <div key={url} className="relative">
                 <img
-                  src={img}
-                  alt={`Hình ảnh ${index}`}
-                  className="w-full h-full object-cover rounded"
+                  src={url}
+                  alt="Product"
+                  className="w-full h-auto rounded-md border border-gray-200"
                 />
                 <button
                   type="button"
-                  className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1"
+                  onClick={() => handleRemoveImage(url)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
                 >
-                  Xóa
+                  &times;
                 </button>
               </div>
             ))}
           </div>
-          <Upload
-            action="/upload"
-            listType="picture-card"
-            fileList={fileList}
-            onChange={handleUploadChange}
-            maxCount={3}
-          >
-            <UploadOutlined />
-            Tải lên
-          </Upload>
+        </div>
+
+        {/* Upload New Images */}
+        <div>
+          <label className="mt-10 mb-2 text-sm text-black block">Thêm ảnh mới:</label>
+          <Input type="file" multiple onChange={handleFileChange} />
+        </div>
+
         </div>
 
         <Form.Item>
