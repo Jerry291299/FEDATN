@@ -48,20 +48,61 @@ const Cart = () => {
       console.error("Failed to remove item:", error);
     }
   };
-
   const handleIncrease = async (item: CartItem) => {
     try {
-      const updatedItems = cartItems.map((cartItem) =>
-        cartItem.productId === item.productId
-          ? { ...cartItem, quantity: (cartItem.quantity ?? 0) + 1 }
-          : cartItem
-      );
-      setCartItems(updatedItems);
-      await updateCartQuantity(userId as string, item.productId, item.quantity + 1);
+      console.log("Increasing quantity for:", item);
+  
+      // Gọi API để lấy chi tiết sản phẩm
+      const response = await fetch(`http://localhost:28017/api/products/${item.productId}`);
+      const text = await response.text(); // Đọc phản hồi dưới dạng text
+  
+      // Kiểm tra nếu phản hồi không phải JSON
+      if (response.ok && text.startsWith("{")) {
+        let product;
+        try {
+          product = JSON.parse(text); // Chuyển text thành JSON nếu có thể
+          console.log("Product details:", product);
+          
+          if (item.quantity + 1 > product.soLuong) {
+            alert("Sản phẩm không đủ số lượng để thêm vào giỏ hàng.");
+            return;
+          }
+  
+          // Cập nhật giỏ hàng cục bộ
+          const updatedItems = cartItems.map((cartItem) =>
+            cartItem.productId === item.productId
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          );
+          setCartItems(updatedItems);
+  
+          // Cập nhật số lượng trên server
+          const updateResponse = await fetch(`http://localhost:28017/api/cart/${userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              productId: item.productId,
+              quantity: item.quantity + 1,
+            }),
+          });
+  
+          if (!updateResponse.ok) {
+            throw new Error(`Failed to update cart quantity: ${updateResponse.statusText}`);
+          }
+  
+          console.log("Cart updated successfully");
+        } catch (parseError) {
+          throw new Error("Failed to parse product details as JSON.");
+        }
+      } else {
+        throw new Error("Received invalid response, expected JSON.");
+      }
     } catch (error) {
       console.error("Failed to increase quantity:", error);
+      alert("Đã xảy ra lỗi, vui lòng thử lại sau.");
     }
   };
+  
 
   const handleDecrease = async (item: CartItem) => {
     try {
