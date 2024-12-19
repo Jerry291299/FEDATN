@@ -51,6 +51,7 @@ const ProductDetail = () => {
     fetchProductData();
   }, [id]);
 
+
   // Fetch related products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -69,17 +70,31 @@ const ProductDetail = () => {
   const truncateText = (text: string, maxLength: number): string => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
+  useEffect(() => {
+    // Fetch comments from localStorage
+    const storedComments = localStorage.getItem(`comments_${id}`); // Key includes product ID
+    if (storedComments) {
+      setComments(JSON.parse(storedComments));
+    }
+  }, [id]); // Rerun if product ID changes
+  
+const handleAddComment = (newComment: { stars: number; content: string }) => {
+  const updatedComments = [...comments, newComment];
+  setComments(updatedComments);
 
-  const calculateAverageRating = (comments: { stars: number }[]) => {
-    if (!comments.length) return 0;
-    const totalStars = comments.reduce(
-      (acc, comment) => acc + comment.stars,
-      0
-    );
-    return totalStars / comments.length;
-  };
+  // Save to localStorage
+  localStorage.setItem(`comments_${id}`, JSON.stringify(updatedComments));
+};
 
-  const averageRating = calculateAverageRating(comments);
+const calculateAverageRating = (comments: { stars: number }[]) => {
+  if (!comments || comments.length === 0) return 0; // Không có bình luận
+  const totalStars = comments.reduce((acc, comment) => acc + comment.stars, 0);
+  return totalStars / comments.length; // Tính trung bình
+};
+const averageRating = calculateAverageRating(comments);
+console.log("Average Rating:", averageRating); 
+
+
 
   return (
     <>
@@ -161,26 +176,28 @@ const ProductDetail = () => {
 
               {/* Average rating display */}
               <div className="my-2">
-                <span className="font-bold text-gray-600">Đánh giá: </span>
-                <span className="text-yellow-500">
+                <span className="font-bold text-gray-600">Đánh giá trung bình: </span>
+                <span>
                   {Array.from({ length: 5 }, (_, index) => (
                     <span
                       key={index}
                       className={
-                        index < averageRating
+                        index < Math.round(averageRating)
                           ? "text-yellow-500"
-                          : "text-gray-400"
+                          : "text-gray-300"
                       }
                     >
-                      &#9733; {/* Star character */}
+                      &#9733;
                     </span>
                   ))}
                 </span>
-                <span className="text-gray-600">
-                  {" "}
-                  ({comments.length} đánh giá)
+                <span className="ml-2 text-gray-600">
+                  {comments.length > 0 ? `(${comments.length} đánh giá)` : "(Chưa có đánh giá)"}
                 </span>
               </div>
+
+
+
 
               <button
                 type="button"
@@ -348,3 +365,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+  
