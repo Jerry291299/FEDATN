@@ -12,9 +12,7 @@ const CommentSection: React.FC<{
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [newRating, setNewRating] = useState<number | null>(null);
   const [ratingCounts, setRatingCounts] = useState<number[]>(Array(5).fill(0));
-  const [commentCount, setCommentCount] = useState<number>(0);
-  const [totalRatings, setTotalRatings] = useState<number>(0);
-  const [averageStarRating, setAverageStarRating] = useState<number>(0);
+  const [filteredRating, setFilteredRating] = useState<number | null>(null);
 
   useEffect(() => {
     const storedComments = localStorage.getItem(`comments_${productId}`);
@@ -22,20 +20,8 @@ const CommentSection: React.FC<{
       const cmts = JSON.parse(storedComments);
       setComments(cmts);
       updateRatingCounts(cmts);
-      updateStatistics(cmts);
     }
   }, [productId]);
-
-  const updateStatistics = (comments: IComment[]) => {
-    const count = comments.length;
-    const total = comments.reduce(
-      (sum: number, comment: IComment) => sum + (comment.rating || 0),
-      0
-    );
-    setCommentCount(count);
-    setTotalRatings(total);
-    setAverageStarRating(count > 0 ? total / count : 0);
-  };
 
   const updateRatingCounts = (comments: IComment[]) => {
     const counts = Array(5).fill(0);
@@ -53,7 +39,7 @@ const CommentSection: React.FC<{
       `comments_${productId}`,
       JSON.stringify(updatedComments)
     );
-    updateStatistics(updatedComments);
+    updateRatingCounts(updatedComments);
   };
 
   const handleAddComment = () => {
@@ -103,50 +89,63 @@ const CommentSection: React.FC<{
     saveComments(updatedComments);
   };
 
+  const filteredComments = filteredRating
+    ? comments.filter((comment) => comment.rating === filteredRating)
+    : comments;
+
   return (
     <div className="comment-section bg-gray-100 p-4 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4">Bình luận</h2>
-      {/* <p className="text-lg font-semibold">Số lần bình luận: {commentCount}</p>
-      <p className="text-lg font-semibold">Tổng số đánh giá: {totalRatings}</p>
-      <p className="text-lg font-semibold">
-        Đánh giá trung bình: {averageStarRating.toFixed(1)} sao
-      </p> */}
-      <div className="my-2">
-        <span className="font-bold text-gray-600">Đánh giá trung bình : </span>
-        <span className="text-yellow-500" style={{ fontSize: "1.5em" }}>
-          {Array.from({ length: 5 }, (_, index) => {
-            if (index < Math.floor(averageStarRating)) {
-              return <span key={index}>&#9733;</span>; // Full star
-            } else if (
-              index === Math.floor(averageStarRating) &&
-              averageStarRating % 1 >= 0.5
-            ) {
-              return <span key={index}>&#9733;</span>; // Half star as full for clarity
-            }
-            return (
-              <span key={index} className="text-gray-400">
-                &#9734;
-              </span> // Empty star
-            );
-          })}
-        </span>
-        <span className="text-gray-600"> ({comments.length} đánh giá)</span>
+
+      {/* Hiển thị tổng kết đánh giá */}
+      <div className="rating-summary bg-gradient-to-br from-blue-600 to-purple-600 p-6 rounded-lg shadow-lg text-white mb-6">
+        <h3 className="text-2xl font-bold mb-4">Tổng kết đánh giá</h3>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-4xl font-extrabold">
+              {averageRating.toFixed(1)} <span className="text-yellow-400">★</span>
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-semibold">{comments.length} đánh giá</p>
+            <p className="text-sm opacity-80">Tổng số bình luận</p>
+          </div>
+        </div>
+        <div className="rating-counts space-y-3">
+          {[5, 4, 3, 2, 1].map((star) => (
+            <div
+              key={star}
+              className={`flex items-center justify-between p-2 bg-opacity-20 rounded-lg transition cursor-pointer ${
+                filteredRating === star ? "bg-yellow-500 text-black" : "hover:bg-opacity-30"
+              }`}
+              onClick={() =>
+                setFilteredRating(filteredRating === star ? null : star)
+              }
+            >
+              <div className="flex items-center space-x-2">
+                <span className="flex text-yellow-400">
+                  {Array.from({ length: star }).map((_, i) => (
+                    <span key={i}>★</span>
+                  ))}
+                </span>
+                <span className="ml-2 text-sm">
+                  {ratingCounts[star - 1]} đánh giá
+                </span>
+              </div>
+              <span className="text-xs font-medium opacity-80">
+                {(
+                  (ratingCounts[star - 1] / comments.length || 0) * 100
+                ).toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* <div className="rating-counts mb-4">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <div key={star} className="flex items-center">
-            <span className="text-yellow-400">{"★".repeat(star)}</span>
-            <span className="ml-2 text-gray-700">
-              {ratingCounts[star - 1]} đánh giá
-            </span>
-          </div>
-        ))}
-      </div> */}
-
+      {/* Hiển thị bình luận */}
       <div className="comments mb-4 space-y-4">
-        {comments.length > 0 ? (
-          comments.map((comment) => (
+        {filteredComments.length > 0 ? (
+          filteredComments.map((comment) => (
             <div
               key={comment.id}
               className="comment flex items-center p-4 bg-white rounded-lg shadow-md"
@@ -163,32 +162,6 @@ const CommentSection: React.FC<{
                     }
                     className="border border-gray-300 rounded-md p-2 w-full"
                   />
-                  <div className="flex justify-start items-center space-x-1 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <div key={star}>
-                        <input
-                          type="radio"
-                          id={`${star}-stars`}
-                          name="rating"
-                          value={star}
-                          className="hidden"
-                          checked={editingComment.rating === star}
-                          onChange={() =>
-                            setEditingComment({
-                              ...editingComment,
-                              rating: star,
-                            })
-                          }
-                        />
-                        <label
-                          htmlFor={`${star}-stars`}
-                          className="text-yellow-400 text-2xl cursor-pointer hover:scale-110"
-                        >
-                          ★
-                        </label>
-                      </div>
-                    ))}
-                  </div>
                   <div className="flex space-x-2">
                     <button
                       onClick={handleUpdateComment}
@@ -212,7 +185,7 @@ const CommentSection: React.FC<{
                   </p>
                   <p className="text-gray-700">{comment.text}</p>
                   <p className="text-xs text-gray-500">
-                    {comment.createdAt.toLocaleString()}
+                    {new Date(comment.createdAt).toLocaleString()}
                   </p>
                   {(user.info.name === comment.name ||
                     user.role === "admin") && (
@@ -239,6 +212,8 @@ const CommentSection: React.FC<{
           <p className="text-gray-500">Chưa có bình luận nào.</p>
         )}
       </div>
+
+      {/* Thêm bình luận mới */}
       <div className="add-comment mt-4">
         <textarea
           value={newComment}
