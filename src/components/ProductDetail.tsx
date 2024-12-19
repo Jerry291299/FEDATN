@@ -8,7 +8,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { actions, Cartcontext } from "./contexts/cartcontext";
 import { Icart } from "../interface/cart";
-import CommentSection from "../interface/comment";
+import CommentSection from "../components/CommentProduct";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -109,11 +109,10 @@ console.log("Average Rating:", averageRating);
                 product.img.map((image, index) => (
                   <img
                     key={index}
-                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${
-                      selectedImage === image
-                        ? "border-blue-500"
-                        : "border-gray-200"
-                    } cursor-pointer`}
+                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${selectedImage === image
+                      ? "border-blue-500"
+                      : "border-gray-200"
+                      } cursor-pointer`}
                     src={image}
                     alt={`Product image ${index + 1}`}
                     onClick={() => setSelectedImage(image)}
@@ -153,9 +152,8 @@ console.log("Average Rating:", averageRating);
                 <p className="font-bold text-gray-600">
                   Số lượng:{" "}
                   <span
-                    className={`font-semibold ${
-                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`font-semibold ${product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                      }`}
                   >
                     {product.soLuong > 0
                       ? `${product.soLuong} sản phẩm`
@@ -165,9 +163,8 @@ console.log("Average Rating:", averageRating);
                 <p className="font-bold text-gray-500 mt-2">
                   Tình trạng:{" "}
                   <span
-                    className={`font-semibold ${
-                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`font-semibold ${product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                      }`}
                   >
                     {product.soLuong > 0 ? "Còn hàng" : "Hết hàng"}
                   </span>
@@ -201,11 +198,10 @@ console.log("Average Rating:", averageRating);
 
               <button
                 type="button"
-                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
-                  product.soLuong > 0
-                    ? "bg-gray-900 hover:bg-orange-400"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${product.soLuong > 0
+                  ? "bg-gray-900 hover:bg-orange-400"
+                  : "bg-gray-400 cursor-not-allowed"
+                  }`}
                 onClick={async () => {
                   if (!product || !product._id) {
                     toast.error("Mã sản phẩm không hợp lệ!", {
@@ -304,6 +300,33 @@ console.log("Average Rating:", averageRating);
               )}
             </div>
           )}
+        </div>
+
+        {/* Bảo hành và vận chuyển */}
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
+          <div className="text-center"> {/* Chỉ căn giữa h2 */}
+            <h2 className="text-xl font-bold mb-4 uppercase tracking-wider text-blue-600">Chính Sách Bảo hành & Vận chuyển</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-medium mb-2">Bảo hành</h3>
+              <ul className="list-disc list-inside text-gray-700">
+                <li>Các sản phẩm nội thất Beautiful House đã đều được sản xuất tại nhà máy của chúng tôi với dây chuyền hiện đại.</li>
+                <li>Beautiful House bảo hành 1 năm cho các trường hợp lỗi về kỹ thuật.</li>
+                <li>Khách hàng không nên tự sửa chữa mà hãy báo ngay cho Beautiful House qua số điện thoại 0344357227.</li>
+                <li>Sau thời gian hết bảo hành, nếu quý khách có bất kỳ câu hỏi thắc mắc nào, hãy liên hệ với Beautiful House để được hướng dẫn và giải quyết các vấn đề phát sinh.</li>
+                <li className="text-red-600">Beautiful House không bảo hành cho các trường hợp sau: Khách hàng tự sửa chữa khi sản phẩm bị trục trặc mà không báo cho Beautiful House.</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium mb-2">Vận chuyển</h3>
+              <ul className="list-disc list-inside text-gray-700">
+                <li>Beautiful House cung cấp dịch vụ giao hàng tận nơi, lắp ráp và sắp xếp vị trí theo yêu cầu của khách hàng.</li>
+                <li>Miễn phí giao hàng trong các quận nội thành phố Hà Nội cho các đơn hàng trị giá trên 10 triệu.</li>
+                <li>Đối với khu vực các tỉnh lân cận: Phí vận chuyển sẽ được tính toán dựa trên khoảng cách.</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         {/* Similar products */}

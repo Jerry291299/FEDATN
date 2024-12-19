@@ -8,6 +8,7 @@ interface Comment {
   text: string;
   createdAt: string;
   productId: string;
+  // productName: string;
   name: string;
   rating?: number;
 }
