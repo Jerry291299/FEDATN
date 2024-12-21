@@ -9,6 +9,10 @@ export interface IComment {
 }
 
 
+
+
+export type CommentLite = Pick<IComment,'name'>
+
 // const CommentSection: React.FC<{
 //   productId: string;
 //   user: IUser | any;
@@ -259,3 +263,5 @@ export interface IComment {
 
 // export default CommentSection;
 
+
+//check xung dot 
