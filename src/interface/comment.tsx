@@ -12,3 +12,4 @@ export interface IComment {
 
 export type CommentLite = Pick<IComment,'name'>
 
+//check xung dot 
