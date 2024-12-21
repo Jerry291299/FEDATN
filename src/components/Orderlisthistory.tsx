@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getOrdersByUserId } from "../service/order";
+import { getOrdersByUserId, Order } from "../service/order";
 import { NavLink } from "react-router-dom";
 import LoadingComponent from "./Loading";
-
-interface Order {
-  _id: string;
-  createdAt: string;
-  amount: number;
-  paymentMethod: string;
-  paymentstatus: string;
-  status: string;
-}
 
 const Orderlisthistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -20,6 +11,8 @@ const Orderlisthistory = () => {
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 5;  // Số đơn hàng hiển thị trên mỗi trang
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
@@ -64,6 +57,13 @@ const Orderlisthistory = () => {
     fetchOrders();
   }, []);
 
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   const confirmCancelOrder = (orderId: string) => {
     setSelectedOrderId(orderId);
     setShowModal(true);
@@ -96,10 +96,7 @@ const Orderlisthistory = () => {
           )
           .filter((order) => order.status !== "deleted")
       );
-
-      // alert(
-      //   `\u2728 Đơn hàng #${selectedOrderId} đã được hủy thành công! \n\nNếu bạn cần thêm hỗ trợ, đừng ngần ngại liên hệ với đội ngũ chăm sóc khách hàng của chúng tôi. \nChúc bạn một ngày vui vẻ!`
-      // );
+      window.location.reload();
     } catch (error) {
       console.error("Error cancelling order:", error);
       alert("Rất tiếc, không thể hủy đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
@@ -166,7 +163,7 @@ const Orderlisthistory = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {currentOrders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2">{order._id}</td>
                   <td className="border border-gray-300 px-4 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
@@ -202,6 +199,23 @@ const Orderlisthistory = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Phân trang */}
+        <div className="flex justify-center mt-4">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`mx-1 px-3 py-1 border ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700"
+              } rounded hover:bg-blue-400`}
+            >
+              {index + 1}
+            </button>
+          ))}
         </div>
       </div>
 
