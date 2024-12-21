@@ -5,14 +5,15 @@ import { IComment } from "../interface/comment";
 const CommentSection: React.FC<{
   productId: string;
   user: IUser | any;
-  averageRating: number;
-}> = ({ productId, user, averageRating }) => {
+  averageRating?: number;
+}> = ({ productId, user }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
   const [newRating, setNewRating] = useState<number | null>(null);
   const [ratingCounts, setRatingCounts] = useState<number[]>(Array(5).fill(0));
   const [filteredRating, setFilteredRating] = useState<number | null>(null);
+  const [averageRating, setAverageRating] = useState<number>(0);
 
   useEffect(() => {
     const storedComments = localStorage.getItem(`comments_${productId}`);
@@ -20,6 +21,7 @@ const CommentSection: React.FC<{
       const cmts = JSON.parse(storedComments);
       setComments(cmts);
       updateRatingCounts(cmts);
+      calculateAverageRating(cmts);
     }
   }, [productId]);
 
@@ -33,6 +35,16 @@ const CommentSection: React.FC<{
     setRatingCounts(counts);
   };
 
+  const calculateAverageRating = (comments: IComment[]) => {
+    if (comments.length > 0) {
+      const totalRating = comments.reduce((sum, comment) => sum + (comment.rating || 0), 0);
+      const average = totalRating / comments.length;
+      setAverageRating(average);
+    } else {
+      setAverageRating(0);
+    }
+  };
+
   const saveComments = (updatedComments: IComment[]) => {
     setComments(updatedComments);
     localStorage.setItem(
@@ -40,6 +52,7 @@ const CommentSection: React.FC<{
       JSON.stringify(updatedComments)
     );
     updateRatingCounts(updatedComments);
+    calculateAverageRating(updatedComments);
   };
 
   const handleAddComment = () => {
