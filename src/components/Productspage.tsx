@@ -68,7 +68,7 @@ const Productspage = (props: Props) => {
     setPage((prev) => ({ ...prev, currentPage }));
     fetchProducts(currentPage);
   };
-  // Logic lọc sản phẩm theo danh m
+  // Logic lọc sản phẩm theo danh mục
   const handleCategoryFilter = (categoryName: string | null) => {
     const selectedCategoryId =
       categories.find((category) => category.name === categoryName)?._id ||

@@ -13,7 +13,7 @@ const Listcategory = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; 
+  const itemsPerPage = 5;
 
   const navigate = useNavigate();
 
@@ -66,11 +66,9 @@ const Listcategory = (props: Props) => {
       )
     : [];
 
-  
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCategories = filteredCategories.slice(startIndex, startIndex + itemsPerPage);
 
-  
   const csvData = filteredCategories.map((category) => ({
     ID: category._id,
     'Tên danh mục': category.name,
@@ -80,123 +78,109 @@ const Listcategory = (props: Props) => {
   return (
     <>
       {loading && <LoadingComponent />}
-      <NavLink to={'/admin/addcategory'}>
-        <button className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
-          Thêm mới
-        </button>
-      </NavLink>
-
-      <CSVLink
-        data={csvData}
-        filename={'categories.csv'}
-        className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-        target="_blank"
-      >
-        Xuất file danh mục
-      </CSVLink>
-
-      <input
-        type="text"
-        placeholder="Tìm kiếm danh mục"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 rounded mb-4"
-      />
-
-      <div className="flex flex-col w-full">
-        <div className="overflow-x-auto">
-          <div className="py-2 inline-block w-full px-0">
-            <div className="overflow-hidden">
-              <table className="min-w-full table-auto">
-                <thead className="bg-white border-b">
-                  <tr>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Stt</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Tên danh mục</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái</th>
-                    <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Handle</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedCategories.length > 0 ? (
-                    paginatedCategories.map((category, index) => (
-                      <tr className="bg-gray-100 border-b" key={category._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {startIndex + index + 1}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {category.name}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {category.status === 'active' ? (
-                            <span className="text-green-600">Hoạt động</span>
-                          ) : (
-                            <span className="text-red-600">Vô hiệu hóa</span>
-                          )}
-                        </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          <button
-                            type="button"
-                            className="focus:outline-none text-white bg-sky-600 hover:bg-sky-900 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                            onClick={() => updateCategory(category._id)}
-                          >
-                            Edit
-                          </button>
-                          {category.status === 'active' ? (
-                            <Popconfirm
-                              title="Vô hiệu hóa danh mục"
-                              description="Bạn có chắc chắn muốn vô hiệu hóa danh mục này không?"
-                              onConfirm={() => handleDeactivateCategory(category._id)}
-                              okText="Có"
-                              cancelText="Không"
-                            >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                              >
-                                Deactivate
-                              </button>
-                            </Popconfirm>
-                          ) : (
-                            <Popconfirm
-                              title="Kích hoạt lại danh mục"
-                              description="Bạn có chắc chắn muốn kích hoạt lại danh mục này không?"
-                              onConfirm={() => handleActivateCategory(category._id)}
-                              okText="Có"
-                              cancelText="Không"
-                            >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                              >
-                                Activate
-                              </button>
-                            </Popconfirm>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="text-center text-gray-500 py-4">
-                        Không tìm thấy danh mục nào.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              {/* Ant Design Pagination */}
-              <div className="flex justify-center mt-4">
-                <Pagination
-                  current={currentPage}
-                  total={filteredCategories.length}
-                  pageSize={itemsPerPage}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false} 
-                />
-              </div>
-            </div>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex space-x-4">
+          <NavLink to={'/admin/addcategory'}>
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+              Thêm mới
+            </button>
+          </NavLink>
+          <CSVLink
+            data={csvData}
+            filename={'categories.csv'}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
+            target="_blank"
+          >
+            Xuất file danh mục
+          </CSVLink>
         </div>
+        <input
+          type="text"
+          placeholder="Tìm kiếm danh mục"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+      <div className="overflow-x-auto shadow-lg rounded-lg">
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Stt</th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Tên danh mục</th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Trạng thái</th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedCategories.length > 0 ? (
+              paginatedCategories.map((category, index) => (
+                <tr key={category._id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-6 text-sm text-gray-700">{startIndex + index + 1}</td>
+                  <td className="py-3 px-6 text-sm text-gray-700">{category.name}</td>
+                  <td className="py-3 px-6 text-sm">
+                    {category.status === 'active' ? (
+                      <span className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs">Hoạt động</span>
+                    ) : (
+                      <span className="bg-red-100 text-red-700 py-1 px-3 rounded-full text-xs">Vô hiệu hóa</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-6 text-sm">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => updateCategory(category._id)}
+                        className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-1 px-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                      >
+                        Sửa
+                      </button>
+                      {category.status === 'active' ? (
+                        <Popconfirm
+                          title="Vô hiệu hóa danh mục"
+                          onConfirm={() => handleDeactivateCategory(category._id)}
+                          okText="Có"
+                          cancelText="Không"
+                        >
+                          <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-400">
+                            Vô hiệu hóa
+                          </button>
+                        </Popconfirm>
+                      ) : (
+                        <Popconfirm
+                          title="Kích hoạt danh mục"
+                          onConfirm={() => handleActivateCategory(category._id)}
+                          okText="Có"
+                          cancelText="Không"
+                        >
+                          <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400">
+                            Kích hoạt
+                          </button>
+                        </Popconfirm>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center py-6 text-gray-500">
+                  Không tìm thấy danh mục nào.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex justify-center mt-6">
+        <Pagination
+          current={currentPage}
+          total={filteredCategories.length}
+          pageSize={itemsPerPage}
+          onChange={(page) => setCurrentPage(page)}
+          showSizeChanger={false}
+          className="pagination-custom"
+        />
       </div>
     </>
   );
