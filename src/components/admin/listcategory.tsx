@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { deactivateCategory, activateCategory, getAllCategories } from '../../service/category';
-import { Icategory } from '../../interface/category';
-import { Popconfirm, Pagination } from 'antd';
-import LoadingComponent from '../Loading';
-import { CSVLink } from 'react-csv';
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  deactivateCategory,
+  activateCategory,
+  getAllCategories,
+} from "../../service/category";
+import { Icategory } from "../../interface/category";
+import { Popconfirm, Pagination } from "antd";
+import LoadingComponent from "../Loading";
+import { CSVLink } from "react-csv";
 
 type Props = {};
 
 const Listcategory = (props: Props) => {
   const [categories, setCategory] = useState<Icategory[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -36,11 +40,13 @@ const Listcategory = (props: Props) => {
     try {
       await deactivateCategory(id);
       const updatedCategories = categories.map((category) =>
-        category._id === id ? { ...category, status: 'deactive' as 'deactive' } : category
+        category._id === id
+          ? { ...category, status: "deactive" as "deactive" }
+          : category
       );
       setCategory(updatedCategories);
     } catch (error) {
-      console.error('Error deactivating category:', error);
+      console.error("Error deactivating category:", error);
     }
   };
 
@@ -48,11 +54,13 @@ const Listcategory = (props: Props) => {
     try {
       await activateCategory(id);
       const updatedCategories = categories.map((category) =>
-        category._id === id ? { ...category, status: 'active' as 'active' } : category
+        category._id === id
+          ? { ...category, status: "active" as "active" }
+          : category
       );
       setCategory(updatedCategories);
     } catch (error) {
-      console.error('Error activating category:', error);
+      console.error("Error activating category:", error);
     }
   };
 
@@ -64,30 +72,34 @@ const Listcategory = (props: Props) => {
     ? categories.filter((category) =>
         category.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    : [];
+    : [];     
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedCategories = filteredCategories.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedCategories = filteredCategories.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const csvData = filteredCategories.map((category) => ({
     ID: category._id,
-    'Tên danh mục': category.name,
-    'Trạng thái': category.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
+    "Tên danh mục": category.name,
+    "Trạng thái": category.status === "active" ? "Hoạt động" : "Vô hiệu hóa",
   }));
 
   return (
     <>
       {loading && <LoadingComponent />}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between px-6 h-[96px] bg-white-600 text-white"></div>
+      <div className="flex items-center mb-6">
         <div className="flex space-x-4">
-          <NavLink to={'/admin/addcategory'}>
+          <NavLink to={"/admin/addcategory"}>
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400">
               Thêm mới
             </button>
           </NavLink>
           <CSVLink
             data={csvData}
-            filename={'categories.csv'}
+            filename={"categories.csv"}
             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
             target="_blank"
           >
@@ -107,23 +119,39 @@ const Listcategory = (props: Props) => {
         <table className="min-w-full bg-white">
           <thead>
             <tr className="bg-gray-100 border-b">
-              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Stt</th>
-              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Tên danh mục</th>
-              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Trạng thái</th>
-              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">Hành động</th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">
+                Stt
+              </th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">
+                Tên danh mục
+              </th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">
+                Trạng thái
+              </th>
+              <th className="text-left py-3 px-6 font-semibold text-sm text-gray-600">
+                Hành động
+              </th>
             </tr>
           </thead>
           <tbody>
             {paginatedCategories.length > 0 ? (
               paginatedCategories.map((category, index) => (
                 <tr key={category._id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-6 text-sm text-gray-700">{startIndex + index + 1}</td>
-                  <td className="py-3 px-6 text-sm text-gray-700">{category.name}</td>
+                  <td className="py-3 px-6 text-sm text-gray-700">
+                    {startIndex + index + 1}
+                  </td>
+                  <td className="py-3 px-6 text-sm text-gray-700">
+                    {category.name}
+                  </td>
                   <td className="py-3 px-6 text-sm">
-                    {category.status === 'active' ? (
-                      <span className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs">Hoạt động</span>
+                    {category.status === "active" ? (
+                      <span className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs">
+                        Hoạt động
+                      </span>
                     ) : (
-                      <span className="bg-red-100 text-red-700 py-1 px-3 rounded-full text-xs">Vô hiệu hóa</span>
+                      <span className="bg-red-100 text-red-700 py-1 px-3 rounded-full text-xs">
+                        Vô hiệu hóa
+                      </span>
                     )}
                   </td>
                   <td className="py-3 px-6 text-sm">
@@ -134,10 +162,12 @@ const Listcategory = (props: Props) => {
                       >
                         Sửa
                       </button>
-                      {category.status === 'active' ? (
+                      {category.status === "active" ? (
                         <Popconfirm
                           title="Vô hiệu hóa danh mục"
-                          onConfirm={() => handleDeactivateCategory(category._id)}
+                          onConfirm={() =>
+                            handleDeactivateCategory(category._id)
+                          }
                           okText="Có"
                           cancelText="Không"
                         >

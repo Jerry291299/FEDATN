@@ -11,6 +11,7 @@ interface Comment {
   productId: string;
   name: string;
   rating?: number;
+  productName: string;
 }
 
 const CommentDashboard = () => {
@@ -25,12 +26,17 @@ const CommentDashboard = () => {
         if (key.startsWith("comments_")) {
           const productComments = JSON.parse(localStorage.getItem(key) || "[]");
           productComments.forEach((comment: Comment) => {
-            allComments.push({ ...comment, productId: key.replace("comments_", "") });
+            allComments.push({
+              ...comment,
+              productId: key.replace("comments_", ""),
+            });
           });
         }
       });
       // Sắp xếp bình luận theo ngày tạo (mới nhất lên đầu)
-      allComments.sort((a, b) => dayjs(b.createdAt).isBefore(dayjs(a.createdAt)) ? 1 : -1);
+      allComments.sort((a, b) =>
+        dayjs(b.createdAt).isBefore(dayjs(a.createdAt)) ? 1 : -1
+      );
       setComments(allComments);
     };
     fetchComments();
@@ -42,12 +48,16 @@ const CommentDashboard = () => {
 
     const groupedComments: Record<string, Comment[]> = {};
     updatedComments.forEach((comment) => {
-      if (!groupedComments[comment.productId]) groupedComments[comment.productId] = [];
+      if (!groupedComments[comment.productId])
+        groupedComments[comment.productId] = [];
       groupedComments[comment.productId].push(comment);
     });
 
     Object.keys(groupedComments).forEach((productId) => {
-      localStorage.setItem(`comments_${productId}`, JSON.stringify(groupedComments[productId]));
+      localStorage.setItem(
+        `comments_${productId}`,
+        JSON.stringify(groupedComments[productId])
+      );
     });
   };
 
@@ -66,7 +76,9 @@ const CommentDashboard = () => {
       title: "Người dùng",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <span className="font-semibold text-cyan-500">{text}</span>,
+      render: (text: string) => (
+        <span className="font-semibold text-cyan-500">{text}</span>
+      ),
     },
     {
       title: "Sản phẩm",
@@ -85,7 +97,7 @@ const CommentDashboard = () => {
       dataIndex: "rating",
       key: "rating",
       render: (text: number) => (
-        <span className="text-yellow-500">{'★'.repeat(text || 0)}</span>
+        <span className="text-yellow-500">{"★".repeat(text || 0)}</span>
       ),
     },
     {
@@ -105,7 +117,10 @@ const CommentDashboard = () => {
           okText="Có"
           cancelText="Không"
         >
-          <Button danger className="transition-all hover:bg-red-600 hover:text-white">
+          <Button
+            danger
+            className="transition-all hover:bg-red-600 hover:text-white"
+          >
             Xóa
           </Button>
         </Popconfirm>

@@ -21,6 +21,7 @@ const ProductDetail = () => {
   const Globalstate = useContext(Cartcontext);
   const [user, setUser] = useState<IUser | null>(null);
   const [comments, setComments] = useState<{ stars: number }[]>([]); // To hold comments with star ratings
+  const [averageRating, setAverageRating] = useState<number>(0);
 
   const dispatch = Globalstate.dispatch;
 
@@ -51,7 +52,6 @@ const ProductDetail = () => {
     fetchProductData();
   }, [id]);
 
-
   // Fetch related products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -77,25 +77,26 @@ const ProductDetail = () => {
       setComments(JSON.parse(storedComments));
     }
   }, [id]); // Rerun if product ID changes
-  
-const handleAddComment = (newComment: { stars: number; content: string }) => {
-  const updatedComments = [...comments, newComment];
-  setComments(updatedComments);
 
-  // Save to localStorage
-  localStorage.setItem(`comments_${id}`, JSON.stringify(updatedComments));
-};
+  const handleAddComment = (newComment: { stars: number; content: string }) => {
+    const updatedComments = [...comments, newComment];
+    setComments(updatedComments);
 
-const calculateAverageRating = (comments: { stars: number }[]) => {
-  if (!comments || comments.length === 0) return 0; // Không có bình luận
-  const totalStars = comments.reduce((acc, comment) => acc + comment.stars, 0);
-  return totalStars / comments.length; // Tính trung bình
-};
-const averageRating = calculateAverageRating(comments);
-console.log("Average Rating:", averageRating); 
+    // Save to localStorage
+    localStorage.setItem(`comments_${id}`, JSON.stringify(updatedComments));
+  };
 
-
-
+  const calculateAverageRating = (comments: { stars: number }[]) => {
+    if (!comments || comments.length === 0) return 0; // Không có bình luận
+    const totalStars = comments.reduce(
+      (acc, comment) => acc + comment.stars,
+      0
+    );
+    return totalStars / comments.length; // Tính trung bình
+  };
+  const handleRatingUpdate = (newAverageRating: number) => {
+    setAverageRating(newAverageRating);
+  };
   return (
     <>
       <Header />
@@ -109,10 +110,11 @@ console.log("Average Rating:", averageRating);
                 product.img.map((image, index) => (
                   <img
                     key={index}
-                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${selectedImage === image
-                      ? "border-blue-500"
-                      : "border-gray-200"
-                      } cursor-pointer`}
+                    className={`w-[150px] h-[150px] object-cover rounded-lg border ${
+                      selectedImage === image
+                        ? "border-blue-500"
+                        : "border-gray-200"
+                    } cursor-pointer`}
                     src={image}
                     alt={`Product image ${index + 1}`}
                     onClick={() => setSelectedImage(image)}
@@ -152,8 +154,9 @@ console.log("Average Rating:", averageRating);
                 <p className="font-bold text-gray-600">
                   Số lượng:{" "}
                   <span
-                    className={`font-semibold ${product.soLuong > 0 ? "text-green-600" : "text-red-600"
-                      }`}
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
                   >
                     {product.soLuong > 0
                       ? `${product.soLuong} sản phẩm`
@@ -163,8 +166,9 @@ console.log("Average Rating:", averageRating);
                 <p className="font-bold text-gray-500 mt-2">
                   Tình trạng:{" "}
                   <span
-                    className={`font-semibold ${product.soLuong > 0 ? "text-green-600" : "text-red-600"
-                      }`}
+                    className={`font-semibold ${
+                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                    }`}
                   >
                     {product.soLuong > 0 ? "Còn hàng" : "Hết hàng"}
                   </span>
@@ -173,7 +177,9 @@ console.log("Average Rating:", averageRating);
 
               {/* Average rating display */}
               <div className="my-2">
-                <span className="font-bold text-gray-600">Đánh giá trung bình: </span>
+                <span className="font-bold text-gray-600">
+                  Đánh giá: {averageRating.toFixed(1)} {" "}
+                </span>
                 <span>
                   {Array.from({ length: 5 }, (_, index) => (
                     <span
@@ -189,19 +195,19 @@ console.log("Average Rating:", averageRating);
                   ))}
                 </span>
                 <span className="ml-2 text-gray-600">
-                  {comments.length > 0 ? `(${comments.length} đánh giá)` : "(Chưa có đánh giá)"}
+                  {comments.length > 0
+                    ? `(${comments.length} đánh giá)`
+                    : "(Chưa có đánh giá)"}
                 </span>
               </div>
 
-
-
-
               <button
                 type="button"
-                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${product.soLuong > 0
-                  ? "bg-gray-900 hover:bg-orange-400"
-                  : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
+                  product.soLuong > 0
+                    ? "bg-gray-900 hover:bg-orange-400"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
                 onClick={async () => {
                   if (!product || !product._id) {
                     toast.error("Mã sản phẩm không hợp lệ!", {
@@ -304,26 +310,56 @@ console.log("Average Rating:", averageRating);
 
         {/* Bảo hành và vận chuyển */}
         <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-          <div className="text-center"> {/* Chỉ căn giữa h2 */}
-            <h2 className="text-xl font-bold mb-4 uppercase tracking-wider text-blue-600">Chính Sách Bảo hành & Vận chuyển</h2>
+          <div className="text-center">
+            {" "}
+            {/* Chỉ căn giữa h2 */}
+            <h2 className="text-xl font-bold mb-4 uppercase tracking-wider text-blue-600">
+              Chính Sách Bảo hành & Vận chuyển
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-medium mb-2">Bảo hành</h3>
               <ul className="list-disc list-inside text-gray-700">
-                <li>Các sản phẩm nội thất Beautiful House đã đều được sản xuất tại nhà máy của chúng tôi với dây chuyền hiện đại.</li>
-                <li>Beautiful House bảo hành 1 năm cho các trường hợp lỗi về kỹ thuật.</li>
-                <li>Khách hàng không nên tự sửa chữa mà hãy báo ngay cho Beautiful House qua số điện thoại 0344357227.</li>
-                <li>Sau thời gian hết bảo hành, nếu quý khách có bất kỳ câu hỏi thắc mắc nào, hãy liên hệ với Beautiful House để được hướng dẫn và giải quyết các vấn đề phát sinh.</li>
-                <li className="text-red-600">Beautiful House không bảo hành cho các trường hợp sau: Khách hàng tự sửa chữa khi sản phẩm bị trục trặc mà không báo cho Beautiful House.</li>
+                <li>
+                  Các sản phẩm nội thất Beautiful House đã đều được sản xuất tại
+                  nhà máy của chúng tôi với dây chuyền hiện đại.
+                </li>
+                <li>
+                  Beautiful House bảo hành 1 năm cho các trường hợp lỗi về kỹ
+                  thuật.
+                </li>
+                <li>
+                  Khách hàng không nên tự sửa chữa mà hãy báo ngay cho Beautiful
+                  House qua số điện thoại 0344357227.
+                </li>
+                <li>
+                  Sau thời gian hết bảo hành, nếu quý khách có bất kỳ câu hỏi
+                  thắc mắc nào, hãy liên hệ với Beautiful House để được hướng
+                  dẫn và giải quyết các vấn đề phát sinh.
+                </li>
+                <li className="text-red-600">
+                  Beautiful House không bảo hành cho các trường hợp sau: Khách
+                  hàng tự sửa chữa khi sản phẩm bị trục trặc mà không báo cho
+                  Beautiful House.
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-medium mb-2">Vận chuyển</h3>
               <ul className="list-disc list-inside text-gray-700">
-                <li>Beautiful House cung cấp dịch vụ giao hàng tận nơi, lắp ráp và sắp xếp vị trí theo yêu cầu của khách hàng.</li>
-                <li>Miễn phí giao hàng trong các quận nội thành phố Hà Nội cho các đơn hàng trị giá trên 10 triệu.</li>
-                <li>Đối với khu vực các tỉnh lân cận: Phí vận chuyển sẽ được tính toán dựa trên khoảng cách.</li>
+                <li>
+                  Beautiful House cung cấp dịch vụ giao hàng tận nơi, lắp ráp và
+                  sắp xếp vị trí theo yêu cầu của khách hàng.
+                </li>
+                <li>
+                  Miễn phí giao hàng trong các quận nội thành phố Hà Nội cho các
+                  đơn hàng trị giá trên 10 triệu.
+                </li>
+                <li>
+                  Đối với khu vực các tỉnh lân cận: Phí vận chuyển sẽ được tính
+                  toán dựa trên khoảng cách.
+                </li>
               </ul>
             </div>
           </div>
@@ -375,7 +411,7 @@ console.log("Average Rating:", averageRating);
             <CommentSection
               productId={id || ""}
               user={user}
-              averageRating={averageRating} // Pass average rating
+              onRatingUpdate={handleRatingUpdate}
             />
           ) : (
             <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
@@ -388,4 +424,3 @@ console.log("Average Rating:", averageRating);
 };
 
 export default ProductDetail;
-  

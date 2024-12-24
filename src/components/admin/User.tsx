@@ -85,6 +85,7 @@ const Users = (props: Props) => {
   return (
     <>
       {loading && <LoadingComponent />}
+      <div className="flex items-center justify-between px-6 h-[96px] bg-white-600 text-white"></div>
 
       <div className="flex flex-col w-full p-6 bg-gray-50">
         <Input
