@@ -5,8 +5,8 @@ import { IComment } from "../interface/comment";
 const CommentSection: React.FC<{
   productId: string;
   user: IUser | any;
-  averageRating?: number;
-}> = ({ productId, user }) => {
+  onRatingUpdate: (averageRating: number) => void;
+}> = ({ productId, user, onRatingUpdate }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
@@ -22,6 +22,7 @@ const CommentSection: React.FC<{
       setComments(cmts);
       updateRatingCounts(cmts);
       calculateAverageRating(cmts);
+      onRatingUpdate(averageRating);
     }
   }, [productId]);
 
@@ -37,7 +38,10 @@ const CommentSection: React.FC<{
 
   const calculateAverageRating = (comments: IComment[]) => {
     if (comments.length > 0) {
-      const totalRating = comments.reduce((sum, comment) => sum + (comment.rating || 0), 0);
+      const totalRating = comments.reduce(
+        (sum, comment) => sum + (comment.rating || 0),
+        0
+      );
       const average = totalRating / comments.length;
       setAverageRating(average);
     } else {
@@ -116,7 +120,8 @@ const CommentSection: React.FC<{
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-4xl font-extrabold">
-              {averageRating.toFixed(1)} <span className="text-yellow-400">★</span>
+              {averageRating.toFixed(1)}{" "}
+              <span className="text-yellow-400">★</span>
             </p>
           </div>
           <div className="text-right">
@@ -129,7 +134,9 @@ const CommentSection: React.FC<{
             <div
               key={star}
               className={`flex items-center justify-between p-2 bg-opacity-20 rounded-lg transition cursor-pointer ${
-                filteredRating === star ? "bg-yellow-500 text-black" : "hover:bg-opacity-30"
+                filteredRating === star
+                  ? "bg-yellow-500 text-black"
+                  : "hover:bg-opacity-30"
               }`}
               onClick={() =>
                 setFilteredRating(filteredRating === star ? null : star)
@@ -148,13 +155,13 @@ const CommentSection: React.FC<{
               <span className="text-xs font-medium opacity-80">
                 {(
                   (ratingCounts[star - 1] / comments.length || 0) * 100
-                ).toFixed(1)}%
+                ).toFixed(1)}
+                %
               </span>
             </div>
           ))}
         </div>
       </div>
-
       {/* Hiển thị bình luận */}
       <div className="comments mb-4 space-y-4">
         {filteredComments.length > 0 ? (

@@ -40,7 +40,9 @@ const ListMaterial = (props: Props) => {
     try {
       await deactivateMaterial(id);
       const updatedMaterials = materials.map((material) =>
-        material._id === id ? { ...material, status: "deactive" as "deactive" } : material
+        material._id === id
+          ? { ...material, status: "deactive" as "deactive" }
+          : material
       );
       setMaterial(updatedMaterials);
     } catch (error) {
@@ -52,7 +54,9 @@ const ListMaterial = (props: Props) => {
     try {
       await activateMaterial(id);
       const updatedMaterials = materials.map((material) =>
-        material._id === id ? { ...material, status: "active" as "active" } : material
+        material._id === id
+          ? { ...material, status: "active" as "active" }
+          : material
       );
       setMaterial(updatedMaterials);
     } catch (error) {
@@ -71,7 +75,10 @@ const ListMaterial = (props: Props) => {
     : [];
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedMaterials = filteredMaterials.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedMaterials = filteredMaterials.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const csvData = filteredMaterials.map((material) => ({
     ID: material._id,
@@ -82,53 +89,73 @@ const ListMaterial = (props: Props) => {
   return (
     <>
       {loading && <LoadingComponent />}
-
+      <div className="flex items-center justify-between px-6 h-[96px] bg-white-600 text-white"></div>
       <div className="flex justify-between items-center mb-4">
-        <NavLink to="/admin/addmaterial">
-          <button className="focus:outline-none text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-            Thêm mới
-          </button>
-        </NavLink>
+        <div className="flex space-x-4">
+          <NavLink to="/admin/addmaterial">
+            <button className="focus:outline-none text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+              Thêm mới
+            </button>
+          </NavLink>
 
-        <CSVLink
-          data={csvData}
-          filename={"materials.csv"}
-          className="focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5"
-          target="_blank"
-        >
-          Xuất file chất liệu
-        </CSVLink>
+          <CSVLink
+            data={csvData}
+            filename={"materials.csv"}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
+            target="_blank"
+          >
+            Xuất file chất liệu
+          </CSVLink>
+          <input
+            type="text"
+            placeholder="Tìm kiếm vật liệu"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-3 border border-gray-300 rounded-md shadow-md sm:w-[200px] focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
       </div>
-
-      <input
-        type="text"
-        placeholder="Tìm kiếm vật liệu"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 rounded-lg w-full mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
 
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full table-auto">
           <thead className="bg-blue-100">
             <tr>
-              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">Stt</th>
-              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">Tên vật liệu</th>
-              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">Trạng thái</th>
-              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">Hành động</th>
+              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">
+                Stt
+              </th>
+              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">
+                Tên vật liệu
+              </th>
+              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">
+                Trạng thái
+              </th>
+              <th className="text-sm font-medium text-gray-700 px-6 py-3 text-left">
+                Hành động
+              </th>
             </tr>
           </thead>
           <tbody>
             {paginatedMaterials.length > 0 ? (
               paginatedMaterials.map((material, index) => (
-                <tr key={material._id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-800">{startIndex + index + 1}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{material.name}</td>
+                <tr
+                  key={material._id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {startIndex + index + 1}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {material.name}
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     {material.status === "active" ? (
-                      <span className="text-green-600 font-semibold">Hoạt động</span>
+                      <span className="text-green-600 font-semibold">
+                        Hoạt động
+                      </span>
                     ) : (
-                      <span className="text-red-600 font-semibold">Vô hiệu hóa</span>
+                      <span className="text-red-600 font-semibold">
+                        Vô hiệu hóa
+                      </span>
                     )}
                   </td>
                   <td className="px-6 py-4 flex space-x-2">

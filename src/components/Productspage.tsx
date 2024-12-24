@@ -16,15 +16,13 @@ const Productspage = (props: Props) => {
   const [categories, setCategories] = useState<Icategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [filterMaterial, setFilterMaterial] = useState<string>(""); // Lọc theo chất liệu
-  const [filterPrice, setFilterPrice] = useState<[number, number]>([
-    0, 100000000,
-  ]); // Giá min và max
-
+  const [sortOption, setSortOption] = useState<string>(""); // Tùy chọn sắp xếp
   const { categoryName } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
   const [pageConfig, setPageConfig] = useState<any>();
   const [page, setPage] = useState({ limit: 6, currentPage: 1 });
 
+  // Hàm lấy sản phẩm
   const fetchProducts = async (currentPage: number) => {
     setLoading(true);
     try {
@@ -43,6 +41,7 @@ const Productspage = (props: Props) => {
     }
   };
 
+  // Hàm lấy danh mục
   const fetchCategories = async () => {
     try {
       const categoryData = await getAllCategories();
@@ -52,10 +51,12 @@ const Productspage = (props: Props) => {
     }
   };
 
+  // Lấy danh mục khi component được mount
   useEffect(() => {
     fetchCategories();
   }, []);
 
+  // Lấy sản phẩm khi danh mục hoặc trang hiện tại thay đổi
   useEffect(() => {
     const categoryId =
       categories.find((category) => category.name === categoryName)?._id ||
@@ -64,11 +65,13 @@ const Productspage = (props: Props) => {
     fetchProducts(page.currentPage);
   }, [categoryName, categories, page.currentPage]);
 
+  // Hàm xử lý thay đổi trang
   const handlePageChange = (currentPage: number) => {
     setPage((prev) => ({ ...prev, currentPage }));
     fetchProducts(currentPage);
   };
-  // Logic lọc sản phẩm theo danh mục
+
+  // Hàm lọc theo danh mục
   const handleCategoryFilter = (categoryName: string | null) => {
     const selectedCategoryId =
       categories.find((category) => category.name === categoryName)?._id ||
@@ -78,37 +81,48 @@ const Productspage = (props: Props) => {
     setPage({ limit: page.limit, currentPage: 1 });
     fetchProducts(1);
   };
+
+  // Hàm cắt ngắn văn bản
   const truncateText = (text: string, maxLength: number): string => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
 
-  // Logic lọc sản phẩm
+  // Lọc sản phẩm
   const filterProduct = products.filter(
     (product) =>
       (selectedCategory === null ||
         product.category._id === selectedCategory) &&
       product.status &&
-      (filterMaterial === "" || product.material?.name === filterMaterial) && // Lọc theo chất liệu
-      product.price >= filterPrice[0] &&
-      product.price <= filterPrice[1] // Lọc theo giá
+      (filterMaterial === "" || product.material?.name === filterMaterial) // Lọc theo chất liệu
   );
+
+  // Sắp xếp sản phẩm theo tùy chọn đã chọn
+  const sortedProducts = [...filterProduct].sort((a, b) => {
+    if (sortOption === "") {
+      return 0; // Không sắp xếp, giữ nguyên thứ tự ban đầu
+    } else if (sortOption === "asc") {
+      return a.price - b.price; // Giá: Từ thấp đến cao
+    } else if (sortOption === "desc") {
+      return b.price - a.price; // Giá: Từ cao xuống thấp
+    } else {
+      // Giả sử chúng ta có một thuộc tính `updatedAt` hoặc tương tự
+      return (
+        new Date(b.updatedAt || 0).getTime() -
+        new Date(a.updatedAt || 0).getTime()
+      ); // Mới nhất trước
+    }
+  });
 
   return (
     <>
       {loading && <LoadingComponent />}
       <Header />
-      {/* lọc sản phẩm theo danh mục  */}
       <div className="container mx-auto py-10 px-4 flex">
         <div className="w-1/4 pr-4 flex flex-col text-left">
-          <label htmlFor="" className="text-2xl font-bold mb-6">
-            Lọc sản phẩm:
-          </label>
+          <label className="text-2xl font-bold mb-6">Lọc sản phẩm:</label>
 
-          <label htmlFor="category" className="text-xl font-bold mb-4">
-            Lọc theo danh mục:
-          </label>
+          <label className="text-xl font-bold mb-4">Lọc theo danh mục:</label>
           <select
-            id="category"
             value={selectedCategory || ""}
             onChange={(e) =>
               handleCategoryFilter(
@@ -131,11 +145,8 @@ const Productspage = (props: Props) => {
             )}
           </select>
 
-          <label htmlFor="material" className="text-xl font-bold mb-4">
-            Lọc theo chất liệu:
-          </label>
+          <label className="text-xl font-bold mb-4">Lọc theo chất liệu:</label>
           <select
-            id="material"
             value={filterMaterial}
             onChange={(e) => setFilterMaterial(e.target.value)}
             className="p-2 border border-gray-300 rounded w-full"
@@ -151,41 +162,23 @@ const Productspage = (props: Props) => {
             )}
           </select>
 
-          <label htmlFor="price" className="text-xl font-bold mb-4">
-            Lọc theo giá:
-          </label>
-          <div className="flex gap-2 mb-6">
-            <input
-              type="number"
-              placeholder="Giá tối thiểu"
-              value={filterPrice[0]}
-              onChange={(e) =>
-                setFilterPrice([
-                  Math.max(0, Number(e.target.value)),
-                  filterPrice[1],
-                ])
-              }
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-            <input
-              type="number"
-              placeholder="Giá tối đa"
-              value={filterPrice[1]}
-              onChange={(e) =>
-                setFilterPrice([
-                  filterPrice[0],
-                  Math.max(0, Number(e.target.value)),
-                ])
-              }
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
+          <label className="text-xl font-bold mb-4">Lọc theo giá:</label>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="p-2 border border-gray-300 rounded w-full mb-6"
+          >
+            <option value="">Tất cả giá</option>
+            <option value="asc">Giá từ thấp đến cao</option>
+            <option value="desc">Giá từ cao xuống thấp</option>
+            <option value="newest">Giá mới nhất</option>
+          </select>
         </div>
 
         <section className="w-3/4">
           <h1 className="text-2xl font-bold mb-6">Sản phẩm của chúng tôi</h1>
 
-          {filterProduct.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <div className="text-center">
               <h2 className="text-xl font-bold mb-4">
                 Không tìm thấy sản phẩm
@@ -196,7 +189,7 @@ const Productspage = (props: Props) => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterProduct.map((product) => (
+              {sortedProducts.map((product) => (
                 <article
                   key={product._id}
                   className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-all flex flex-col"
@@ -228,7 +221,7 @@ const Productspage = (props: Props) => {
                   <NavLink to={`/product/${product._id}`}>
                     <div className="p-4">
                       <button className="w-full py-2 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-                        View Details
+                        Xem chi tiết
                       </button>
                     </div>
                   </NavLink>

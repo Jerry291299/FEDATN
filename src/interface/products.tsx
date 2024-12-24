@@ -2,7 +2,6 @@ import { Icategory } from "./category";
 import { IMaterial } from "./material";
 
 export interface Iproduct {
-
   _id: string;
   name: string;
   img: string[];
@@ -14,7 +13,7 @@ export interface Iproduct {
   status: boolean;
   comments: { rating: number }[]; // Existing property
   rating?: number; // Thêm trường đánh giá | "rating"
-
+  updatedAt?: string; // Add this line
 }
 export type IProductLite = Pick<
   Iproduct,
@@ -29,4 +28,5 @@ export type IProductLite = Pick<
   | "moTa"
   | "rating"
   | "comments"
+  | "updatedAt"
 >;
