@@ -8,6 +8,7 @@ import Add from "./components/admin/modaladd/add";
 import Dashboard from "./components/admin/Dashboard";
 import Register from "./components/user/register";
 import Update from "./components/admin/modaladd/update";
+import View from "./components/admin/modaladd/view";
 import Users from "./components/admin/User";
 import Listcategory from "./components/admin/listcategory";
 import Addcategory from "./components/admin/modaladd/addcategory";
@@ -93,6 +94,7 @@ function App() {
             <Route path="tintuc" element={<DashboardNews />} />
             {/* <Route path="dashboard/update/:id" Component={Update}></Route> */}
             <Route path="dashboard/update/:id" Component={Update}></Route>
+            <Route path="dashboard/view/:id" Component={View}></Route>
             <Route path="News/updatenews/:id" Component={UpdateNews}></Route>
 
             <Route

@@ -1,33 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getOrdersByUserId } from "../service/order";
+import { getOrdersByUserId, Order } from "../service/order";
 import { NavLink } from "react-router-dom";
 import LoadingComponent from "./Loading";
-
-interface Order {
-  _id: string;
-  createdAt: string;
-  amount: number;
-  paymentMethod: string;
-  paymentstatus: string;
-  status: string;
-}
 
 const Orderlisthistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 5;  // Số đơn hàng hiển thị trên mỗi trang
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
     completed: "Hoàn thành",
     cancelled: "Đã hủy",
     processing: "Đang xử lý",
-    in_progress: "Đã giao hàng",
+    in_progress: "Đang giao hàng",
     delivered: "Đã giao",
     deleted: "Đã hủy",
-    failed: "Đã hủy"
+    failed: "Đã hủy",
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -43,7 +38,7 @@ const Orderlisthistory = () => {
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
-          setError("User not logged in!");
+          setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử đơn hàng.");
           setLoading(false);
           return;
         }
@@ -52,7 +47,7 @@ const Orderlisthistory = () => {
         const fetchedOrders = await getOrdersByUserId(id);
         setOrders(fetchedOrders);
       } catch (error) {
-        setError("Failed to fetch orders.");
+        setError("Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.");
         console.error("Error fetching orders:", error);
       } finally {
         setLoading(false);
@@ -62,15 +57,23 @@ const Orderlisthistory = () => {
     fetchOrders();
   }, []);
 
-  const handleCancelOrder = async (orderId: string) => {
-    try {
-      const confirmed = window.confirm(
-        "Bạn có chắc chắn muốn hủy đơn hàng này?"
-      );
-      if (!confirmed) return;
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
 
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const confirmCancelOrder = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setShowModal(true);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!selectedOrderId) return;
+    try {
       const response = await fetch(
-        `http://localhost:28017/api/orders/${orderId}/cancel`,
+        `http://localhost:28017/api/orders/${selectedOrderId}/cancel`,
         {
           method: "POST",
           headers: {
@@ -80,25 +83,26 @@ const Orderlisthistory = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to cancel order");
+        throw new Error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
       }
 
       const updatedOrder = await response.json();
-      setOrders(
-        (prevOrders) =>
-          prevOrders
-            .map((order) =>
-              order._id === updatedOrder._id
-                ? { ...order, status: updatedOrder.status }
-                : order
-            )
-            .filter((order) => order.status !== "deleted")
+      setOrders((prevOrders) =>
+        prevOrders
+          .map((order) =>
+            order._id === updatedOrder._id
+              ? { ...order, status: updatedOrder.status }
+              : order
+          )
+          .filter((order) => order.status !== "deleted")
       );
-
-      alert("Đơn hàng đã được hủy thành công!");
+      window.location.reload();
     } catch (error) {
       console.error("Error cancelling order:", error);
-      alert("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+      alert("Rất tiếc, không thể hủy đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
+    } finally {
+      setShowModal(false);
+      setSelectedOrderId(null);
     }
   };
 
@@ -113,7 +117,7 @@ const Orderlisthistory = () => {
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500 text-center mt-10">{error}</p>;
   }
 
   if (orders.length === 0) {
@@ -159,7 +163,7 @@ const Orderlisthistory = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {currentOrders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2">{order._id}</td>
                   <td className="border border-gray-300 px-4 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
@@ -181,7 +185,7 @@ const Orderlisthistory = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {order.status === "pending" && (
                       <button
-                        onClick={() => handleCancelOrder(order._id)}
+                        onClick={() => confirmCancelOrder(order._id)}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
                       >
                         Hủy
@@ -196,7 +200,48 @@ const Orderlisthistory = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Phân trang */}
+        <div className="flex justify-center mt-4">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`mx-1 px-3 py-1 border ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700"
+              } rounded hover:bg-blue-400`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold">Xác nhận hủy đơn hàng</h3>
+            <p className="mt-2">Bạn có chắc chắn muốn hủy đơn hàng này? Sau khi hủy, bạn sẽ không thể khôi phục lại.</p>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

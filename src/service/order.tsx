@@ -1,6 +1,13 @@
 import { axiosservice } from '../config/API';
 import { CartItem } from '../interface/cart';
-
+export interface Order {
+  _id: string;
+  createdAt: string;
+  amount: number;
+  paymentMethod: string;
+  paymentstatus: string;
+  status: string;
+}
 export interface IOrderData {
     userId: string;
     items: CartItem[];

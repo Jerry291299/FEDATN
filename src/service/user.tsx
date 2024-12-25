@@ -2,7 +2,6 @@ import React from "react";
 import { axiosservice } from "../config/API";
 import { IUserLogin, IUserRegister, IUserLite } from "../interface/user";
 import axios from "axios";
-import { AxiosError } from "axios";
 
 export const getAllusersAccount = async () => {
   try {

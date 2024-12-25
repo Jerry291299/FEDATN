@@ -11,9 +11,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [order,setOrder] = useState<IOrderData[]>([])
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
-  const [user, setUser] = useState<string>('');
+  const [order, setOrder] = useState<IOrderData[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
+  const [user, setUser] = useState<string>("");
   const [customerDetails, setCustomerDetails] = useState({
     name: "",
     phone: "",
@@ -47,7 +48,9 @@ function OrderPayment() {
     setSelectedPaymentMethod(method);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setCustomerDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
   };
@@ -58,23 +61,87 @@ function OrderPayment() {
     return total + price * quantity;
   }, 0);
 
+  // Hàm cập nhật số lượng sản phẩm trong kho sau khi đặt hàng
+  const updateProductQuantities = async (items: CartItem[]) => {
+    try {
+      for (const item of items) {
+        console.log(`Fetching product data for: ${item.productId}`);
+  
+        // Lấy thông tin sản phẩm từ API
+        const response = await fetch(
+          `http://localhost:28017/api/products-pay/${item.productId}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+  
+        if (!response.ok) {
+          const error = await response.json();
+          toast.error(error.message || "Không thể lấy thông tin sản phẩm.");
+          return;
+        }
+  
+        const product = await response.json(); // Lấy thông tin sản phẩm
+  
+        console.log("Product data received:", product);
+  
+        // Kiểm tra số lượng còn lại trong kho
+        if (product.soLuong < item.quantity) {
+          toast.error(`Sản phẩm ${item.name} không đủ số lượng.`);
+          return;
+        }
+  
+        // Tính số lượng mới của sản phẩm sau khi giảm
+        const updatedQuantity = product.soLuong - item.quantity;
+  
+        console.log(`Updating product quantity for ${item.productId}, new quantity: ${updatedQuantity}`);
+  
+        // Gọi API PUT để cập nhật số lượng
+        const updateResponse = await fetch(
+          `http://localhost:28017/api/products/${item.productId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ quantity: item.quantity }), // Gửi số lượng đặt
+          }
+        );
+  
+        if (!updateResponse.ok) {
+          const error = await updateResponse.json();
+          toast.error(error.message || `Không thể cập nhật số lượng cho sản phẩm ${item.name}.`);
+          return;
+        }
+  
+        console.log(`Product ${item.name} quantity updated successfully.`);
+      }
+    } catch (error) {
+      console.error("Error updating product quantities:", error);
+      toast.error("Không thể cập nhật số lượng sản phẩm trong kho.");
+    }
+  };
+  
+  
+
   const handleOrderSubmit = async () => {
     console.log("Order ID being sent:", user); // Kiểm tra giá trị
-  
+
+    // Nếu chưa chọn phương thức thanh toán
     if (!selectedPaymentMethod) {
       toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
         position: "top-right",
         autoClose: 3000,
         theme: "colored",
       });
-
       return;
     }
-  
+
+    // Tính toán tổng số tiền của đơn hàng
     const totalAmount = cartItems.reduce((total, item) => {
       return total + (item.price || 0) * (item.quantity || 0);
     }, 0);
-  
+
+    // Dữ liệu đơn hàng
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
@@ -82,33 +149,29 @@ function OrderPayment() {
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
-  
+
     try {
-      if ( selectedPaymentMethod === "cash_on_delivery") {
-        await placeOrder(orderData);
-        toast.success("Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.", { position: "top-right" });
+      // Trừ số lượng sản phẩm trong kho trước khi tạo đơn hàng
+      await updateProductQuantities(cartItems);
 
-        setCartItems([]);
-        navigate("/success", { state: { orderData } });
-        console.log("Order data:", orderData);
-      } else if (selectedPaymentMethod === "vnpay") {
-        
-        console.log("Order data:", orderData);
-        await placeOrder(orderData);
-        const paymentUrl = await createVNPayPayment({ userId: user, paymentMethod: selectedPaymentMethod, amount: totalAmount});
-        setCartItems([]);
-        
-        window.location.href = paymentUrl; // Redirect to VNPay
-        
+      // Đặt hàng và thông báo thành công
+      await placeOrder(orderData);
+      toast.success(
+        "Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.",
+        { position: "top-right" }
+      );
 
-
-      }
+      setCartItems([]); // Xóa giỏ hàng
+      navigate("/success", { state: { orderData } });
+      console.log("Order data:", orderData);
     } catch (error) {
-      toast.error("Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.", { position: "top-right" });
-
+      toast.error(
+        "Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.",
+        { position: "top-right" }
+      );
+      console.error("Error during order submission:", error);
     }
   };
-  
 
   return (
     <>
@@ -132,7 +195,9 @@ function OrderPayment() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium">Số điện thoại *</label>
+                <label className="block text-sm font-medium">
+                  Số điện thoại *
+                </label>
                 <input
                   type="tel"
                   name="phone"
@@ -146,7 +211,9 @@ function OrderPayment() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium">Địa chỉ email *</label>
+                <label className="block text-sm font-medium">
+                  Địa chỉ email *
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -182,49 +249,59 @@ function OrderPayment() {
             </div>
           </form>
 
-
-
-
-
-
-
-
           <h2 className="text-lg font-bold mt-8">Phương thức thanh toán</h2>
           <div className="flex gap-4 mt-4">
-  
-  <button
-    onClick={() => handlePaymentMethodChange("cash_on_delivery")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "cash_on_delivery" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">Thanh toán khi nhận hàng</span>
-  </button>
-  <button
-    onClick={() => handlePaymentMethodChange("vnpay")}
-    className={`w-full border p-4 rounded-md flex items-center justify-center ${
-      selectedPaymentMethod === "vnpay" ? "bg-gray-200" : "hover:bg-gray-100"
-    }`}
-  >
-    <span className="text-lg font-medium">VNPay</span>
-  </button>
-</div>
+            <button
+              onClick={() => handlePaymentMethodChange("cash_on_delivery")}
+              className={`w-full border p-4 rounded-md flex items-center justify-center ${
+                selectedPaymentMethod === "cash_on_delivery"
+                  ? "bg-gray-200"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <span className="text-lg font-medium">
+                Thanh toán khi nhận hàng
+              </span>
+            </button>
+            <button
+              onClick={() => handlePaymentMethodChange("vnpay")}
+              className={`w-full border p-4 rounded-md flex items-center justify-center ${
+                selectedPaymentMethod === "vnpay"
+                  ? "bg-gray-200"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <span className="text-lg font-medium">VNPay</span>
+            </button>
+          </div>
 
           {/* Bank transfer details if selected */}
-          
         </div>
 
         {/* Right Column */}
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-lg font-semibold mb-4">Giỏ hàng ({cartItems.length} sản phẩm)</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Giỏ hàng ({cartItems.length} sản phẩm)
+          </h2>
           {cartItems.map((item) => (
-            <div key={item.productId} className="flex items-center justify-between mb-4">
+            <div
+              key={item.productId}
+              className="flex items-center justify-between mb-4"
+            >
               <div className="flex items-center">
-                <img src={item.img[0]} alt={item.name} className="w-16 h-16 rounded-md mr-4" />
+                <img
+                  src={item.img[0]}
+                  alt={item.name}
+                  className="w-16 h-16 rounded-md mr-4"
+                />
                 <span>{item.name}</span>
               </div>
               <span className="font-semibold">
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.price)} x {item.quantity}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(item.price)}{" "}
+                x {item.quantity}
               </span>
             </div>
           ))}
@@ -232,15 +309,25 @@ function OrderPayment() {
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng cộng</span>
               <span>
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(total)}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(total)}
               </span>
             </div>
           </div>
 
           {/* Order confirmation button */}
           <div className="mt-6 flex justify-between items-center">
-            <NavLink to={`/Cart/${user}`} className="text-blue-500">Quay về giỏ hàng</NavLink>
-            <button onClick={handleOrderSubmit} className="bg-blue-500 text-white px-6 py-3 rounded-lg">Xác nhận</button>
+            <NavLink to={`/Cart/${user}`} className="text-blue-500">
+              Quay về giỏ hàng
+            </NavLink>
+            <button
+              onClick={handleOrderSubmit}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg"
+            >
+              Xác nhận
+            </button>
           </div>
         </div>
       </div>
@@ -253,4 +340,3 @@ export default OrderPayment;
 function confirmOrder(orderData: any) {
   throw new Error("Function not implemented.");
 }
-

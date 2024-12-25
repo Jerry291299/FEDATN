@@ -31,14 +31,14 @@ const Success = () => {
 
   useEffect(() => {
     if (location.state) {
-      setMessage("Thanh toán tien mat thanh cong");
+      setMessage("Thanh toán tiền mặt thành công");
       console.log(location.state?.orderData?.amount, "state data");
 
       setTongtien(location.state?.orderData?.amount.toString());
     } else {
       if (isPaymentSuccessful) {
         handleConfirmPayment();
-        setMessage("thanh toan vn pay thanh cong");
+        setMessage("Thanh toán VNPay thành công");
       }
     }
   }, [isPaymentSuccessful]);

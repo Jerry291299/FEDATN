@@ -31,7 +31,7 @@ const AddNews = () => {
 
             try {
                 const response = await upload(formData);
-                const imageUrl = response.payload[0].url; // Adjust based on your API structure
+                const imageUrl = response.payload[0].url; 
                 urls.push(imageUrl);
             } catch (error) {
                 console.error("Error uploading image:", error);
@@ -51,7 +51,7 @@ const AddNews = () => {
                 title: values.title,
                 descriptions: values.descriptions,
                 content: values.content,
-                img: imageUrls, // Array of image URLs
+                img: imageUrls,
             };
 
             console.log("Payload:", payload);
@@ -76,99 +76,80 @@ const AddNews = () => {
 
     return (
         <>
-            {loading && <LoadingComponent />}
-            {contextHolder}
-            <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-                <Form form={form} onFinish={onFinish}>
-                    <div>
-                        <label className="mb-2 text-2xl text-black block">
-                            Tiêu đề:
-                        </label>
-                        <Form.Item
-                            name="title"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Bắt buộc nhập tiêu đề!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Enter news title" />
-                        </Form.Item>
-                    </div>
-
-                    <div>
-                        <label className="mb-2 text-2xl text-black block">
-                            Mô tả:
-                        </label>
-                        <Form.Item
-                            name="descriptions"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Bắt buộc nhập mô tả!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Enter news description" />
-                        </Form.Item>
-                    </div>
-
-                    <div>
-                        <label className="mb-2 text-2xl text-black block">
-                            Nội dung:
-                        </label>
-                        <Form.Item
-                            name="content"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Bắt buộc nhập nội dung!",
-                                },
-                            ]}
-                        >
-                            <Input.TextArea rows={4} placeholder="Enter content" />
-                        </Form.Item>
-                    </div>
-
-                    <div>
-                        <label className="mb-2 text-sm text-black block">
-                            Ảnh bài viết:
-                        </label>
-                        <div className="flex flex-wrap gap-4 mb-4">
-                            {previews.map((preview, index) => (
-                                <div key={index} className="relative w-24 h-24">
-                                    <img
-                                        src={preview}
-                                        alt={`Preview ${index}`}
-                                        className="w-full h-full object-cover rounded"
-                                    />
-                                    <button
-                                        onClick={() => removeImage(index)}
-                                        className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full"
-                                    >
-                                        x
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                        <Input
-                            type="file"
-                            multiple
-                            onChange={handleFileChange}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="!mt-8 w-full px-4 py-2.5 mx-auto block text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                        Thêm mới bài viết
-                    </button>
-                </Form>
+          {loading && <LoadingComponent />}
+          {contextHolder}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 font-[sans-serif] max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-700">Thông tin bài viết</h2>
+      
+              <Form form={form} onFinish={onFinish} layout="vertical">
+                <Form.Item
+                  name="title"
+                  label={<span className="text-lg text-gray-700">Tiêu đề:</span>}
+                  rules={[{ required: true, message: "Bắt buộc nhập tiêu đề!" }]}
+                >
+                  <Input placeholder="Nhập tiêu đề bài viết" className="rounded border-gray-300" />
+                </Form.Item>
+      
+                <Form.Item
+                  name="descriptions"
+                  label={<span className="text-lg text-gray-700">Mô tả:</span>}
+                  rules={[{ required: true, message: "Bắt buộc nhập mô tả!" }]}
+                >
+                  <Input placeholder="Nhập mô tả bài viết" className="rounded border-gray-300" />
+                </Form.Item>
+      
+                <Form.Item
+                  name="content"
+                  label={<span className="text-lg text-gray-700">Nội dung:</span>}
+                  rules={[{ required: true, message: "Bắt buộc nhập nội dung!" }]}
+                >
+                  <Input.TextArea rows={6} placeholder="Nhập nội dung bài viết" className="rounded border-gray-300" />
+                </Form.Item>
+              </Form>
             </div>
+      
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-700">Ảnh bài viết</h2>
+      
+              <div className="flex flex-wrap gap-4">
+                {previews.map((preview, index) => (
+                  <div key={index} className="relative w-32 h-32 border rounded overflow-hidden">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+      
+              <Input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="block w-full border-gray-300 rounded p-2"
+              />
+            </div>
+          </div>
+      
+          <div className="mt-6 flex justify-center">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-500 text-white font-medium text-lg rounded hover:bg-blue-600 focus:ring focus:ring-blue-300"
+            >
+              Thêm mới bài viết
+            </button>
+          </div>
         </>
-    );
+      );
+      
 };
 
 export default AddNews;
