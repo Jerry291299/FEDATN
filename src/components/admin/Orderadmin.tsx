@@ -22,22 +22,26 @@ const Order = (props: Props) => {
   };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosservice.get("/orders");
-        setOrders(response.data);
-        setFilteredOrders(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách đơn hàng:", error);
-        setError("Không thể tải dữ liệu");
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosservice.get("/orders");
+      const sortedOrders = response.data.sort(
+        (a: IOrder, b: IOrder) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders);
+      setLoading(false);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+      setError("Không thể tải dữ liệu");
+      setLoading(false);
+    }
+  };
 
-    fetchOrders();
-  }, []);
+  fetchOrders();
+}, []);
+
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
