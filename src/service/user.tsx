@@ -46,9 +46,9 @@ export const UserRegister = async (datauser: IUserRegister) => {
   }
 };
 
-export const deactivateUser = async (id: string) => {
+export const deactivateUser = async (_id: string, reason: string) => {
   try {
-    const { data } = await axiosservice.put(`/user/deactivate/${id}`);
+    const { data } = await axiosservice.put(`/user/deactivate/${_id}`, { reason });
     return data;
   } catch (error) {
     console.error("Error deactivating user:", error);
@@ -56,21 +56,20 @@ export const deactivateUser = async (id: string) => {
   }
 };
 
-export const activateUser = async (id: string) => {
+
+export const activateUser = async (_id: string) => {
   try {
-    const { data } = await axiosservice.put(`/user/activate/${id}`);
+    const { data } = await axiosservice.put(`/user/activate/${_id}`);
     return data;
   } catch (error) {
     console.error("Error activating user:", error);
-    throw new Error(
-      "Không thể kích hoạt lại người dùng. Vui lòng thử lại sau."
-    );
+    throw new Error("Không thể kích hoạt lại người dùng. Vui lòng thử lại sau.");
   }
 };
 
-export const updateUser = async (id: string, newRole: string) => {
+export const updateUser = async (_id: string, newRole: string) => {
   try {
-    const response = await axiosservice.put(`/admin/users/updateuser/${id}`, { role: newRole });
+    const response = await axiosservice.put(`/admin/users/updateuser/${_id}`, { role: newRole });
     return response.data; // Ensure this returns the updated user data
   } catch (error) {
     // console.error("Error updating user in API:", error);

@@ -132,12 +132,12 @@ const Order = (props: Props) => {
                             <span
                               className={`px-3 py-1 inline-block text-white rounded-lg shadow-sm text-xs font-medium ${
                                 order.status === "pending"
-                                  ? "bg-yellow-400"
+                                  ? "bg-yellow-500"
                                   : order.status === "delivered"
                                   ? "bg-green-500"
                                   : order.status === "cancelledOrder"
                                   ? "bg-red-500"
-                                  : "bg-gray-400"
+                                  : "bg-red-500"
                               }`}
                             >
                               {order.status === "pending"
