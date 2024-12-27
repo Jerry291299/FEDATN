@@ -46,15 +46,16 @@ export const UserRegister = async (datauser: IUserRegister) => {
   }
 };
 
-export const deactivateUser = async (_id: string) => {
+export const deactivateUser = async (_id: string, reason: string) => {
   try {
-    const { data } = await axiosservice.put(`/user/deactivate/${_id}`);
+    const { data } = await axiosservice.put(`/user/deactivate/${_id}`, { reason });
     return data;
   } catch (error) {
     console.error("Error deactivating user:", error);
     throw new Error("Không thể vô hiệu hóa người dùng. Vui lòng thử lại sau.");
   }
 };
+
 
 export const activateUser = async (_id: string) => {
   try {

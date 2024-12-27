@@ -7,7 +7,8 @@ export interface IUser {
   role: string;
   password: string;
   fullname: string;
-  active: boolean; 
+  active: boolean;
+  reason:String;
 }
   export type IUserRegister = Pick<IUser,'name'|'email'|'password'>
   export type IUserLogin = Pick<IUser,'email'|'password'>

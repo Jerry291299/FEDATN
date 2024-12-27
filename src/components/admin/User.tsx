@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Popconfirm, message, Pagination, Input } from "antd";
-import { getAllusersAccount, activateUser, deactivateUser } from "../../service/user";
+import { Popconfirm, message, Pagination, Input, Modal,Select } from "antd";
+import {
+  getAllusersAccount,
+  activateUser,
+  deactivateUser,
+} from "../../service/user";
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
 import { useNavigate } from "react-router-dom";
@@ -13,14 +17,16 @@ const Users = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-
+  const [reason, setReason] = useState<string>("");
   const navigate = useNavigate();
+  const { TextArea } = Input;
+  const { Option } = Select;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const data = await getAllusersAccount(); 
+        const data = await getAllusersAccount();
         setUsers(data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -32,32 +38,66 @@ const Users = (props: Props) => {
     fetchUsers();
   }, []);
 
-  const deactivateUserById = async (_id: string) => {
-    try {
-      await deactivateUser(_id); 
-      message.success(`Người dùng với ID ${_id} đã được vô hiệu hóa.`);
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user._id === _id
-            ? { ...user, active: false } 
-            : user
-        )
-      );
-    } catch (error) {
-      console.error("Error deactivating user:", error);
-      message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
-    }
+  const deactivateUserById = async (id: string) => {
+    let selectedReasonLocal = "";
+    let tempReason = "";
+  
+    Modal.confirm({
+      title: "Vô hiệu hóa người dùng",
+      content: (
+        <>
+          <p>Vui lòng chọn lý do hoặc nhập lý do mới:</p>
+          <Select
+            style={{ width: "100%", marginBottom: 10 }}
+            placeholder="Chọn lý do"
+            onChange={(value: string) => {
+              selectedReasonLocal = value;
+            }}
+            allowClear
+          >
+            <Option value="Vi phạm chính sách">Vi phạm chính sách</Option>
+            <Option value="Yêu cầu từ người dùng">Yêu cầu từ người dùng</Option>
+            <Option value="Hoạt động bất thường">Hoạt động bất thường</Option>
+          </Select>
+          <Input.TextArea
+            rows={4}
+            placeholder="Hoặc nhập lý do tùy chỉnh"
+            onChange={(e) => (tempReason = e.target.value)}
+          />
+        </>
+      ),
+      onOk: async () => {
+        const finalReason = selectedReasonLocal || tempReason.trim();
+        if (!finalReason) {
+          message.error("Vui lòng chọn hoặc nhập lý do.");
+          return Promise.reject(); // Ngăn modal đóng
+        }
+  
+        try {
+          await deactivateUser(id, finalReason);
+          message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
+  
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user._id === id ? { ...user, active: false, reason: finalReason } : user
+            )
+          );
+        } catch (error) {
+          console.error("Error deactivating user:", error);
+          message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
+        }
+      },
+    });
   };
+  
 
   const activateUserById = async (_id: string) => {
     try {
-      await activateUser(_id); 
+      await activateUser(_id);
       message.success(`Người dùng với ID ${_id} đã được kích hoạt lại.`);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === _id
-            ? { ...user, active: true } 
-            : user
+          user._id === _id ? { ...user, active: true } : user
         )
       );
     } catch (error) {
@@ -99,29 +139,60 @@ const Users = (props: Props) => {
               <table className="min-w-full table-auto">
                 <thead className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
                   <tr>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Stt</th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Họ và Tên</th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Email</th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Vai trò</th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Trạng thái</th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Handle</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Stt
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Họ và Tên
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Email
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Vai trò
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Trạng thái
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Lý do vô hiệu hóa
+                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
+                      Thao tác
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedUsers.length > 0 ? (
                     paginatedUsers.map((user: IUser, index: number) => (
-                      <tr className="bg-gray-100 border-b hover:bg-gray-200" key={user._id}>
+                      <tr
+                        className="bg-gray-100 border-b hover:bg-gray-200"
+                        key={user._id}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {index + 1 + (currentPage - 1) * pageSize}
                         </td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.name}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.email}</td>
-                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.role}</td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.name}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.email}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.role}
+                        </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                           {user.active ? (
                             <span className="text-green-600">Hoạt động</span>
                           ) : (
                             <span className="text-red-600">Vô hiệu hóa</span>
+                          )}
+                        </td>
+                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                          {user.reason && !user.active ? (
+                            <span className="text-gray-700">{user.reason}</span>
+                          ) : (
+                            "Không có"
                           )}
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
@@ -161,7 +232,10 @@ const Users = (props: Props) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="text-center text-gray-500 py-4">
+                      <td
+                        colSpan={7}
+                        className="text-center text-gray-500 py-4"
+                      >
                         Không tìm thấy người dùng nào.
                       </td>
                     </tr>
