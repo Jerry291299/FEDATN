@@ -211,7 +211,7 @@ console.log("Average Rating:", averageRating);
                     });
                     return;
                   }
-                  if (!user || !user.id) {
+                  if (!user || !user._id) {
                     toast.info(
                       "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!",
                       {
@@ -235,7 +235,7 @@ console.log("Average Rating:", averageRating);
                   }
 
                   const cartItem: Icart = {
-                    userId: user.id,
+                    userId: user._id,
                     items: [
                       {
                         productId: String(product._id),

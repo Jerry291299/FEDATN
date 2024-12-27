@@ -3,13 +3,13 @@ import { Popconfirm, message, Pagination, Input } from "antd";
 import { getAllusersAccount, activateUser, deactivateUser } from "../../service/user";
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Props = {};
 
 const Users = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUser] = useState<IUser[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -17,51 +17,49 @@ const Users = (props: Props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUsers = async () => {
       try {
         setLoading(true);
-        const data = await getAllusersAccount();
-        setUser(data);
-        console.log(data, "data");
-        localStorage.setItem("users", JSON.stringify(data));
+        const data = await getAllusersAccount(); 
+        setUsers(data);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching users:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchUsers();
   }, []);
 
-  const deactivateUserById = async (id: string) => {
+  const deactivateUserById = async (_id: string) => {
     try {
-      await deactivateUser(id);
-      message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
-      const updatedUsers = users.map((user) =>
-        user.id === id
-          ? { ...user, status: "deactive" as const, isActive: false }
-          : user
+      await deactivateUser(_id); 
+      message.success(`Người dùng với ID ${_id} đã được vô hiệu hóa.`);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === _id
+            ? { ...user, active: false } 
+            : user
+        )
       );
-      setUser(updatedUsers);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
     } catch (error) {
       console.error("Error deactivating user:", error);
       message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
     }
   };
 
-  const activateUserById = async (id: string) => {
+  const activateUserById = async (_id: string) => {
     try {
-      await activateUser(id);
-      message.success(`Người dùng với ID ${id} đã được kích hoạt lại.`);
-      const updatedUsers = users.map((user) =>
-        user.id === id
-          ? { ...user, status: "active" as const, isActive: true }
-          : user
+      await activateUser(_id); 
+      message.success(`Người dùng với ID ${_id} đã được kích hoạt lại.`);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === _id
+            ? { ...user, active: true } 
+            : user
+        )
       );
-      setUser(updatedUsers);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
     } catch (error) {
       console.error("Error activating user:", error);
       message.error("Có lỗi xảy ra khi kích hoạt lại người dùng.");
@@ -94,7 +92,7 @@ const Users = (props: Props) => {
           className="border-2 border-gray-300 rounded-md p-3 mb-6"
           style={{ maxWidth: "400px" }}
         />
-        
+
         <div className="overflow-x-auto shadow-lg rounded-lg">
           <div className="py-2 inline-block w-full px-0">
             <div className="overflow-hidden bg-white rounded-lg">
@@ -112,7 +110,7 @@ const Users = (props: Props) => {
                 <tbody>
                   {paginatedUsers.length > 0 ? (
                     paginatedUsers.map((user: IUser, index: number) => (
-                      <tr className="bg-gray-100 border-b hover:bg-gray-200" key={user.id}>
+                      <tr className="bg-gray-100 border-b hover:bg-gray-200" key={user._id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {index + 1 + (currentPage - 1) * pageSize}
                         </td>
@@ -120,18 +118,18 @@ const Users = (props: Props) => {
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.email}</td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.role}</td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {user.status === "deactive" ? (
-                            <span className="text-red-600">Vô hiệu hóa</span>
-                          ) : (
+                          {user.active ? (
                             <span className="text-green-600">Hoạt động</span>
+                          ) : (
+                            <span className="text-red-600">Vô hiệu hóa</span>
                           )}
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {user.status === "active" ? (
+                          {user.active ? (
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"
                               description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
-                              onConfirm={() => deactivateUserById(user.id)}
+                              onConfirm={() => deactivateUserById(user._id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -146,7 +144,7 @@ const Users = (props: Props) => {
                             <Popconfirm
                               title="Kích hoạt lại người dùng"
                               description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
-                              onConfirm={() => activateUserById(user.id)}
+                              onConfirm={() => activateUserById(user._id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -173,7 +171,7 @@ const Users = (props: Props) => {
             </div>
           </div>
         </div>
-        
+
         <Pagination
           current={currentPage}
           pageSize={pageSize}
