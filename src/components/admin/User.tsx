@@ -79,7 +79,7 @@ const Users = (props: Props) => {
   
           setUsers((prevUsers) =>
             prevUsers.map((user) =>
-              user._id === id ? { ...user, active: false, reason: finalReason } : user
+              user.id === id ? { ...user, active: false, reason: finalReason } : user
             )
           );
         } catch (error) {
@@ -97,7 +97,7 @@ const Users = (props: Props) => {
       message.success(`Người dùng với ID ${_id} đã được kích hoạt lại.`);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === _id ? { ...user, active: true } : user
+          user.id === _id ? { ...user, active: true } : user
         )
       );
     } catch (error) {
@@ -168,7 +168,7 @@ const Users = (props: Props) => {
                     paginatedUsers.map((user: IUser, index: number) => (
                       <tr
                         className="bg-gray-100 border-b hover:bg-gray-200"
-                        key={user._id}
+                        key={user.id}
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {index + 1 + (currentPage - 1) * pageSize}
@@ -201,7 +201,7 @@ const Users = (props: Props) => {
                             <Popconfirm
                               title="Vô hiệu hóa người dùng"
                               description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
-                              onConfirm={() => deactivateUserById(user._id)}
+                              onConfirm={() => deactivateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >
@@ -216,7 +216,7 @@ const Users = (props: Props) => {
                             <Popconfirm
                               title="Kích hoạt lại người dùng"
                               description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
-                              onConfirm={() => activateUserById(user._id)}
+                              onConfirm={() => activateUserById(user.id)}
                               okText="Có"
                               cancelText="Không"
                             >

@@ -217,7 +217,7 @@ const ProductDetail = () => {
                     });
                     return;
                   }
-                  if (!user || !user._id) {
+                  if (!user || !user.id) {
                     toast.info(
                       "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!",
                       {
@@ -241,7 +241,7 @@ const ProductDetail = () => {
                   }
 
                   const cartItem: Icart = {
-                    userId: user._id,
+                    userId: user.id,
                     items: [
                       {
                         productId: String(product._id),
