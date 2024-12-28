@@ -153,7 +153,7 @@ const Orderlisthistory = () => {
   return (
     <>
       <Header />
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <div className="max-w-7xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-xl font-semibold mb-4">DANH SÁCH ĐƠN HÀNG MỚI NHẤT</h2>
         <div className="overflow-x-auto">
           <table className="w-full table-auto border-collapse border border-gray-200">
@@ -164,7 +164,7 @@ const Orderlisthistory = () => {
                 <th className="border border-gray-300 px-4 py-2 text-left">Thành tiền</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Phương thức thanh toán</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Trạng thái thanh toán</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Vận chuyển</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Tình trạng đơn hàng</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Hành động</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Lý do hủy</th>
               </tr>
@@ -189,23 +189,32 @@ const Orderlisthistory = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {statusMapping[order.status] || order.status}
                   </td>
-                  
+
                   <td className="border border-gray-300 px-4 py-2">
-                    {order.status === "pending" && (
-                      <button
+                    <div className="flex space-x-2">
+                      {order.status === "pending" && (
+                        <button
                         onClick={() => confirmCancelOrder(order._id)}
-                        className="bg-red-600 text-white py-1 px-4 rounded-lg hover:bg-red-700"
+                        className="bg-red-600 text-white py-1 px-4 rounded-lg hover:bg-red-700 whitespace-nowrap"
                       >
                         Hủy đơn
                       </button>
-                    )}
+                      )}
+                      <NavLink to={`/orders/${order._id}`}>
+                        <button
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+                        >
+                          Xem
+                        </button>
+                      </NavLink>
+                    </div>
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {order.cancelReason ? (
                       <div>
                         <p>Lý do hủy: {order.cancelReason.reason}</p>
                         <p>Thời điểm hủy: {new Date(order.cancelReason.canceledAt).toLocaleString()}</p>
-                       
+
                       </div>
                     ) : (
                       ""
@@ -229,9 +238,8 @@ const Orderlisthistory = () => {
               <button
                 key={index}
                 onClick={() => paginate(index + 1)}
-                className={`px-4 py-2 rounded-lg ${
-                  currentPage === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
-                }`}
+                className={`px-4 py-2 rounded-lg ${currentPage === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+                  }`}
               >
                 {index + 1}
               </button>
