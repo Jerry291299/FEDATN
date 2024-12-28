@@ -7,6 +7,11 @@ export interface Order {
   paymentMethod: string;
   paymentstatus: string;
   status: string;
+  cancelReason:{
+    reason: String , // Lý do hủy đơn
+    canceledAt:  Date , // Thời điểm hủy
+    canceledBy: String , // Người thực hiện hủy
+    }
 }
 export interface IOrderData {
     userId: string;
@@ -33,6 +38,11 @@ export interface IOrderData {
     amount: number;
     status: string;
     createdAt: string;
+    cancelReason:{
+      reason: String , // Lý do hủy đơn
+      canceledAt:  Date , // Thời điểm hủy
+      canceledBy: String , // Người thực hiện hủy
+      }
     customerDetails: {
       name: string;
       phone: string;
@@ -54,6 +64,9 @@ export interface IOrderData {
     amount: number;
     status: string;
     createdAt: string;
+    cancelReason:{
+
+    }
     customerDetails: {
       name: string;
       phone: string;
