@@ -153,24 +153,31 @@ function OrderPayment() {
     try {
       // Trừ số lượng sản phẩm trong kho trước khi tạo đơn hàng
       await updateProductQuantities(cartItems);
-
-      // Đặt hàng và thông báo thành công
-      await placeOrder(orderData);
-      toast.success(
-        "Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.",
-        { position: "top-right" }
-      );
-
-      setCartItems([]); // Xóa giỏ hàng
-      navigate("/success", { state: { orderData } });
-      console.log("Order data:", orderData);
+    
+      // Kiểm tra phương thức thanh toán
+      if (selectedPaymentMethod === "cash_on_delivery") {
+        // Đặt hàng và thông báo thành công
+        await placeOrder(orderData);
+        toast.success("Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.", { position: "top-right" });
+        setCartItems([]);
+        navigate("/success", { state: { orderData } });
+      } else if (selectedPaymentMethod === "vnpay") {
+        // Tạo link thanh toán VNPay
+        const paymentUrl = await createVNPayPayment({
+          userId: user,
+          paymentMethod: selectedPaymentMethod,
+          amount: totalAmount,
+        });
+    
+        // Xóa giỏ hàng và chuyển hướng đến VNPay
+        setCartItems([]);
+        window.location.href = paymentUrl;
+      }
     } catch (error) {
-      toast.error(
-        "Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.",
-        { position: "top-right" }
-      );
+      toast.error("Có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại!", { position: "top-right" });
       console.error("Error during order submission:", error);
     }
+    
   };
 
   return (

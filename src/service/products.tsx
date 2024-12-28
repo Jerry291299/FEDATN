@@ -89,3 +89,18 @@ export const getProductsByCategory = async (categoryId: string) => {
     console.log(error);
   }
 };
+export const filterProducts = async (params: {
+  category?: string;
+  material?: string;
+  limit?: number;
+  page?: number;
+  sort?: string;
+}) => {
+  try {
+    const { data } = await axiosservice.get("/products/filter", { params });
+    return data;
+  } catch (error) {
+    console.error("Error filtering products:", error);
+    throw error;
+  }
+};

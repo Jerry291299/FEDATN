@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { Iproduct } from "../interface/products";
-import { IUser } from "../interface/user";
+import { IUser,PUser } from "../interface/user";
 import { addtoCart } from "../service/cart";
 import { getAllproducts, getProductByID } from "../service/products";
 import Header from "./Header";
@@ -15,11 +15,11 @@ import "react-toastify/dist/ReactToastify.css";
 const ProductDetail = () => {
   const [products, setProducts] = useState<Iproduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{  id: string }>();
   const [product, setProduct] = useState<Iproduct | undefined>(undefined);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const Globalstate = useContext(Cartcontext);
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useState<PUser | null>(null);
   const [comments, setComments] = useState<{ stars: number }[]>([]); // To hold comments with star ratings
   const [averageRating, setAverageRating] = useState<number>(0);
 
@@ -29,7 +29,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
-      const parsedUser: IUser = JSON.parse(storedUser);
+      const parsedUser: PUser = JSON.parse(storedUser);
       setUser(parsedUser);
     }
   }, []);
