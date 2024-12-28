@@ -2,19 +2,26 @@ import React, { useEffect, useState } from "react";
 import { axiosservice } from "../../config/API";
 import { IOrder } from "../../interface/order";
 import { Pagination } from "antd";
+import { NavLink } from "react-router-dom";
 
-interface Props {}
-
-const Order = (props: Props) => {
+interface Order {
+  _id: string;
+  createdAt: string;
+  amount: number;
+  paymentMethod: string;
+  paymentstatus: string;
+  status: string;
+}
+const Order = () => {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 5; 
+  const itemsPerPage = 5;
 
- 
+
   const formatCurrency = (value: any) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -22,14 +29,17 @@ const Order = (props: Props) => {
     }).format(value);
   };
 
- 
+
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
         const response = await axiosservice.get("/orders");
-        setOrders(response.data);
-        setFilteredOrders(response.data); 
+        const sortedOrders = response.data.sort((a: IOrder, b: IOrder) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setOrders(sortedOrders);
+        setFilteredOrders(sortedOrders);
         setLoading(false);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách đơn hàng:", error);
@@ -37,7 +47,7 @@ const Order = (props: Props) => {
         setLoading(false);
       }
     };
-
+  
     fetchOrders();
   }, []);
 
@@ -51,12 +61,12 @@ const Order = (props: Props) => {
       );
       setFilteredOrders(filtered);
     } else {
-      setFilteredOrders(orders); 
+      setFilteredOrders(orders);
     }
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
-  
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedOrders = filteredOrders.slice(startIndex, startIndex + itemsPerPage);
 
@@ -86,9 +96,9 @@ const Order = (props: Props) => {
                       <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">STT</th>
                       <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Mã đơn</th>
                       <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Email</th>
-                      <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Địa chỉ</th>
+                      <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Ngày đặt hàng</th>
                       <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Đơn hàng</th>
-                      <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Giá trị</th>
+                      <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Tổng tiền</th>
                       <th className="text-sm font-medium text-gray-900 px-6 py-4 text-left">Trạng thái</th>
                     </tr>
                   </thead>
@@ -100,7 +110,7 @@ const Order = (props: Props) => {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">{order._id}</td>
                         <td className="px-6 py-4 text-sm text-gray-900">{order.customerDetails.email}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{order.customerDetails.address}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{new Date(order.createdAt).toLocaleDateString()}</td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {order.items.map((item, idx) => (
                             <div key={idx}>
@@ -112,29 +122,42 @@ const Order = (props: Props) => {
                         <td className="px-6 py-4 text-sm text-gray-900">
                           <div className="flex items-center">
                             <span
-                              className={`px-4 py-1 text-sm font-semibold rounded-lg shadow-sm text-white ${
-                                order.status === "pending"
-                                  ? "bg-yellow-500"
-                                  : order.status === "delivered"
+                              className={`px-4 py-3 text-sm font-semibold rounded-lg shadow-sm text-white ${order.status === "pending"
+                                ? "bg-yellow-500"
+                                : order.status === "delivered"
                                   ? "bg-green-500"
                                   : order.status === "cancelledOrder"
-                                  ? "bg-red-500"
-                                  : "bg-gray-400"
-                              }`}
+                                    ? "bg-red-500"
+                                    : "bg-gray-400"
+                                }`}
                             >
                               {order.status === "pending"
                                 ? "Đang xử lý"
                                 : order.status === "delivered"
-                                ? "Đã giao"
-                                : order.status === "cancelledOrder"
-                                ? "Đã hủy"
-                                : "Thất bại"}
+                                  ? "Đã giao"
+                                  : order.status === "cancelledOrder"
+                                    ? "Đã hủy"
+                                    : "Thất bại"}
                             </span>
                           </div>
                         </td>
+                        <td>
+                          <div className="flex items-center">
+                            <NavLink to={`/viewdonhang/${order._id}`}>
+                              <button
+                                className="bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-all "
+                              >
+                                Xem
+                              </button>
+                            </NavLink>
+                          </div>
+                        </td>
                       </tr>
+
                     ))}
+
                   </tbody>
+
                 </table>
 
                 {/* Ant Design Pagination */}
@@ -144,7 +167,7 @@ const Order = (props: Props) => {
                     total={filteredOrders.length}
                     pageSize={itemsPerPage}
                     onChange={(page) => setCurrentPage(page)}
-                    showSizeChanger={false} 
+                    showSizeChanger={false}
                   />
                 </div>
               </>

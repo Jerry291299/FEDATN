@@ -50,7 +50,7 @@ const PlacedOrders = () => {
                 Trạng thái thanh toán
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left">
-                Vận chuyển
+                Tình trạng đơn hàng
               </th>
             </tr>
           </thead>

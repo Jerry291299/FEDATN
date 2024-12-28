@@ -81,3 +81,12 @@ export const getOrdersByUserId = async (userId: string) => {
     throw error;
   }
 };
+export const getOrderById = async (orderId: string): Promise<IOrder> => {
+  try {
+    const response = await axiosservice.get(`/orders/${orderId}`);
+    return response.data; // Đảm bảo response.data có cấu trúc của IOrder
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    throw error;
+  }
+};

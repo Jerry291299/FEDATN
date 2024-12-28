@@ -42,6 +42,8 @@ import AddNews from "./components/admin/modaladd/addtintuc";
 import UpdateNews from "./components/admin/modaladd/updatetintuc";
 import DashboardNews from "./components/admin/tintuc";
 import AdminDashboard from "./components/admin/AdminDashboard";
+import OrderDetail from "./components/OrderDetail"; // Import component OrderDetail
+import OrderView from "./components/admin/modaladd/viewdonhang";
 
 function App() {
   return (
@@ -96,7 +98,7 @@ function App() {
             <Route path="dashboard/update/:id" Component={Update}></Route>
             <Route path="dashboard/view/:id" Component={View}></Route>
             <Route path="News/updatenews/:id" Component={UpdateNews}></Route>
-
+            <Route path="viewdonhang/:id" Component={OrderView}></Route>
             <Route
               path="Listcategory/updatecategory/:id"
               Component={Updatecategory}
@@ -118,6 +120,7 @@ function App() {
             {/* {/* <Route path="orders" element={<ShipperOrders />} /> */}
             <Route path="/shipper/orders" element={<OrdersShipper />} />
           </Route>
+          <Route path="/orders/:orderId" element={<OrderDetail />} /> Route cho trang chi tiết đơn hàng
         </Routes>
       </BrowserRouter>
     </>

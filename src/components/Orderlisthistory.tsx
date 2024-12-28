@@ -86,20 +86,8 @@ const Orderlisthistory = () => {
         throw new Error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
       }
 
-      const updatedOrder = await response.json();
-      setOrders((prevOrders) =>
-        prevOrders
-          .map((order) =>
-            order._id === updatedOrder._id
-              ? { ...order, status: updatedOrder.status }
-              : order
-          )
-          .filter((order) => order.status !== "deleted")
-      );
-
-      // alert(
-      //   `\u2728 Đơn hàng #${selectedOrderId} đã được hủy thành công! \n\nNếu bạn cần thêm hỗ trợ, đừng ngần ngại liên hệ với đội ngũ chăm sóc khách hàng của chúng tôi. \nChúc bạn một ngày vui vẻ!`
-      // );
+      // Reload trang sau khi hủy đơn hàng
+      window.location.reload();
     } catch (error) {
       console.error("Error cancelling order:", error);
       alert("Rất tiếc, không thể hủy đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
@@ -161,7 +149,7 @@ const Orderlisthistory = () => {
                 <th className="border border-gray-300 px-4 py-2 text-left">Thành tiền</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Phương thức thanh toán</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Trạng thái thanh toán</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Vận chuyển</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Tình trạng đơn hàng</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Hành động</th>
               </tr>
             </thead>
@@ -185,7 +173,7 @@ const Orderlisthistory = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {statusMapping[order.status] || order.status}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border border-gray-300 px-4 py-6 flex space-x-2">
                     {order.status === "pending" && (
                       <button
                         onClick={() => confirmCancelOrder(order._id)}
@@ -195,8 +183,15 @@ const Orderlisthistory = () => {
                       </button>
                     )}
                     {order.status === "cancelled" && (
-                      <span className="text-gray-500">Đã hủy</span>
+                      <span className="bg-green-500 text-white rounded-lg px-4 py-2 flex whitespace-nowrap">Đã huỷ</span>
                     )}
+                    <NavLink to={`/orders/${order._id}`}>
+                      <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+                      >
+                        Xem
+                      </button>
+                    </NavLink>
                   </td>
                 </tr>
               ))}
