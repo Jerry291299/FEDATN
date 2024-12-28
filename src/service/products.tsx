@@ -1,6 +1,6 @@
 import React from "react";
 import { axiosservice } from "../config/API";
-import { IProductLite } from "../interface/products";
+import { IVariant, IProductLite } from "../interface/products";
 
 export const getAllproducts = async ({
   limit = 10,
@@ -12,6 +12,7 @@ export const getAllproducts = async ({
   page: number;
   admin?: string;
   category?: string;
+  variants?: IVariant[];
 }) => {
   try {
     const { data } = await axiosservice.get(
@@ -44,7 +45,7 @@ export const addProduct = async (product: IProductLite) => {
 
 export const updateProduct = async (id?: string, product?: IProductLite) => {
   try {
-    const { data } = await axiosservice.put(`/update/${id}`, product);
+    const { data } = await axiosservice.put(`product/${id}`, product);
     return data;
   } catch (error) {
     console.log(error);
@@ -89,18 +90,7 @@ export const getProductsByCategory = async (categoryId: string) => {
     console.log(error);
   }
 };
-export const filterProducts = async (params: {
-  category?: string;
-  material?: string;
-  limit?: number;
-  page?: number;
-  sort?: string;
-}) => {
-  try {
-    const { data } = await axiosservice.get("/products/filter", { params });
-    return data;
-  } catch (error) {
-    console.error("Error filtering products:", error);
-    throw error;
-  }
+export const calculateTotalQuantity = (variants?: IVariant[]): number => {
+  if (!variants) return 0;
+  return variants.reduce((total, variant) => total + variant.quantity, 0);
 };

@@ -1,6 +1,6 @@
 export interface IUser {
   status: "active" | "deactive"; 
-  // id: string;
+  id: string;
   _id: string;
   name: string;
   email: string;
@@ -17,8 +17,8 @@ export interface IUser {
   export type IUserLite = Pick<IUser, 'role' >
   export interface PUser {
     status: "active" | "deactive"; 
-    // id: string;
     id: string;
+    _id: string;
     name: string;
     email: string;
     role: string;

@@ -1,13 +1,12 @@
-
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, notification } from "antd";
+import { Form, Input, Select, notification, Button, Space } from "antd";
 import { getProductByID, updateProduct } from "../../../service/products";
 import { Icategory } from "../../../interface/category";
 import { getAllCategories } from "../../../service/category";
 import { upload } from "../../../service/upload";
 import LoadingComponent from "../../Loading";
 import { getAllMaterials } from "../../../service/material";
-import { Iproduct } from "../../../interface/products";
+import { Iproduct, IVariant } from "../../../interface/products";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ProductUpdate = () => {
@@ -19,6 +18,7 @@ const ProductUpdate = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<Iproduct | null>(null);
+  const [variants, setVariants] = useState<IVariant[]>([]); // State for variants
   const navigate = useNavigate();
 
   const showNotification = (
@@ -67,6 +67,7 @@ const ProductUpdate = () => {
         const productData = await getProductByID(id);
         setProduct(productData);
         setExistingImages(productData.img || []);
+        setVariants(productData.variants || []); // Set existing variants
         form.setFieldsValue({
           name: productData.name,
           soLuong: productData.soLuong,
@@ -125,6 +126,36 @@ const ProductUpdate = () => {
     return urls;
   };
 
+  const addVariant = () => {
+    setVariants((prev) => [...prev, { size: "", quantity: 0, price: 0 }]);
+  };
+
+  const removeVariant = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVariantChange = (
+    index: number,
+    key: keyof IVariant,
+    value: string | number | undefined // Chấp nhận các loại có thể
+  ) => {
+    const newVariants: IVariant[] = [...variants];
+    // Kiểm tra loại của key và gán giá trị tương ứng
+    if (key === "size" && typeof value === "string") {
+      newVariants[index][key] = value as IVariant["size"];
+    } else if (key === "quantity" && typeof value === "number") {
+      newVariants[index][key] = value as IVariant["quantity"];
+    } else if (key === "price" && typeof value === "number") {
+      newVariants[index][key] = value as IVariant["price"];
+    } else if (
+      key === "discount" &&
+      (typeof value === "number" || value === undefined)
+    ) {
+      newVariants[index][key] = value as IVariant["discount"];
+    }
+    setVariants(newVariants);
+  };
+
   const onFinish = async (values: any) => {
     setLoading(true);
 
@@ -136,19 +167,28 @@ const ProductUpdate = () => {
         ...values,
         moTa: values.moTa,
         soLuong: values.soLuong,
-        img: updatedImages, 
+        img: updatedImages,
         categoryID: values.category,
         materialID: values.material,
         status: true,
+        variants, // Include variants in the payload
       };
 
       await updateProduct(id, payload);
-      showNotification("success", "Thành công", "Cập nhật sản phẩm thành công!");
-      setFiles([]); 
+      showNotification(
+        "success",
+        "Thành công",
+        "Cập nhật sản phẩm thành công!"
+      );
+      setFiles([]);
       navigate("/admin/dashboard", { state: { shouldRefetch: true } });
     } catch (error) {
       console.error("Error updating product:", error);
-      showNotification("error", "Lỗi", "Không thể cập nhật sản phẩm, vui lòng thử lại!");
+      showNotification(
+        "error",
+        "Lỗi",
+        "Không thể cập nhật sản phẩm, vui lòng thử lại!"
+      );
     } finally {
       setLoading(false);
     }
@@ -157,126 +197,224 @@ const ProductUpdate = () => {
   if (loading || !product) {
     return <LoadingComponent />;
   }
-
   return (
-    <div className="space-y-6 font-[sans-serif] max-w-md mx-auto">
-      <Form form={form} onFinish={onFinish}>
-      <div>
-             <label className="mb-2 text-2xl text-black block">Tên sản phẩm:</label>
-          <Form.Item
-              name="name"
-              rules={[{ required: true, message: "Bắt buộc nhập tên Sản Phẩm!" }]}
-            >
-              <Input placeholder="Enter product name" />
-            </Form.Item>
+    <>
+      {loading && <LoadingComponent />}
+      <div className="max-w-6xl mx-auto p-8 bg-white shadow-xl rounded-xl">
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <div className="flex flex-wrap md:flex-nowrap gap-8">
+            {/* Cột Bên Trái */}
+            <div className="flex-1 space-y-6">
+              {/* Tên sản phẩm */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Tên sản phẩm
+                </label>
+                <Form.Item
+                  name="name"
+                  rules={[
+                    { required: true, message: "Bắt buộc nhập tên sản phẩm!" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Nhập tên sản phẩm"
+                    className="text-gray-700 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                  />
+                </Form.Item>
+              </div>
+
+              {/* Mô tả sản phẩm */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Mô tả sản phẩm
+                </label>
+                <Form.Item
+                  name="moTa"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Bắt buộc nhập mô tả sản phẩm!",
+                    },
+                  ]}
+                >
+                  <Input.TextArea
+                    placeholder="Nhập mô tả sản phẩm"
+                    className="text-gray-700 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                    rows={5}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+
+            {/* Cột Bên Phải */}
+            <div className="flex-1 space-y-6">
+              {/* Ảnh sản phẩm */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Ảnh sản phẩm
+                </label>
+                <div className="flex flex-wrap gap-4">
+                  {existingImages.map((preview, index) => (
+                    <div key={index} className="relative w-28 h-28">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index}`}
+                        className="w-full h-full object-cover rounded-lg shadow-md"
+                      />
+                      <button
+                        onClick={() => handleRemoveImage(preview)} // Use the url from the map
+                        className="absolute top-0 right-0 bg-red-600 text-white text-xs p-2 rounded-full shadow-md"
+                      >
+                        x
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <Input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                />
+              </div>
+
+              {/* Danh mục */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Danh mục
+                </label>
+                <Form.Item
+                  name="category"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn danh mục!" },
+                  ]}
+                >
+                  <Select
+                    className="w-full rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
+                    placeholder="Chọn danh mục"
+                  >
+                    {activeCategories.map((categoryID: Icategory) => (
+                      <Select.Option
+                        key={categoryID._id}
+                        value={categoryID._id}
+                      >
+                        {categoryID.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
+
+              {/* Chất liệu */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Chất liệu
+                </label>
+                <Form.Item
+                  name="material"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn chất liệu!" },
+                  ]}
+                >
+                  <Select
+                    className="w-full rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
+                    placeholder="Chọn chất liệu"
+                  >
+                    {activeMaterial.map((materialID: Icategory) => (
+                      <Select.Option
+                        key={materialID._id}
+                        value={materialID._id}
+                      >
+                        {materialID.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="mb-2 text-2xl text-black block">Số Lượng</label>
-            <Form.Item
-              name="soLuong"
-              rules={[{ required: true, message: "Bắt buộc nhập số lượng!" }]}
-            >
-              <Input type="number" placeholder="Enter product quantity" />
-            </Form.Item>
-          </div>
-
-          <div>
-            <label className="mb-2 text-2xl text-black block">Giá sản phẩm:</label>
-            <Form.Item
-              name="price"
-              rules={[{ required: true, message: "Please input your product price!" }]}
-            >
-              <Input
-                type="number"
-                className="pr-4 pl-14 py-3 text-sm text-black rounded bg-white border border-gray-400 w-full outline-[#333]"
-                placeholder="Enter Price $$$"
-              />
-            </Form.Item>
-          </div>
-
-          <div>
-            <label className="mb-2 text-2xl text-black block">Mô tả</label>
-            <Form.Item
-              name="moTa"
-              rules={[{ required: true, message: "Bắt buộc nhập mô tả!" }]}
-            >
-              <Input placeholder="Enter product description" />
-            </Form.Item>
-          </div>
-        <div>
-          <label className="mt-10 mb-2 text-sm text-black block">Ảnh hiện tại:</label>
-          <div className="grid grid-cols-3 gap-4">
-            {existingImages.map((url) => (
-              <div key={url} className="relative">
-                <img
-                  src={url}
-                  alt="Product"
-                  className="w-full h-auto rounded-md border border-gray-200"
+          {/* Biến thể sản phẩm */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-800">
+              Biến thể sản phẩm
+            </h3>
+            {variants.map((variant, index) => (
+              <div key={index} className="flex gap-4 mb-4">
+                <Input
+                  placeholder="Kích thước"
+                  value={variant.size}
+                  onChange={(e) =>
+                    handleVariantChange(index, "size", e.target.value)
+                  }
+                  className="w-1/4 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
+                />
+                <Input
+                  type="number"
+                  placeholder="Số lượng"
+                  value={variant.quantity}
+                  onChange={(e) =>
+                    handleVariantChange(
+                      index,
+                      "quantity",
+                      Number(e.target.value)
+                    )
+                  }
+                  className="w-1/4 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
+                />
+                <Input
+                  type="number"
+                  placeholder="Giá"
+                  value={variant.price}
+                  onChange={(e) =>
+                    handleVariantChange(index, "price", Number(e.target.value))
+                  }
+                  className="w-1/4 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
+                />
+                <Input
+                  type="number"
+                  placeholder="Giảm giá (nếu có)"
+                  value={variant.discount}
+                  onChange={(e) =>
+                    handleVariantChange(
+                      index,
+                      "discount",
+                      Number(e.target.value)
+                    )
+                  }
+                  className="w-1/4 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage(url)}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  onClick={() => removeVariant(index)}
+                  className="bg-red-600 text-white rounded-lg px-4"
                 >
-                  &times;
+                  Xóa
                 </button>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Upload New Images */}
-        <div>
-          <label className="mt-10 mb-2 text-sm text-black block">Thêm ảnh mới:</label>
-          <Input type="file" multiple onChange={handleFileChange} />
-        </div>
-
-        <div className="pt-[20px]">
-        <label className="mt-10 mb-2 text-sm text-black block">Danh mục</label>
-
-           <Form.Item
-              name="category"
-              rules={[{ required: true, message: "Please select a category!" }]}
+            <button
+              type="button"
+              onClick={addVariant}
+              className="bg-blue-600 text-white rounded-lg px-4"
             >
-              <Select style={{ width: "100%" }}>
-                {activeCategories.map((categoryID: Icategory) => (
-                  <Select.Option key={categoryID._id} value={categoryID._id}>
-                    {categoryID.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+              Thêm biến thể
+            </button>
           </div>
 
-          <div>
-            <label className="mt-10 mb-2 text-sm text-black block">Chất liệu</label>
-            <Form.Item
-              name="material"
-              rules={[{ required: true, message: "Please select a material!" }]}
+          {/* Nút Submit */}
+          <div className="mt-8 text-center">
+            <button
+              type="submit"
+              className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
             >
-              <Select style={{ width: "100%" }}>
-                {activeMaterial.map((materialID: Icategory) => (
-                  <Select.Option key={materialID._id} value={materialID._id}>
-                    {materialID.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+              Thêm mới sản phẩm
+            </button>
           </div>
-
-        <div className="mt-6 text-right">
-          <button
-            type="submit"
-            className="bg-[#2F6D7E] text-white py-3 px-6 rounded-md text-xl"
-          >
-            Cập nhật sản phẩm
-          </button>
-        </div>
-      </Form>
-    </div>
+        </Form>
+      </div>
+    </>
   );
 };
 
 export default ProductUpdate;
-
