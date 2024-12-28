@@ -1,9 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { Iproduct } from "../interface/products";
-import { IUser,PUser } from "../interface/user";
+import { Iproduct, IVariant } from "../interface/products";
+import { IUser } from "../interface/user";
 import { addtoCart } from "../service/cart";
-import { getAllproducts, getProductByID } from "../service/products";
+import {
+  getAllproducts,
+  getProductByID,
+  calculateTotalQuantity,
+} from "../service/products";
 import Header from "./Header";
 import Footer from "./Footer";
 import { actions, Cartcontext } from "./contexts/cartcontext";
@@ -15,12 +19,13 @@ import "react-toastify/dist/ReactToastify.css";
 const ProductDetail = () => {
   const [products, setProducts] = useState<Iproduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { id } = useParams<{  id: string }>();
+  const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Iproduct | undefined>(undefined);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<number | null>(null); // New state for selected variant
   const Globalstate = useContext(Cartcontext);
-  const [user, setUser] = useState<PUser | null>(null);
-  const [comments, setComments] = useState<{ stars: number }[]>([]); // To hold comments with star ratings
+  const [user, setUser] = useState<IUser | null>(null);
+  const [comments, setComments] = useState<{ stars: number }[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
 
   const dispatch = Globalstate.dispatch;
@@ -29,7 +34,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
-      const parsedUser: PUser = JSON.parse(storedUser);
+      const parsedUser: IUser = JSON.parse(storedUser);
       setUser(parsedUser);
     }
   }, []);
@@ -43,8 +48,11 @@ const ProductDetail = () => {
         if (Array.isArray(data.img) && data.img.length > 0) {
           setSelectedImage(data.img[0]);
         }
-        // Assuming comments are part of the product data
-        setComments(data.comments || []); // Adjust based on your data structure
+        setComments(data.comments || []);
+        // Set the first variant as the default selected variant
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(0);
+        }
       } catch (error) {
         console.log("Failed to fetch product by ID", error);
       }
@@ -67,35 +75,26 @@ const ProductDetail = () => {
     };
     fetchProducts();
   }, []);
+
   const truncateText = (text: string, maxLength: number): string => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
-  useEffect(() => {
-    // Fetch comments from localStorage
-    const storedComments = localStorage.getItem(`comments_${id}`); // Key includes product ID
-    if (storedComments) {
-      setComments(JSON.parse(storedComments));
+
+  const handleVariantChange = (index: number) => {
+    setSelectedVariant(index);
+    if (product && product.img && product.img[index]) {
+      setSelectedImage(product.img[index]); // Change image based on selected variant
     }
-  }, [id]); // Rerun if product ID changes
-
-  const handleAddComment = (newComment: { stars: number; content: string }) => {
-    const updatedComments = [...comments, newComment];
-    setComments(updatedComments);
-
-    // Save to localStorage
-    localStorage.setItem(`comments_${id}`, JSON.stringify(updatedComments));
   };
 
-  const calculateAverageRating = (comments: { stars: number }[]) => {
-    if (!comments || comments.length === 0) return 0; // Không có bình luận
-    const totalStars = comments.reduce(
-      (acc, comment) => acc + comment.stars,
-      0
-    );
-    return totalStars / comments.length; // Tính trung bình
-  };
-  const handleRatingUpdate = (newAverageRating: number) => {
-    setAverageRating(newAverageRating);
+  const calculateTotalQuantity = (
+    variants: IVariant[] =[],
+    selectedVariantIndex: number | null
+  ): number => {
+    if (!variants || selectedVariantIndex === null) return 0;
+
+    const selectedVariant = variants[selectedVariantIndex];
+    return selectedVariant ? selectedVariant.quantity : 0; // Assuming each variant has a 'quantity' property
   };
   return (
     <>
@@ -138,28 +137,62 @@ const ProductDetail = () => {
               <h1 className="text-xl font-bold text-black-800">
                 {product.name}
               </h1>
+
+              {/* Display product variants */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="my-4">
+                  <h2 className="text-lg font-medium">Kích thước:</h2>
+                  <div className="flex gap-4 overflow-x-auto">
+                    {product.variants.map((variant, index) => (
+                      <button
+                        key={index}
+                        className={`px-4 py-2 rounded-md ${
+                          selectedVariant === index
+                            ? "bg-blue-200"
+                            : "bg-white text-black"
+                        }`}
+                        onClick={() => handleVariantChange(index)}
+                        aria-pressed={selectedVariant === index}
+                      >
+                        {variant.size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="my-4">
                 <div className="flex items-baseline">
                   <span className="text-2xl font-semibold text-black-600">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(product.price)}
+                    }).format(
+                      product.variants && selectedVariant !== null
+                        ? product.variants[selectedVariant].price
+                        : 0
+                    )}
                   </span>
                 </div>
-                <div className="font-bold text-gray-600">
-                  Chất liệu:{" "}
-                  <span className="text-red-600">{product.material?.name}</span>
-                </div>
+
                 <p className="font-bold text-gray-600">
                   Số lượng:{" "}
                   <span
                     className={`font-semibold ${
-                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                      calculateTotalQuantity(
+                        product.variants,
+                        selectedVariant
+                      ) > 0
+                        ? "text-green-600"
+                        : "text-red-600"
                     }`}
                   >
-                    {product.soLuong > 0
-                      ? `${product.soLuong} sản phẩm`
+                    {calculateTotalQuantity(product.variants, selectedVariant) >
+                    0
+                      ? `${calculateTotalQuantity(
+                          product.variants,
+                          selectedVariant
+                        )} sản phẩm`
                       : "Hết hàng"}
                   </span>
                 </p>
@@ -167,44 +200,30 @@ const ProductDetail = () => {
                   Tình trạng:{" "}
                   <span
                     className={`font-semibold ${
-                      product.soLuong > 0 ? "text-green-600" : "text-red-600"
+                      calculateTotalQuantity(
+                        product.variants,
+                        selectedVariant
+                      ) > 0
+                        ? "text-green-600"
+                        : "text-red-600"
                     }`}
                   >
-                    {product.soLuong > 0 ? "Còn hàng" : "Hết hàng"}
+                    {calculateTotalQuantity(product.variants, selectedVariant) >
+                    0
+                      ? "Còn hàng"
+                      : "Hết hàng"}
                   </span>
                 </p>
               </div>
-
-              {/* Average rating display */}
-              <div className="my-2">
-                <span className="font-bold text-gray-600">
-                  Đánh giá: {averageRating.toFixed(1)} {" "}
-                </span>
-                <span>
-                  {Array.from({ length: 5 }, (_, index) => (
-                    <span
-                      key={index}
-                      className={
-                        index < Math.round(averageRating)
-                          ? "text-yellow-500"
-                          : "text-gray-300"
-                      }
-                    >
-                      &#9733;
-                    </span>
-                  ))}
-                </span>
-                <span className="ml-2 text-gray-600">
-                  {comments.length > 0
-                    ? `(${comments.length} đánh giá)`
-                    : "(Chưa có đánh giá)"}
-                </span>
+              <div className="font-bold text-gray-600">
+                Chất liệu:{" "}
+                <span className="text-red-600">{product.material?.name}</span>
               </div>
 
               <button
                 type="button"
                 className={`inline-flex items-center justify-center rounded-md border-2 border-transparent px-12 py-3 text-center text-base font-bold text-white transition-all duration-200 ease-in-out ${
-                  product.soLuong > 0
+                  calculateTotalQuantity(product.variants, selectedVariant) > 0
                     ? "bg-gray-900 hover:bg-orange-400"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
@@ -228,7 +247,10 @@ const ProductDetail = () => {
                     );
                     return;
                   }
-                  if (product.soLuong <= 0) {
+                  if (
+                    calculateTotalQuantity(product.variants, selectedVariant) <=
+                    0
+                  ) {
                     toast.warning(
                       "Sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác.",
                       {
@@ -246,7 +268,10 @@ const ProductDetail = () => {
                       {
                         productId: String(product._id),
                         name: product.name,
-                        price: product.price,
+                        price:
+                          product.variants && selectedVariant !== null
+                            ? product.variants[selectedVariant].price
+                            : 0,
                         img: product.img[0],
                         quantity: 1,
                       },
@@ -276,9 +301,13 @@ const ProductDetail = () => {
                     );
                   }
                 }}
-                disabled={product.soLuong <= 0}
+                disabled={
+                  calculateTotalQuantity(product.variants, selectedVariant) <= 0
+                }
               >
-                {product.soLuong > 0 ? "Add to cart" : "Out of Stock"}
+                {calculateTotalQuantity(product.variants, selectedVariant) > 0
+                  ? "Add to cart"
+                  : "Out of Stock"}
               </button>
             </div>
           </div>
@@ -311,8 +340,6 @@ const ProductDetail = () => {
         {/* Bảo hành và vận chuyển */}
         <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
           <div className="text-center">
-            {" "}
-            {/* Chỉ căn giữa h2 */}
             <h2 className="text-xl font-bold mb-4 uppercase tracking-wider text-blue-600">
               Chính Sách Bảo hành & Vận chuyển
             </h2>
@@ -392,7 +419,11 @@ const ProductDetail = () => {
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(product.price)}
+                      }).format(
+                        product.variants && product.variants.length > 0
+                          ? product.variants[0].price
+                          : 0
+                      )}
                     </p>
                   </div>
                   <div className="p-4">
@@ -408,11 +439,7 @@ const ProductDetail = () => {
 
         <div className="pt-[50px]">
           {user ? (
-            <CommentSection
-              productId={id || ""}
-              user={user}
-              onRatingUpdate={handleRatingUpdate}
-            />
+            <CommentSection productId={id || ""} user={user} />
           ) : (
             <p className="text-gray-500">Bạn cần đăng nhập để bình luận.</p>
           )}

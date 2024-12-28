@@ -4,6 +4,7 @@ import {
   DeactivateProduct,
   ActivateProduct,
   getAllproducts,
+  calculateTotalQuantity,
 } from "../../service/products";
 import { Iproduct } from "../../interface/products";
 import { Pagination, Popconfirm } from "antd";
@@ -25,8 +26,8 @@ const Dashboard = (props: Props) => {
     limit: 5,
     currentPage: 1,
   });
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedProduct, setSelectedProduct] = useState<Iproduct | null>(null);
+  // const [modalVisible, setModalVisible] = useState<boolean>(false);
+  // const [selectedProduct, setSelectedProduct] = useState<Iproduct | null>(null);
   const [priceFilterOption, setPriceFilterOption] = useState<string>(""); // Thêm trạng thái cho tùy chọn giá
 
   const filterByName = (products: Iproduct[], name: string): Iproduct[] => {
@@ -91,16 +92,6 @@ const Dashboard = (props: Props) => {
     }
   };
 
-  const filterByPrice = (
-    products: Iproduct[],
-    minPrice: number,
-    maxPrice: number
-  ): Iproduct[] => {
-    return products.filter(
-      (product) => product.price >= minPrice && product.price <= maxPrice
-    );
-  };
-
   const filterByMaterial = (
     products: Iproduct[],
     material: string
@@ -141,22 +132,30 @@ const Dashboard = (props: Props) => {
 
     // Lọc theo giá
 
+    // Assuming filtered is an array of Iproduct
     if (priceFilterOption === "asc") {
-      filtered.sort((a, b) => a.price - b.price);
+      filtered.sort((a, b) => {
+        const aPrice =
+          a.variants && a.variants.length > 0 ? a.variants[0].price : 0;
+        const bPrice =
+          b.variants && b.variants.length > 0 ? b.variants[0].price : 0;
+        return aPrice - bPrice;
+      });
     } else if (priceFilterOption === "desc") {
-      filtered.sort((a, b) => b.price - a.price);
+      filtered.sort((a, b) => {
+        const aPrice =
+          a.variants && a.variants.length > 0 ? a.variants[0].price : 0;
+        const bPrice =
+          b.variants && b.variants.length > 0 ? b.variants[0].price : 0;
+        return bPrice - aPrice;
+      });
     } else if (priceFilterOption === "newest") {
-      if (priceFilterOption === "newest") {
-        filtered.sort((a, b) => {
-          const dateA = a.updatedAt
-            ? new Date(a.updatedAt).getTime()
-            : -Infinity; // Nếu không có, coi là ngày rất cũ
-          const dateB = b.updatedAt
-            ? new Date(b.updatedAt).getTime()
-            : -Infinity; // Nếu không có, coi là ngày rất cũ
-          return dateB - dateA; // Sắp xếp theo ngày mới nhất
-        });
-      }
+      // Sorting by newest may require an updatedAt property
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.updatedAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || 0).getTime();
+        return dateB - dateA; // Descending order
+      });
     }
 
     return filtered;
@@ -173,10 +172,13 @@ const Dashboard = (props: Props) => {
   const csvData = filteredProducts.map((products) => ({
     ID: products._id,
     "Tên sản phẩm": products.name,
-    "Gía sản phẩm": products.price,
+    "Gía sản phẩm":
+      products.variants && products.variants.length > 0
+        ? products.variants[0].price
+        : 0, // Truy cập giá từ biến thể đầu tiên
     "Tên danh mục": products.category.name,
     "Tên chất liệu": products.material.name,
-    "Số lượng sản phẩm": products.soLuong,
+    "Số lượng sản phẩm": calculateTotalQuantity(products.variants),
     "Mô tả sản phẩm": products.moTa,
     "Anh sản phẩm": products.img,
     "Trạng thái": products.status ? "Hoạt động" : "Vô hiệu hóa",
@@ -280,9 +282,7 @@ const Dashboard = (props: Props) => {
                     <th className="px-6 py-4 text-sm font-semibold text-left">
                       Trạng Thái
                     </th>
-                    <th className="center">
-                      Hành động
-                    </th>
+                    <th className="center">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -302,7 +302,11 @@ const Dashboard = (props: Props) => {
                           {new Intl.NumberFormat("vi-VN", {
                             style: "currency",
                             currency: "VND",
-                          }).format(product.price)}
+                          }).format(
+                            product.variants && product.variants.length > 0
+                              ? product.variants[0].price
+                              : 0
+                          )}
                         </td>
                         <td className="px-6 py-4 text-sm font-light text-gray-900">
                           {product?.category?.name}
@@ -311,7 +315,7 @@ const Dashboard = (props: Props) => {
                           {product?.material?.name}
                         </td>
                         <td className="px-6 py-4 text-sm font-light text-gray-900">
-                          {product.soLuong}
+                          {calculateTotalQuantity(product.variants)}
                         </td>
                         <td className="px-6 py-4 text-sm font-light text-gray-900">
                           <img

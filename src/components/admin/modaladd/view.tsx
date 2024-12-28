@@ -50,9 +50,9 @@ const ProductView = () => {
   }
 
   return (
-    <div className="space-y-6 font-[sans-serif] max-w-md mx-auto" style={{ width: "500px" }}>
-      <h2 className="text-2xl text-black" style={{ marginTop: "30px" }}>
-         {product.name}
+    <div className="space-y-6 font-sans w-11/12 mx-auto p-4">
+      <h2 className="text-2xl text-black mt-8">
+        <strong>Tên sản phẩm :</strong> {product.name}
       </h2>
       <p>
         <strong>Danh mục:</strong> {product.category?.name}
@@ -60,23 +60,47 @@ const ProductView = () => {
       <p>
         <strong>Chất liệu:</strong> {product.material?.name}
       </p>
-      <p>
-        <strong>Số lượng:</strong> {product.soLuong}
-      </p>
-      <p>
-        <strong>Giá:</strong>{" "}
-        {new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(product.price)}
-      </p>
+
+      <div>
+        <h3 className="text-xl font-semibold">Biến thể sản phẩm</h3>
+        {product.variants && product.variants.length > 0 ? (
+          product.variants.map((variant, index) => (
+            <div key={index} className="border p-4 mb-2 rounded">
+              <p>
+                <strong>Kích thước:</strong> {variant.size}
+              </p>
+              <p>
+                <strong>Số lượng:</strong> {variant.quantity}
+              </p>
+              <p>
+                <strong>Giá:</strong>{" "}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(variant.price)}
+              </p>
+              {variant.discount ? (
+                <p>
+                  <strong>Giảm giá:</strong> {variant.discount}%
+                </p>
+              ) : (
+                <p>
+                  <strong>Giảm giá:</strong> Sản phẩm không được giảm giá
+                </p>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>Không có biến thể nào.</p>
+        )}
+      </div>
 
       <p>
         <strong>Ảnh:</strong>
       </p>
       <div className="flex flex-wrap gap-4 mb-4">
         {product.img.map((imgUrl, index) => (
-          <div key={index} className="relative w-24 h-24">
+          <div key={index} className="relative w-24 h-24 md:w-32 md:h-32">
             <img
               src={imgUrl}
               alt={`Product Image ${index}`}
@@ -85,9 +109,7 @@ const ProductView = () => {
           </div>
         ))}
       </div>
-      <p>
-        <strong>Số lượng:</strong> {product.soLuong}
-      </p>
+
       <p>
         <strong>Trạng thái:</strong>{" "}
         {product.status ? "Hoạt động" : "Vô hiệu hóa"}
@@ -95,19 +117,19 @@ const ProductView = () => {
       <p>
         <strong>Mô tả:</strong> {product.moTa}
       </p>
-      <p>
-        <strong>Đánh giá:</strong> {product.rating}
 
-      </p>
-      <p>
-        <strong>Số lượt đánh giá:</strong> {}
-        
-      </p>
-      <Link to="/admin/dashboard">
-        <Button type="primary" style={{ marginBottom: 16 }}>
-          Quay lại
-        </Button>
-      </Link>
+      <div className="space-x-2">
+        <Link to={`/admin/dashboard/update/${id}`}>
+          <Button type="primary" className="mb-4">
+            Chỉnh sửa sản phẩm
+          </Button>
+        </Link>
+        <Link to="/admin/dashboard">
+          <Button type="default" className="mb-4">
+            Quay lại
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

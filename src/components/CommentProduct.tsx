@@ -5,8 +5,7 @@ import { IComment } from "../interface/comment";
 const CommentSection: React.FC<{
   productId: string;
   user: IUser | any;
-  onRatingUpdate: (averageRating: number) => void;
-}> = ({ productId, user, onRatingUpdate }) => {
+}> = ({ productId, user }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [editingComment, setEditingComment] = useState<IComment | null>(null);
@@ -22,7 +21,7 @@ const CommentSection: React.FC<{
       setComments(cmts);
       updateRatingCounts(cmts);
       calculateAverageRating(cmts);
-      onRatingUpdate(averageRating);
+      // onRatingUpdate(averageRating);
     }
   }, [productId]);
 
