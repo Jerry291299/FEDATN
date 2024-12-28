@@ -11,11 +11,17 @@ export interface IOrder {
     status: string;
     paymentstatus: string;
     createdAt: string;
+    cancelReason:{
+    reason: String , // Lý do hủy đơn
+    canceledAt:  Date , // Thời điểm hủy
+    canceledBy: String , // Người thực hiện hủy
+    }
     customerDetails: {
       name: string;
       phone: string;
       email: string;
       address: string;
       notes?: string;
+      
     }
 }
