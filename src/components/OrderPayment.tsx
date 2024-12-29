@@ -61,87 +61,23 @@ function OrderPayment() {
     return total + price * quantity;
   }, 0);
 
-  // Hàm cập nhật số lượng sản phẩm trong kho sau khi đặt hàng
-  const updateProductQuantities = async (items: CartItem[]) => {
-    try {
-      for (const item of items) {
-        console.log(`Fetching product data for: ${item.productId}`);
-  
-        // Lấy thông tin sản phẩm từ API
-        const response = await fetch(
-          `http://localhost:28017/api/products-pay/${item.productId}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-  
-        if (!response.ok) {
-          const error = await response.json();
-          toast.error(error.message || "Không thể lấy thông tin sản phẩm.");
-          return;
-        }
-  
-        const product = await response.json(); // Lấy thông tin sản phẩm
-  
-        console.log("Product data received:", product);
-  
-        // Kiểm tra số lượng còn lại trong kho
-        if (product.soLuong < item.quantity) {
-          toast.error(`Sản phẩm ${item.name} không đủ số lượng.`);
-          return;
-        }
-  
-        // Tính số lượng mới của sản phẩm sau khi giảm
-        const updatedQuantity = product.soLuong - item.quantity;
-  
-        console.log(`Updating product quantity for ${item.productId}, new quantity: ${updatedQuantity}`);
-  
-        // Gọi API PUT để cập nhật số lượng
-        const updateResponse = await fetch(
-          `http://localhost:28017/api/products/${item.productId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity: item.quantity }), // Gửi số lượng đặt
-          }
-        );
-  
-        if (!updateResponse.ok) {
-          const error = await updateResponse.json();
-          toast.error(error.message || `Không thể cập nhật số lượng cho sản phẩm ${item.name}.`);
-          return;
-        }
-  
-        console.log(`Product ${item.name} quantity updated successfully.`);
-      }
-    } catch (error) {
-      console.error("Error updating product quantities:", error);
-      toast.error("Không thể cập nhật số lượng sản phẩm trong kho.");
-    }
-  };
-  
-  
-
   const handleOrderSubmit = async () => {
     console.log("Order ID being sent:", user); // Kiểm tra giá trị
 
-    // Nếu chưa chọn phương thức thanh toán
     if (!selectedPaymentMethod) {
       toast.success("Sản phẩm đã được thêm vào giỏ hàng!", {
         position: "top-right",
         autoClose: 3000,
         theme: "colored",
       });
+
       return;
     }
 
-    // Tính toán tổng số tiền của đơn hàng
     const totalAmount = cartItems.reduce((total, item) => {
       return total + (item.price || 0) * (item.quantity || 0);
     }, 0);
 
-    // Dữ liệu đơn hàng
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
@@ -149,35 +85,100 @@ function OrderPayment() {
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
+    const updateProductQuantities = async (items: CartItem[]) => {
+      try {
+        for (const item of items) {
+          console.log(`Fetching product data for: ${item.productId}`);
+
+          // Lấy thông tin sản phẩm từ API
+          const response = await fetch(
+            `http://localhost:28017/api/products-pay/${item.productId}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
+          if (!response.ok) {
+            const error = await response.json();
+            toast.error(error.message || "Không thể lấy thông tin sản phẩm.");
+            return;
+          }
+
+          const product = await response.json(); // Lấy thông tin sản phẩm
+
+          console.log("Product data received:", product);
+
+          // Kiểm tra số lượng còn lại trong kho
+          if (product.soLuong < item.quantity) {
+            toast.error(`Sản phẩm ${item.name} không đủ số lượng.`);
+            return;
+          }
+
+          // Tính số lượng mới của sản phẩm sau khi giảm
+          const updatedQuantity = product.soLuong - item.quantity;
+
+          console.log(
+            `Updating product quantity for ${item.productId}, new quantity: ${updatedQuantity}`
+          );
+
+          // Gọi API PUT để cập nhật số lượng
+          const updateResponse = await fetch(
+            `http://localhost:28017/api/products/${item.productId}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantity: item.quantity }), // Gửi số lượng đặt
+            }
+          );
+
+          if (!updateResponse.ok) {
+            const error = await updateResponse.json();
+            toast.error(
+              error.message ||
+                `Không thể cập nhật số lượng cho sản phẩm ${item.name}.`
+            );
+            return;
+          }
+
+          console.log(`Product ${item.name} quantity updated successfully.`);
+        }
+      } catch (error) {
+        console.error("Error updating product quantities:", error);
+        toast.error("Không thể cập nhật số lượng sản phẩm trong kho.");
+      }
+    };
 
     try {
-      // Trừ số lượng sản phẩm trong kho trước khi tạo đơn hàng
       await updateProductQuantities(cartItems);
-    
-      // Kiểm tra phương thức thanh toán
       if (selectedPaymentMethod === "cash_on_delivery") {
-        // Đặt hàng và thông báo thành công
         await placeOrder(orderData);
-        toast.success("Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.", { position: "top-right" });
+        toast.success(
+          "Cảm ơn bạn! Đơn hàng của bạn đã được xác nhận thành công.",
+          { position: "top-right" }
+        );
+
         setCartItems([]);
         navigate("/success", { state: { orderData } });
+        console.log("Order data:", orderData);
       } else if (selectedPaymentMethod === "vnpay") {
-        // Tạo link thanh toán VNPay
+        console.log("Order data:", orderData);
+        await placeOrder(orderData);
         const paymentUrl = await createVNPayPayment({
           userId: user,
           paymentMethod: selectedPaymentMethod,
           amount: totalAmount,
         });
-    
-        // Xóa giỏ hàng và chuyển hướng đến VNPay
         setCartItems([]);
-        window.location.href = paymentUrl;
+
+        window.location.href = paymentUrl; // Redirect to VNPay
       }
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại!", { position: "top-right" });
-      console.error("Error during order submission:", error);
+      toast.error(
+        "Rất tiếc! Đã có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.",
+        { position: "top-right" }
+      );
     }
-    
   };
 
   return (
