@@ -197,6 +197,26 @@ const Add = () => {
           <div className="flex flex-wrap md:flex-nowrap gap-8">
             {/* Cột Bên Trái */}
             <div className="flex-1 space-y-6">
+
+              {/* Mã sản phẩm */}
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Mã sản phẩm
+                </label>
+                <Form.Item
+                  name="masp"
+                  rules={[
+                    { required: true, message: "Bắt buộc nhập mã sản phẩm!" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Nhập tên sản phẩm"
+                    className="text-gray-700 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                  />
+                </Form.Item>
+              </div>
+
+
               {/* Tên sản phẩm */}
               <div>
                 <label className="text-lg font-semibold text-gray-800">
