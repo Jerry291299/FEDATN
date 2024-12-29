@@ -210,7 +210,7 @@ const Add = () => {
                   ]}
                 >
                   <Input
-                    placeholder="Nhập tên sản phẩm"
+                    placeholder="Nhập mã sản phẩm"
                     className="text-gray-700 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
                   />
                 </Form.Item>
