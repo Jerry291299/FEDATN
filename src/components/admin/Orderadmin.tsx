@@ -24,6 +24,17 @@ const Order = (props: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 5;
 
+  const statusMapping: { [key: string]: string } = {
+    pending: "Chờ xử lý",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+    processing: "Đang xử lý",
+    in_progress: "Đang giao hàng",
+    delivered: "Đã giao",
+    deleted: "Đã hủy",
+    failed: "Đã hủy",
+  };
+
   const formatCurrency = (value: any) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -48,7 +59,7 @@ const Order = (props: Props) => {
         setLoading(false);
       }
     };
-  
+
     fetchOrders();
   }, []);
 
@@ -102,8 +113,9 @@ const Order = (props: Props) => {
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">STT</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Mã đơn</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Địa chỉ</th>
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Địa chỉ</th> */}
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Ngày đặt hàng</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Tình trạng thanh toán</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Đơn hàng</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Tổng tiền</th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Trạng thái</th>
@@ -125,11 +137,14 @@ const Order = (props: Props) => {
                           <td className="px-6 py-4 text-sm text-gray-700">
                             {order.customerDetails.email}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-700">
+                          {/* <td className="px-6 py-4 text-sm text-gray-700">
                             {order.customerDetails.address}
-                          </td>
+                          </td> */}
                           <td
-                            className="px-6 py-4 text-sm text-gray-900">{new Date(order.createdAt).toLocaleDateString()}
+                            className="px-6 py-4 text-sm text-gray-700">{new Date(order.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {statusMapping[order.paymentstatus] || order.paymentstatus}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-700">
                             {order.items.map((item, idx) => (
@@ -144,12 +159,12 @@ const Order = (props: Props) => {
                           <td className="px-6 py-4 text-sm">
                             <span
                               className={`px-3 py-1 inline-block text-white rounded-lg shadow-sm text-xs font-medium ${order.status === "pending"
-                                  ? "bg-yellow-500"
-                                  : order.status === "delivered"
-                                    ? "bg-green-500"
-                                    : order.status === "cancelledOrder"
-                                      ? "bg-red-500"
-                                      : "bg-red-500"
+                                ? "bg-yellow-500"
+                                : order.status === "delivered"
+                                  ? "bg-green-500"
+                                  : order.status === "cancelledOrder"
+                                    ? "bg-red-500"
+                                    : "bg-red-500"
                                 }`}
                             >
                               {order.status === "pending"
@@ -162,16 +177,16 @@ const Order = (props: Props) => {
                             </span>
                           </td>
                           <td>
-                          <div className="flex items-center">
-                            <NavLink to={""}>
-                              <button
-                                className="bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-all "
-                              >
-                                Xem
-                              </button>
-                            </NavLink>
-                          </div>
-                        </td>
+                            <div className="flex items-center">
+                              <NavLink to={""}>
+                                <button
+                                  className="bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-all "
+                                >
+                                  Xem
+                                </button>
+                              </NavLink>
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
