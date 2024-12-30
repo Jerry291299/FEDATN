@@ -171,6 +171,7 @@ const Dashboard = (props: Props) => {
   );
   const csvData = filteredProducts.map((products) => ({
     ID: products._id,
+    "Mã sản phẩm": products.masp,
     "Tên sản phẩm": products.name,
     "Gía sản phẩm":
       products.variants && products.variants.length > 0
@@ -262,6 +263,9 @@ const Dashboard = (props: Props) => {
                       Stt
                     </th>
                     <th className="px-6 py-4 text-sm font-semibold text-left">
+                      Mã sản phẩm
+                    </th>
+                    <th className="px-6 py-4 text-sm font-semibold text-left">
                       Tên Sản Phẩm
                     </th>
                     <th className="px-6 py-4 text-sm font-semibold text-left">
@@ -294,6 +298,9 @@ const Dashboard = (props: Props) => {
                       >
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">
                           {index + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900">
+                          {product.masp}
                         </td>
                         <td className="px-6 py-4 text-sm font-light text-gray-900">
                           {product.name}

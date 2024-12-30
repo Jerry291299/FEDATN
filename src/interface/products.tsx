@@ -12,6 +12,7 @@ export interface IVariant {
 // Cập nhật giao diện sản phẩm
 export interface Iproduct {
   _id: string; // ID sản phẩm
+  masp: string;
   name: string; // Tên sản phẩm
   img: string[]; // Mảng URL ảnh sản phẩm
   moTa: string; // Mô tả sản phẩm
@@ -27,6 +28,7 @@ export interface Iproduct {
 export type IProductLite = Pick<
   Iproduct,
   | "_id"
+  | "masp"
   | "name"
   | "img"
   | "category"
