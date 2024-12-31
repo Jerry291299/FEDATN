@@ -200,7 +200,7 @@ const Dashboard = (props: Props) => {
         className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
         target="_blank"
       >
-        Xuất file danh mục
+        Xuất file sản phẩm
       </CSVLink>
 
       <div className="mb-4 flex flex-col sm:flex-row gap-4 items-center">

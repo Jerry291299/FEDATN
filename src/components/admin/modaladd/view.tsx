@@ -49,6 +49,12 @@ const ProductView = () => {
     return <div>Không tìm thấy sản phẩm.</div>;
   }
 
+  // Calculate total price after discount
+  const totalPrice = (product.variants || []).reduce((total, variant) => {
+    const priceAfterDiscount = variant.price - (variant.discount || 0);
+    return total + priceAfterDiscount;
+  }, 0);
+
   return (
     <div className="space-y-6 font-sans w-11/12 mx-auto p-4">
       <h2 className="text-2xl text-black mt-8">
@@ -64,32 +70,49 @@ const ProductView = () => {
       <div>
         <h3 className="text-xl font-semibold">Biến thể sản phẩm</h3>
         {product.variants && product.variants.length > 0 ? (
-          product.variants.map((variant, index) => (
-            <div key={index} className="border p-4 mb-2 rounded">
-              <p>
-                <strong>Kích thước:</strong> {variant.size}
-              </p>
-              <p>
-                <strong>Số lượng:</strong> {variant.quantity}
-              </p>
-              <p>
-                <strong>Giá:</strong>{" "}
-                {new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(variant.price)}
-              </p>
-              {variant.discount ? (
+          product.variants.map((variant, index) => {
+            // Calculate price after discount for the current variant
+            const priceAfterDiscount = variant.price - (variant.discount || 0);
+            return (
+              <div key={index} className="border p-4 mb-2 rounded">
                 <p>
-                  <strong>Giảm giá:</strong> {variant.discount}%
+                  <strong>Kích thước:</strong> {variant.size}
                 </p>
-              ) : (
                 <p>
-                  <strong>Giảm giá:</strong> Sản phẩm không được giảm giá
+                  <strong>Số lượng:</strong> {variant.quantity}
                 </p>
-              )}
-            </div>
-          ))
+                <p>
+                  <strong>Giá:</strong>
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(variant.price)}
+                </p>
+                {variant.discount ? (
+                  <p>
+                    <strong>Giảm giá:</strong>{" "}
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(variant.discount)}{" "}
+                    {/* Format discount as currency */}
+                  </p>
+                ) : (
+                  <p>
+                    <strong>Giảm giá:</strong> Sản phẩm không được giảm giá
+                  </p>
+                )}
+                <div className="mt-6 text-lg font-semibold text-gray-800">
+                  <strong>Tổng giá:</strong>
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(priceAfterDiscount)}{" "}
+                  
+                </div>
+              </div>
+            );
+          })
         ) : (
           <p>Không có biến thể nào.</p>
         )}
