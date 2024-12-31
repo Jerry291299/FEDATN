@@ -26,6 +26,8 @@ const Dashboard = (props: Props) => {
     limit: 5,
     currentPage: 1,
   });
+  const [isReversed, setIsReversed] = useState(true);
+
   // const [modalVisible, setModalVisible] = useState<boolean>(false);
   // const [selectedProduct, setSelectedProduct] = useState<Iproduct | null>(null);
   const [priceFilterOption, setPriceFilterOption] = useState<string>(""); // Thêm trạng thái cho tùy chọn giá
@@ -41,7 +43,7 @@ const Dashboard = (props: Props) => {
     try {
       setLoading(true);
       const data = await getAllproducts({
-        limit: page.limit,
+        limit: 1000,
         page: currentPage,
       });
       setProduct(data?.docs);
@@ -121,45 +123,44 @@ const Dashboard = (props: Props) => {
   const getFilteredProducts = () => {
     let filtered = [...products];
 
-    // Lọc theo chất liệu
+    // Filter by material
     filtered = filterByMaterial(filtered, filterMaterial);
 
-    // Lọc theo danh mục
+    // Filter by category
     filtered = filterByCategory(filtered, selectedCategory);
 
-    // Lọc theo tên sản phẩm
+    // Filter by name
     filtered = filterByName(filtered, filterName);
 
-    // Lọc theo giá
-
-    // Assuming filtered is an array of Iproduct
+    // Sort by price
     if (priceFilterOption === "asc") {
       filtered.sort((a, b) => {
-        const aPrice =
-          a.variants && a.variants.length > 0 ? a.variants[0].price : 0;
-        const bPrice =
-          b.variants && b.variants.length > 0 ? b.variants[0].price : 0;
+        const aPrice = a.variants?.[0]?.price || 0;
+        const bPrice = b.variants?.[0]?.price || 0;
         return aPrice - bPrice;
       });
     } else if (priceFilterOption === "desc") {
       filtered.sort((a, b) => {
-        const aPrice =
-          a.variants && a.variants.length > 0 ? a.variants[0].price : 0;
-        const bPrice =
-          b.variants && b.variants.length > 0 ? b.variants[0].price : 0;
+        const aPrice = a.variants?.[0]?.price || 0;
+        const bPrice = b.variants?.[0]?.price || 0;
         return bPrice - aPrice;
       });
     } else if (priceFilterOption === "newest") {
-      // Sorting by newest may require an updatedAt property
       filtered.sort((a, b) => {
-        const dateA = new Date(a.updatedAt || 0).getTime();
-        const dateB = new Date(b.updatedAt || 0).getTime();
-        return dateB - dateA; // Descending order
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
       });
+    }
+
+    // Reverse the list if isReversed is true
+    if (isReversed) {
+      filtered.reverse();
     }
 
     return filtered;
   };
+
   const filteredProducts = Array.isArray(products)
     ? products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())

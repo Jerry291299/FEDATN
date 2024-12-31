@@ -106,7 +106,6 @@ const Add = () => {
 
   const onFinish = async (values: any) => {
     setLoading(true);
-
     try {
       const imageUrls = await uploadImages(files);
 
@@ -136,9 +135,15 @@ const Add = () => {
       };
 
       // Call the service to add the product with variants
-      await addProduct(payload);
-      showNotification("success", "Thành công", "Thêm sản phẩm thành công!");
-      navigate("/admin/dashboard");
+      const response = await addProduct(payload);
+      
+      if (response?.status === 200) {
+        showNotification("success", "Thành công", "Thêm sản phẩm thành công!");
+        navigate("/admin/dashboard");
+      } else {
+        showNotification("error", "Lỗi", "Không thể thêm sản phẩm, vui lòng thử lại!");
+      }
+
       form.resetFields();
       setFiles([]);
       setPreviews([]);
@@ -153,7 +158,8 @@ const Add = () => {
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
   const removeImage = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
