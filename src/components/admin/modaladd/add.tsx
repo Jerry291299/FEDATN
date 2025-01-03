@@ -7,6 +7,7 @@ import { upload } from "../../../service/upload";
 import LoadingComponent from "../../Loading";
 import { getAllMaterials } from "../../../service/material";
 import { useNavigate } from "react-router-dom";
+
 type Variant = {
   size: string;
   quantity: number;
@@ -24,6 +25,7 @@ const Add = () => {
   const [variants, setVariants] = useState<Variant[]>([
     { size: "", quantity: 0, price: 0, discount: undefined },
   ]);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
   const navigate = useNavigate();
   const showNotification = (
     type: "success" | "error",
@@ -109,10 +111,29 @@ const Add = () => {
     try {
       const imageUrls = await uploadImages(files);
 
-      // Validate variants before sending
+      //Xác thực các biến thể trước khi gửi
       const validVariants = variants.filter(
         (variant) => variant.size && variant.quantity > 0 && variant.price > 0
       );
+
+      // Kiểm tra kích thước trùng lặp
+      const sizeSet = new Set();
+      const duplicateSizes = validVariants.filter((variant) => {
+        if (sizeSet.has(variant.size)) {
+          return true;
+        }
+        sizeSet.add(variant.size);
+        return false;
+      });
+
+      if (duplicateSizes.length > 0) {
+        showNotification(
+          "error",
+          "Lỗi",
+          "Kích thước phải là duy nhất cho từng biến thể!"
+        );
+        return;
+      }
 
       if (validVariants.length === 0) {
         showNotification(
@@ -130,9 +151,10 @@ const Add = () => {
         img: imageUrls,
         categoryID: values.category,
         materialID: values.material,
-        variants: validVariants, // Send valid variants
+        variants: validVariants, // Gửi các biến thể hợp lệ
         status: true,
       };
+
 
       // Call the service to add the product with variants
       const response = await addProduct(payload);
@@ -143,6 +165,7 @@ const Add = () => {
       } else {
         showNotification("error", "Lỗi", "Không thể thêm sản phẩm, vui lòng thử lại!");
       }
+
 
       form.resetFields();
       setFiles([]);
@@ -166,6 +189,15 @@ const Add = () => {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const calculateTotalPrice = () => {
+    const total = variants.reduce((acc, variant) => {
+      const discountAmount = variant.discount || 0;
+      const effectivePrice = variant.price - discountAmount;
+      return acc + (effectivePrice > 0 ? effectivePrice : 0) * variant.quantity;
+    }, 0);
+    setTotalPrice(total);
+  };
+
   const handleVariantChange = (
     index: number,
     field: keyof Variant,
@@ -182,6 +214,7 @@ const Add = () => {
     }
 
     setVariants(updatedVariants);
+    calculateTotalPrice(); // Tính tổng bất cứ khi nào một biến thể thay đổi
   };
 
   const addVariant = () => {
@@ -431,8 +464,8 @@ const Add = () => {
                 <Form.Item name={`discount-${index}`} className="w-1/4">
                   <Input
                     type="number"
-                    placeholder="Giảm giá (nếu có)"
-                    value={variant.discount}
+                    placeholder="Giảm giá (VND)"
+                    value={variant.discount || 0}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (value === "" || /^[0-9]*$/.test(value)) {
@@ -445,6 +478,11 @@ const Add = () => {
                     className="p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600"
                   />
                 </Form.Item>
+                {/* ... existing JSX ... */}
+                {/* <div className="mt-6 text-lg font-semibold text-gray-800">
+                  Tổng giá: {totalPrice.toLocaleString()} VND
+                </div> */}
+                {/* ... existing JSX ... */}
 
                 <button
                   type="button"

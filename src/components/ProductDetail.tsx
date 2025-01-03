@@ -88,7 +88,7 @@ const ProductDetail = () => {
   };
 
   const calculateTotalQuantity = (
-    variants: IVariant[] =[],
+    variants: IVariant[] = [],
     selectedVariantIndex: number | null
   ): number => {
     if (!variants || selectedVariantIndex === null) return 0;
@@ -163,13 +163,28 @@ const ProductDetail = () => {
 
               <div className="my-4">
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-semibold text-black-600">
+                  <span className="text-xl font-semibold text-red-600">
+                    {"Giảm giá : "}
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     }).format(
                       product.variants && selectedVariant !== null
-                        ? product.variants[selectedVariant].price
+                        ? product.variants[selectedVariant].discount || 0 // Use discount if available
+                        : 0
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-baseline">
+                  <span className="text-2xl font-semibold text-black-600">
+                  {"Giá  : "}
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(
+                      product.variants && selectedVariant !== null
+                        ? product.variants[selectedVariant].price -
+                            (product.variants[selectedVariant].discount || 0) // Calculate total
                         : 0
                     )}
                   </span>

@@ -20,7 +20,7 @@ const ProductUpdate = () => {
   const [product, setProduct] = useState<Iproduct | null>(null);
   const [variants, setVariants] = useState<IVariant[]>([]); // State for variants
   const navigate = useNavigate();
-
+  const [totalPrice, setTotalPrice] = useState<number>(0);
   const showNotification = (
     type: "success" | "error",
     title: string,
@@ -134,6 +134,14 @@ const ProductUpdate = () => {
   const removeVariant = (index: number) => {
     setVariants((prev) => prev.filter((_, i) => i !== index));
   };
+  const calculateTotalPrice = () => {
+    const total = variants.reduce((acc, variant) => {
+      const discountAmount = variant.discount || 0;
+      const effectivePrice = variant.price - discountAmount;
+      return acc + (effectivePrice > 0 ? effectivePrice : 0) * variant.quantity;
+    }, 0);
+    setTotalPrice(total);
+  };
 
   const handleVariantChange = (
     index: number,
@@ -141,9 +149,21 @@ const ProductUpdate = () => {
     value: string | number | undefined // Chấp nhận các loại có thể
   ) => {
     const newVariants: IVariant[] = [...variants];
-    // Kiểm tra loại của key và gán giá trị tương ứng
+
+    // Cập nhật biến thể
     if (key === "size" && typeof value === "string") {
       newVariants[index][key] = value as IVariant["size"];
+
+      // Kiểm tra kích thước trùng lặp
+      const sizes = newVariants.map((variant) => variant.size);
+      if (sizes.filter((size) => size === value).length > 1) {
+        showNotification(
+          "error",
+          "Lỗi",
+          "Kích thước này đã tồn tại trong các biến thể khác!"
+        );
+        return; //Thoát nếu trùng lặp
+      }
     } else if (key === "quantity" && typeof value === "number") {
       newVariants[index][key] = value as IVariant["quantity"];
     } else if (key === "price" && typeof value === "number") {
@@ -154,11 +174,26 @@ const ProductUpdate = () => {
     ) {
       newVariants[index][key] = value as IVariant["discount"];
     }
+
     setVariants(newVariants);
+    calculateTotalPrice(); // Tính tổng bất cứ khi nào một biến thể thay đổi
   };
 
   const onFinish = async (values: any) => {
     setLoading(true);
+
+    // Check for duplicate sizes before proceeding
+    const sizes = variants.map((variant) => variant.size);
+    const hasDuplicates = sizes.length !== new Set(sizes).size;
+    if (hasDuplicates) {
+      showNotification(
+        "error",
+        "Lỗi",
+        "Có kích thước trùng lặp trong các biến thể!"
+      );
+      setLoading(false);
+      return; // Exit if duplicate
+    }
 
     try {
       const newImageUrls = await uploadImages(files);
@@ -172,7 +207,7 @@ const ProductUpdate = () => {
         categoryID: values.category,
         materialID: values.material,
         status: true,
-        variants, // Include variants in the payload
+        variants,
       };
 
       await updateProduct(id, payload);
@@ -428,7 +463,7 @@ const ProductUpdate = () => {
               type="submit"
               className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
             >
-              Thêm mới sản phẩm
+             Cập nhật sản phẩm
             </button>
           </div>
         </Form>
