@@ -1,6 +1,7 @@
 import React from "react";
 import { axiosservice } from "../config/API";
 import { IVariant, IProductLite } from "../interface/products";
+import axios from "axios";
 
 export const getAllproducts = async ({
   limit = 10,
@@ -34,17 +35,20 @@ export const getProductByID = async (id?: string) => {
   }
 };
 
-export const addProduct = async (product: IProductLite) => {
+export const addProduct = async (payload: any) => {
   try {
-    const { data } = await axiosservice.post("product/add", product);
-    return data;
+    const response = await axios.post("http://localhost:28017/product/add", payload);
+    return response.data; // Chắc chắn trả về data để xử lý ở client
   } catch (error) {
-    console.log(error);
+    console.error("Error adding product:", error);
+    throw error; // Ném lỗi ra ngoài để xử lý trong component
   }
 };
 
+
 export const updateProduct = async (id?: string, product?: IProductLite) => {
   try {
+    const { createdAt, updatedAt, ...productData } = product || {};
     const { data } = await axiosservice.put(`product/${id}`, product);
     return data;
   } catch (error) {
@@ -93,4 +97,17 @@ export const getProductsByCategory = async (categoryId: string) => {
 export const calculateTotalQuantity = (variants?: IVariant[]): number => {
   if (!variants) return 0;
   return variants.reduce((total, variant) => total + variant.quantity, 0);
+};
+// service/products.ts
+export const checkProductExistence = async (masp: string, name: string) => {
+  try {
+    const response = await fetch(
+      `/api/products/check-existence?masp=${masp}&name=${name}`
+    );
+    const data = await response.json();
+    return data; // Trả về true nếu tồn tại, false nếu không tồn tại
+  } catch (error) {
+    console.error("Error checking product existence:", error);
+    return { exists: false }; // Mặc định là không tồn tại
+  }
 };
