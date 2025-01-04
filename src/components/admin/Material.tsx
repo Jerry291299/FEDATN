@@ -26,7 +26,7 @@ const ListMaterial = (props: Props) => {
       try {
         setLoading(true);
         const data = await getAllMaterials();
-        setMaterial(data);
+        setMaterial(data.reverse());
       } catch (error) {
         console.error(error);
       } finally {

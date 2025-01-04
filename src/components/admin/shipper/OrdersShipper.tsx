@@ -20,7 +20,7 @@ const OrdersShipper = (props: Props) => {
         const response = await axios.get<IOrderShipper[]>(
           "http://localhost:28017/orders-list"
         );
-        setOrders(response.data);
+        setOrders((response.data).reverse());
       } catch (err) {
         setError("Không thể tải danh sách đơn hàng");
         console.error("Error fetching orders:", err);
