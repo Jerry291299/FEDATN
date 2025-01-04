@@ -91,6 +91,7 @@ function App() {
             <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
+            
             <Route path="tintuc" element={<DashboardNews />} />
             {/* <Route path="dashboard/update/:id" Component={Update}></Route> */}
             <Route path="dashboard/update/:id" Component={Update}></Route>
