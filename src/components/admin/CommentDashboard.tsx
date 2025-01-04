@@ -37,7 +37,7 @@ const CommentDashboard = () => {
       allComments.sort((a, b) =>
         dayjs(b.createdAt).isBefore(dayjs(a.createdAt)) ? 1 : -1
       );
-      setComments(allComments);
+      setComments(allComments.reverse());
     };
     fetchComments();
   }, []);

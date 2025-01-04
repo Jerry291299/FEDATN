@@ -27,7 +27,7 @@ const Users = (props: Props) => {
       try {
         setLoading(true);
         const data = await getAllusersAccount();
-        setUsers(data);
+        setUsers(data.reverse());
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {

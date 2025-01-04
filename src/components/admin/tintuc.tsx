@@ -18,7 +18,7 @@ const DashboardNews = (props: Props) => {
     try {
       setLoading(true);
       const data = await getAllPosts();
-      setNews(data || []);
+      setNews((data || []).reverse());
     } catch (error) {
       console.error("Error fetching news:", error);
       message.error("Lỗi khi tải danh sách tin tức.");

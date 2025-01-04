@@ -26,7 +26,7 @@ const Listcategory = (props: Props) => {
       try {
         setLoading(true);
         const data = await getAllCategories();
-        setCategory(data);
+        setCategory(data.reverse());
       } catch (error) {
         console.error(error);
       } finally {
