@@ -29,6 +29,7 @@ const Order = (props: Props) => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
+    confirmed: "Đã xác nhận", // Add this line
   };
 
   const formatCurrency = (value: any) => {
@@ -111,7 +112,7 @@ const Order = (props: Props) => {
       }
   
       const updatedOrder = response.data; // Lấy thông tin đơn hàng đã cập nhật từ phản hồi
-  
+
       // Cập nhật trạng thái trong danh sách đơn hàng mà không cần phải hiển thị lại modal confirm
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
@@ -128,7 +129,6 @@ const Order = (props: Props) => {
             : order
         )
       );
-      window.location.reload();
       setIsModalVisible(false); // Đóng modal
     } catch (error) {
       console.error("Error cancelling order:", error);
@@ -137,8 +137,45 @@ const Order = (props: Props) => {
       );
     }
   };
-  
 
+  const handleConfirmOrder = async (orderId: string) => {
+    const confirm = window.confirm("Bạn có chắc chắn muốn xác nhận đơn hàng này?");
+    if (!confirm) return;
+  
+    setLoading(true); // Set loading state
+  
+    try {
+      const response = await axiosservice.post(`/api/orders/${orderId}/confirm`, {
+        confirmedBy: 'YourUserID' // Replace 'YourUserID' with the actual user ID or relevant information
+      });
+  
+      if (response.status !== 200) {
+        throw new Error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
+      }
+  
+      const updatedOrder = response.data.order; // Access the updated order from the response
+  
+      // Update the status of the confirmed order
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === updatedOrder._id
+            ? {
+                ...order,
+                status: "confirmed", // Change this to 'confirmed'
+              }
+            : order
+        )
+      );
+      alert("Đơn hàng đã được xác nhận thành công!");
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      alert(
+        "Rất tiếc, không thể xác nhận đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng."
+      );
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
   const handleCancel = () => {
     setIsModalVisible(false); // Close the modal
     setCancelReason(""); // Clear the reason
@@ -221,13 +258,22 @@ const Order = (props: Props) => {
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="flex gap-2">
                           {order.status === "pending" && (
-                            <button
-                              onClick={() => handleCancelOrder(order._id)}
-                              className="flex items-center px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                            >
-                              <CloseCircleOutlined className="mr-1" />
-                              Hủy
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleCancelOrder(order._id)}
+                                className="flex items-center px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                              >
+                                <CloseCircleOutlined className="mr-1" />
+                                Hủy
+                              </button>
+                              <button
+                                onClick={() => handleConfirmOrder(order._id)} // Add the confirm button
+                                className="flex items-center px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                              >
+                                <CheckCircleOutlined className="mr-1" />
+                                Xác nhận
+                              </button>
+                            </>
                           )}
                           <button
                             onClick={() => setSelectedOrder(order)}
@@ -273,54 +319,53 @@ const Order = (props: Props) => {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded shadow-md w-1/2">
-      <h2 className="text-2xl font-semibold mb-4">Chi tiết đơn hàng</h2>
-      <p><strong>Mã đơn: </strong>{selectedOrder._id}</p>
-      <p><strong>Ngày đặt: </strong>{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
-      <p><strong>Thanh toán: </strong>{statusMapping[selectedOrder.paymentstatus]}</p>
-      <p><strong>Trạng thái: </strong>{statusMapping[selectedOrder.status]}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-md w-1/2">
+            <h2 className="text-2xl font-semibold mb-4">Chi tiết đơn hàng</h2>
+            <p><strong>Mã đơn: </strong>{selectedOrder._id}</p>
+            <p><strong>Ngày đặt: </strong>{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+            <p><strong>Thanh toán: </strong>{statusMapping[selectedOrder.paymentstatus]}</p>
+            <p><strong>Trạng thái: </strong>{statusMapping[selectedOrder.status]}</p>
 
-      {selectedOrder.status === "cancelled" && (
-        <div className="mt-4">
-          <strong>Lý do hủy: </strong>
-          <p>{selectedOrder.cancelReason?.reason || "Không có lý do"}</p>
+            {selectedOrder.status === "cancelled" && (
+              <div className="mt-4">
+                <strong>Lý do hủy: </strong>
+                <p>{selectedOrder.cancelReason?.reason || "Không có lý do"}</p>
+              </div>
+            )}
+
+            <p><strong>Sản phẩm:</strong></p>
+            <ul>
+              {selectedOrder.items.map((item, idx) => (
+                <li key={idx}>
+                  {item.name} ({item.quantity}) - {item.price.toLocaleString()} VND
+                </li>
+              ))}
+            </ul>
+
+            <p><strong>Tổng tiền: </strong>{selectedOrder.amount.toLocaleString()} VND</p>
+
+            {/* Display Customer Details */}
+            <div className="mt-4">
+              <h2 className="text-2xl font-semibold mb-4">Thông tin khách hàng</h2>
+              <p><strong>Khách hàng: </strong>{selectedOrder.customerDetails.name}</p>
+              <p><strong>Điện thoại: </strong>{selectedOrder.customerDetails.phone}</p>
+              <p><strong>Email: </strong>{selectedOrder.customerDetails.email}</p>
+              <p><strong>Địa chỉ: </strong>{selectedOrder.customerDetails.address}</p>
+              {selectedOrder.customerDetails.notes && (
+                <p><strong>Ghi chú: </strong>{selectedOrder.customerDetails.notes}</p>
+              )}
+            </div>
+
+            <button
+              onClick={closeModal}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded"
+            >
+              Đóng
+            </button>
+          </div>
         </div>
       )}
-
-      <p><strong>Sản phẩm:</strong></p>
-      <ul>
-        {selectedOrder.items.map((item, idx) => (
-          <li key={idx}>
-            {item.name} ({item.quantity}) - {item.price.toLocaleString()} VND
-          </li>
-        ))}
-      </ul>
-
-      <p><strong>Tổng tiền: </strong>{selectedOrder.amount.toLocaleString()} VND</p>
-
-      {/* Display Customer Details */}
-      <div className="mt-4">
-        <h2 className="text-2xl font-semibold mb-4">Thông tin khách hàng</h2>
-        <p><strong>Khách hàng: </strong>{selectedOrder.customerDetails.name}</p>
-        <p><strong>Điện thoại: </strong>{selectedOrder.customerDetails.phone}</p>
-        <p><strong>Email: </strong>{selectedOrder.customerDetails.email}</p>
-        <p><strong>Địa chỉ: </strong>{selectedOrder.customerDetails.address}</p>
-        {selectedOrder.customerDetails.notes && (
-          <p><strong>Ghi chú: </strong>{selectedOrder.customerDetails.notes}</p>
-        )}
-      </div>
-
-      <button
-        onClick={closeModal}
-        className="mt-4 px-4 py-2 bg-gray-500 text-white rounded"
-      >
-        Đóng
-      </button>
-    </div>
-  </div>
-)}
-
     </div>
   );
 };

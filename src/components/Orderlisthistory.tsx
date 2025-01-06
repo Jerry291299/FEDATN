@@ -24,6 +24,7 @@ const Orderlisthistory = () => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
+    confirmed: "Đã xác nhận", // Add this line
   };
 
   const paymentMethodMapping: { [key: string]: string } = {

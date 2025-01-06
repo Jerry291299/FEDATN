@@ -10,7 +10,10 @@ export interface IOrder {
     amount: number;
     status: string;
     paymentstatus: string;
+    
     createdAt: string;
+    confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
+    confirmedBy?: string; // Người xác nhận đơn hàng
     cancelReason:{
     reason: String , // Lý do hủy đơn
     canceledAt:  Date , // Thời điểm hủy
@@ -24,4 +27,4 @@ export interface IOrder {
       notes?: string;
       
     }
-}
+  }
