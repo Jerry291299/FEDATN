@@ -2,18 +2,32 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, message } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { IMaterial } from "../../../interface/material";
-import { getMaterialByID, updateMaterial } from "../../../service/material";
+import { getAllMaterials, getMaterialByID, updateMaterial } from "../../../service/material";
 
 type Props = {};
 
 const UpdateMaterial = (props: Props) => {
   const [name, setName] = useState<string>("");
-  const [material, setMaterial] = useState<IMaterial | null>(null);
+  const [materials, setMaterials] = useState<IMaterial[]>([]);
   const [messageApi] = message.useMessage();
 
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { id } = useParams();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllMaterials();
+        
+        setMaterials(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     const fetchMaterial = async () => {
@@ -34,6 +48,14 @@ const UpdateMaterial = (props: Props) => {
   const onFinish = async (values: any) => {
     try {
       const materialData = { ...values };
+
+      // same name material
+      const isExist = materials.find((material) => material.name === materialData.name.trim());
+      if (isExist) {
+        message.error("Tên vật liệu đã tồn tại! Vui lòng nhập lại");
+        return;
+      }
+      
       const updatedMaterial = await updateMaterial(id, materialData);
 
       if (updatedMaterial) {
