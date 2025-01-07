@@ -30,6 +30,20 @@ const Updatecategory = (props: Props) => {
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllCategories();
+
+        setCategorys(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+  useEffect(() => {
     const fetchCategory = async () => {
       try {
         const response = await getCategoryByID(id);
@@ -51,6 +65,15 @@ const Updatecategory = (props: Props) => {
   const onFinish = async (values: any) => {
     try {
       const categoryData = { ...values };
+
+      // same name category
+      const isExist = categorys.find(
+        (category) => category.name === categoryData.name.trim()
+      );
+      if (isExist) {
+        message.error("Tên danh mục đã tồn tại");
+        return;
+      }
 
       const updatedCategory = await updateCategory(id, categoryData);
 
