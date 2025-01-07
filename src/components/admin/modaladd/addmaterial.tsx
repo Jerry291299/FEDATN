@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { addMaterial } from "../../../service/material";
+import { addMaterial, getAllMaterials } from "../../../service/material";
 import { IMaterial } from "../../../interface/material";
 
 const AddMaterial = () => {
   const [messageApi, contextHolder] = message.useMessage(); // useMessage Hook
+  const [materials, setMaterials] = useState<IMaterial[]>([]);
+
   const navigate = useNavigate();
   const [form] = Form.useForm();
+
+  // Get material
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllMaterials();
+        
+        setMaterials(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const info = () => {
     messageApi.open({
@@ -19,6 +35,14 @@ const AddMaterial = () => {
   const onFinish = async (values: any) => {
     try {
       const payload = { ...values };
+
+       // same name material
+       const isExist = materials.find((material) => material.name === payload.name.trim());
+       if (isExist) {
+         messageApi.error("Tên chất liệu đã tồn tạo! Vui lòng nhập tên khác");
+         return;
+       }
+
       const material = await addMaterial(payload);
 
       if (material) {
