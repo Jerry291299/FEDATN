@@ -234,71 +234,75 @@ const OrdersShipper = (props: Props) => {
                     }).format(order.amount)}
                   </td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <span
-                        className={`px-4 py-2 text-sm font-semibold rounded-lg text-white ${
-                          order.status === "pending"
-                            ? "bg-yellow-500"
-                            : order.status === "in_progress"
-                            ? "bg-blue-500"
-                            : order.status === "delivered"
-                            ? "bg-green-500"
-                            : order.status === "cancelledOrder"
-                            ? "bg-red-500"
-                            : order.status === "failed"
-                            ? "bg-gray-500"
-                            : "bg-gray-400"
-                        }`}
-                      >
-                        {order.status === "pending"
-                          ? "Đang xử lý"
-                          : order.status === "in_progress"
-                          ? "Đang giao"
-                          : order.status === "delivered"
-                          ? "Đã giao"
-                          : order.status === "cancelledOrder"
-                          ? "Đã hủy"
-                          : order.status === "failed"
-                          ? "Thất bại"
-                          : "Thất bại"}
-                      </span>
-                    </div>
-                  </td>
+  <div className="flex items-center">
+    <span
+      className={`px-4 py-2 text-sm font-semibold rounded-lg text-white ${
+        order.status === "pending"
+          ? "bg-yellow-500"
+          : order.status === "packaging"
+          ? "bg-orange-500" // Màu cho trạng thái 'đóng gói'
+          : order.status === "in_progress"
+          ? "bg-blue-500"
+          : order.status === "delivered"
+          ? "bg-green-500"
+          : order.status === "cancelledOrder"
+          ? "bg-red-500"
+          : order.status === "failed"
+          ? "bg-gray-500"
+          : "bg-gray-400"
+      }`}
+    >
+      {order.status === "pending"
+        ? "Đang xử lý"
+        : order.status === "packaging"
+        ? "Đóng gói" // Hiển thị trạng thái 'đóng gói'
+        : order.status === "in_progress"
+        ? "Đang giao"
+        : order.status === "delivered"
+        ? "Đã giao"
+        : order.status === "cancelledOrder"
+        ? "Đã hủy"
+        : order.status === "failed"
+        ? "Thất bại"
+        : "Thất bại"}
+    </span>
+  </div>
+</td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
                     {order.paymentstatus === "chưa thanh toán"
                       ? "Chưa thanh toán"
                       : "Đã thanh toán"}
                   </td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
-                    {order.status === "pending" && (
-                      <button
-                        onClick={() => handleInProgressOrder(order._id)}
-                        className="bg-blue-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
-                      >
-                        Nhận đơn
-                      </button>
-                    )}
+  {order.status === "packaging" && ( // Hiển thị nút chỉ khi trạng thái là 'đóng gói'
+    <button
+      onClick={() => handleInProgressOrder(order._id)}
+      className="bg-blue-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"
+    >
+      Nhận đơn
+    </button>
+  )}
 
-                    {order.status === "in_progress" && (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleConfirmDelivery(order._id)}
-                          className="bg-green-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-green-600 hover:shadow-lg"
-                        >
-                          Giao thành công
-                        </button>
+  {order.status === "in_progress" && (
+    <div className="flex space-x-2">
+      <button
+        onClick={() => handleConfirmDelivery(order._id)}
+        className="bg-green-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-green-600 hover:shadow-lg"
+      >
+        Giao thành công
+      </button>
 
-                        {order.paymentMethod === "cash_on_delivery" && (
-                          <button
-                            onClick={() => handleFailedDelivery(order._id)}
-                            className="bg-red-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-red-600 hover:shadow-lg"
-                          >
-                            Giao thất bại
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </td>
+      {order.paymentMethod === "cash_on_delivery" && (
+        <button
+          onClick={() => handleFailedDelivery(order._id)}
+          className="bg-red-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-red-600 hover:shadow-lg"
+        >
+          Giao thất bại
+        </button>
+      )}
+    </div>
+  )}
+</td>
                 </tr>
               ))}
             </tbody>
