@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { addCategory } from "../../../service/category";
+import { addCategory, getAllCategories } from "../../../service/category";
 import { Icategory } from "../../../interface/category";
 
 type Props = {};
@@ -9,6 +9,7 @@ type Props = {};
 const Addcategory = (props: Props) => {
   const [name, setName] = useState<string>("");
   const [messageApi] = message.useMessage();
+  const [categorys, setCategorys] = useState<Icategory[]>([]);
 
   const Navigate = useNavigate();
   const [form] = Form.useForm();
@@ -21,9 +22,31 @@ const Addcategory = (props: Props) => {
     });
   };
 
+    // tên danh mục k đc trùng
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllCategories();
+
+        setCategorys(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const onFinish = async (values: any) => {
     try {
       const payload = { ...values };
+      // no name category
+      const isExist = categorys.find(
+        (category) => category.name === payload.name.trim()
+      );
+      if (isExist) {
+        message.error("Tên danh mục đã tồn tại");
+        return;
+      }
       const category = await addCategory(payload);
 
       if (category) {

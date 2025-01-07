@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, message, notification } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icategory } from "../../../interface/category";
-import { getCategoryByID, updateCategory } from "../../../service/category";
+import { getAllCategories, getCategoryByID, updateCategory } from "../../../service/category";
 
 type Props = {};
 
 const Updatecategory = (props: Props) => {
   const [name, setName] = useState<string>("");
-  const [category, setCategory] = useState<Icategory[]>([]);
+  const [categorys, setCategorys] = useState<Icategory[]>([]);
   const [messageApi] = message.useMessage();
 
   const Navigate = useNavigate();
@@ -28,6 +28,19 @@ const Updatecategory = (props: Props) => {
       placement: "topRight", // You can adjust the placement: 'topLeft', 'topRight', etc.
     });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllCategories();
+
+        setCategorys(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -51,6 +64,16 @@ const Updatecategory = (props: Props) => {
   const onFinish = async (values: any) => {
     try {
       const categoryData = { ...values };
+
+      // same name category
+      const isExist = categorys.find(
+        (category) => category.name === categoryData.name.trim()
+      );
+      if (isExist) {
+        message.error("Tên danh mục đã tồn tại");
+        return;
+      }
+
       const updatedCategory = await updateCategory(id, categoryData);
 
       if (updatedCategory) {
