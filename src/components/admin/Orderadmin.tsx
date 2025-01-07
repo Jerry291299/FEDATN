@@ -4,6 +4,7 @@ import { IOrder } from "../../interface/order";
 import { Pagination, Modal, Input } from "antd";
 import { NavLink } from "react-router-dom";
 import { CheckCircleOutlined, CloseCircleOutlined, EyeOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 interface Props {}
 
@@ -29,8 +30,10 @@ const Order = (props: Props) => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
-    confirmed: "Đã xác nhận", // Add this line
+    confirmed: "Đã xác nhận", // Đã thêm trạng thái này
+    packaging: "Đóng gói", // Thêm trạng thái "đóng gói"
   };
+  
 
   const formatCurrency = (value: any) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -146,32 +149,36 @@ const Order = (props: Props) => {
   
     try {
       const response = await axiosservice.post(`/api/orders/${orderId}/confirm`, {
-        confirmedBy: 'YourUserID' // Replace 'YourUserID' with the actual user ID or relevant information
+        confirmedBy: 'YourUserID' // Thay thế 'YourUserID' bằng ID người dùng thực tế
       });
   
       if (response.status !== 200) {
         throw new Error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
       }
   
-      const updatedOrder = response.data.order; // Access the updated order from the response
+      const updatedOrder = response.data.order; // Lấy đơn hàng đã cập nhật từ phản hồi
   
-      // Update the status of the confirmed order
+      // Cập nhật trạng thái đơn hàng đã xác nhận
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === updatedOrder._id
             ? {
                 ...order,
-                status: "confirmed", // Change this to 'confirmed'
+                status: "confirmed", // Cập nhật trạng thái thành 'đóng gói'
               }
             : order
         )
       );
+  
+      // Cập nhật trạng thái trong OrdersShipper
+      await axios.put(`http://localhost:28017/orders-list/${orderId}`, {
+        status: "packaging",
+      });
+  
       alert("Đơn hàng đã được xác nhận thành công!");
     } catch (error) {
       console.error("Error confirming order:", error);
-      alert(
-        "Rất tiếc, không thể xác nhận đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng."
-      );
+      alert("Rất tiếc, không thể xác nhận đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
     } finally {
       setLoading(false); // Reset loading state
     }
@@ -240,21 +247,23 @@ const Order = (props: Props) => {
                         {order.amount.toLocaleString()} VND
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
-                        <span
-                          className={`inline-block px-4 py-1 rounded text-white text-center whitespace-nowrap ${
-                            order.status === "pending"
-                              ? "bg-yellow-500"
-                              : order.status === "delivered"
-                              ? "bg-green-500"
-                              : order.status === "cancelled"
-                              ? "bg-red-500"
-                              : "bg-gray-400"
-                          }`}
-                          style={{ minWidth: "120px" }}
-                        >
-                          {statusMapping[order.status]}
-                        </span>
-                      </td>
+  <span
+    className={`inline-block px-4 py-1 rounded text-white text-center whitespace-nowrap ${
+      order.status === "pending"
+        ? "bg-yellow-500"
+        : order.status === "confirmed" // Cập nhật trạng thái 'đóng gói'
+        ? "bg-orange-500"
+        : order.status === "delivered"
+        ? "bg-green-500"
+        : order.status === "cancelled"
+        ? "bg-red-500"
+        : "bg-gray-400"
+    }`}
+    style={{ minWidth: "120px" }}
+  >
+    {statusMapping[order.status]}
+  </span>
+</td>
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="flex gap-2">
                           {order.status === "pending" && (
