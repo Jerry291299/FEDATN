@@ -19,6 +19,8 @@ const Order = (props: Props) => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [cancelReason, setCancelReason] = useState<string>("");
   const [orderIdToCancel, setOrderIdToCancel] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
   const itemsPerPage = 5;
 
   const statusMapping: { [key: string]: string } = {
@@ -157,6 +159,16 @@ const Order = (props: Props) => {
     }
   };
 
+  useEffect(() => {
+    const userData = sessionStorage.getItem("user");
+    if (userData) {
+      const { id } = JSON.parse(userData);
+      if (id) {
+        setUserId(id);
+      }
+    }
+  }, []); 
+
   const handleConfirmOrder = async (orderId: string) => {
     Modal.confirm({
       title: "Xác nhận đơn hàng",
@@ -168,8 +180,8 @@ const Order = (props: Props) => {
         setLoading(true);
   
         try {
-          const response = await axiosservice.post(`/api/orders/${orderId}/confirm`, {
-            confirmedBy: 'YourUserID',
+          const response = await axiosservice.post(`http://localhost:28017/api/orders/${orderId}/confirm`, {
+            confirmedBy: userId,
           });
   
           if (response.status !== 200) {
