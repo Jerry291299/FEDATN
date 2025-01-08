@@ -10,15 +10,6 @@ import phongngu from "./img/phongngu.jpeg";
 import phongan from "./img/phongan.jpeg";
 import noithattinhte from "./img/noithattinhte.jpeg";
 import { NavLink } from "react-router-dom";
-import sofa1 from "./img/sofa1.jpeg";
-import sofa2 from "./img/sofa2.jpeg";
-import sofa3 from "./img/sofa3.jpeg";
-import sofa4 from "./img/sofa4.jpeg";
-import sofa5 from "./img/sofa5.jpeg";
-import sofa6 from "./img/sofa6.jpeg";
-import battay1 from "./img/battay1.jpeg";
-import battay2 from "./img/battay2.jpeg";
-import toam from "./img/toamnguoitinhte.jpeg";
 import { Iproduct } from "../interface/products"; // Giả sử bạn đã định nghĩa interface Iproduct
 import { getAllproducts } from "../service/products"; // Hàm gọi API để lấy danh sách sản phẩm
 
@@ -43,12 +34,14 @@ const Content = (props: Props) => {
     };
     fetchData();
   }, []);
+
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length > maxLength) {
       return text.slice(0, maxLength) + "...";
     }
     return text;
   };
+
   return (
     <>
       <h2 className="font-bold text-[35px] text-center pt-[25px]">
@@ -69,7 +62,7 @@ const Content = (props: Props) => {
                 <img
                   src={product.img[0]}
                   alt={product.name}
-                  className="h-60 w-full object-cover transition-opacity duration-300 hover:opacity-90"
+                  className="h-60 w-full object-cover transition-opacity duration-300 hover:opacity-90 border border-gray-300 rounded-lg"
                 />
               </NavLink>
 
@@ -106,136 +99,159 @@ const Content = (props: Props) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mt-[50px]">
-        <div className="">
-          <div className="box1 relative text-center">
-            <img src={Sofa} alt="" className="object-cover w-full h-[670px]" />
-            <div className="w-full absolute top-[210px] left-0 text-center">
-              <p className="text-white text-[40px]">Sofa</p>
-            </div>
-          </div>
-        </div>
+  <div>
+    <div className="relative text-center">
+      <img
+        src={Sofa}
+        alt="Sofa"
+        className="w-full h-[350px] object-cover border border-gray-300 rounded-lg"
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <p className="text-white text-[40px]">Sofa</p>
+      </div>
+    </div>
+  </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <div className="box2 relative text-center flex-1">
-              <img src={banan} alt="" className="h-full object-cover" />
-              <div className="w-full absolute top-[110px] left-0 text-center">
-                <p className="text-white text-[20px]">Bàn ăn</p>
-              </div>
-            </div>
-            <div className="box2 relative text-center flex-1">
-              <img src={giuong} alt="" className="h-full object-cover" />
-              <div className="w-full absolute top-[110px] left-0 text-center">
-                <p className="text-white text-[20px]">Giường</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="box3 relative text-center flex-1">
-              <img src={armchair} alt="" className="h-full object-cover" />
-              <div className="w-full absolute top-[110px] left-0 text-center">
-                <p className="text-white text-[20px]">Armchair</p>
-              </div>
-            </div>
-            <div className="box3 relative text-center flex-1">
-              <img src={ghean} alt="" className="h-full object-cover" />
-              <div className="w-full absolute top-[110px] left-0 text-center">
-                <p className="text-white text-[20px]">Ghế ăn</p>
-              </div>
-            </div>
-          </div>
+  <div className="flex flex-col gap-4">
+    <div className="flex gap-4">
+      <div className="relative text-center flex-1">
+        <img
+          src={banan}
+          alt="Bàn ăn"
+          className="w-full h-[170px] object-cover border border-gray-300 rounded-lg"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="text-white text-[20px]">Bàn ăn</p>
         </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-4 pt-[40px] max-sm mx-auto bg-gray border border-black rounded-lg shadow-lg bg-gray-200">
-        <div className="">
-          <div className="box1 relative text-center">
-            <img
-              src={phongkhach}
-              alt=""
-              className="w-full object-cover h-[95%]"
-            />
-            <div className="w-full pt-0 left-0 text-center mt-[10px]">
-              <h2 className="text-3xl font-bold mb-4">
-                Không gian phòng khách
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Phòng khách là không gian chính của ngôi nhà, là nơi sum họp gia
-                đình.
-              </p>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]"
-              >
-                Mẫu thiết kế &rarr;
-              </a>
-            </div>
-          </div>
-          <div className="">
-            <img
-              src={phongngu}
-              alt=""
-              className="w-[75%] object-cover p-[45px]"
-            />
-            <div className="">
-              <h2 className="text-[20px] font-bold">Không gian phòng ngủ</h2>
-              <p className="text-gray-600 mb-6">
-                Những mẫu phòng ngủ của Nhà Xinh mang đến cảm giác ấm cúng, gần
-                gũi và thoải mái
-              </p>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]"
-              >
-                Mẫu phòng ngủ &rarr;
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="">
-          <div className="box1 relative text-center">
-            <img
-              src={trangtri}
-              alt=""
-              className="h-full object-cover w-[55%] float-right"
-            />
-            <div className="w-full pt-0 left-0 text-center mt-[10px] ">
-              <h2 className="text-[20px] font-bold">Đồ trang trí</h2>
-              <p className="text-gray-600 mb-6">
-                Mang lại những nguồn cảm hứng và nét sinh động cho không gian.
-              </p>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-700 font-semibold pt-[10px]"
-              >
-                Khám phá &rarr;
-              </a>
-            </div>
-          </div>
-          <div className="">
-            <img
-              src={phongan}
-              alt=""
-              className="h-full object-cover pt-[40px]"
-            />
-            <div className="">
-              <h2 className="text-[20px] font-bold">Không gian phòng ăn</h2>
-              <p className="text-gray-600 mb-6">
-                Một bữa ăn ngon luôn là mong ước của mỗi gia đình. Không gian
-                phòng ăn đóng vai trò rất quan trọng trong văn hóa Việt
-              </p>
-              <a
-                href="#"
-                className="text-gray-500 hover:text-gray-700 font-semibold"
-              >
-                Mẫu phòng ăn &rarr;
-              </a>
-            </div>
-          </div>
+      <div className="relative text-center flex-1">
+        <img
+          src={giuong}
+          alt="Giường"
+          className="w-full h-[170px] object-cover border border-gray-300 rounded-lg"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="text-white text-[20px]">Giường</p>
         </div>
       </div>
+    </div>
+
+    <div className="flex gap-4">
+      <div className="relative text-center flex-1">
+        <img
+          src={armchair}
+          alt="Armchair"
+          className="w-full h-[170px] object-cover border border-gray-300 rounded-lg"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="text-white text-[20px]">Armchair</p>
+        </div>
+      </div>
+      <div className="relative text-center flex-1">
+        <img
+          src={ghean}
+          alt="Ghế ăn"
+          className="w-full h-[170px] object-cover border border-gray-300 rounded-lg"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="text-white text-[20px]">Ghế ăn</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div className="grid grid-cols-2 gap-8 p-8 mx-auto rounded-lg shadow-lg">
+  <div className="flex flex-col items-center gap-6">
+    {/* Phòng khách */}
+    <div className="text-center">
+      <img
+        src={phongkhach}
+        alt="Phòng khách"
+        className="w-full h-[300px] object-cover border border-gray-300 rounded-lg"
+      />
+      <div className="mt-4">
+        <h2 className="text-3xl font-bold mb-2">Không gian phòng khách</h2>
+        <p className="text-gray-600 mb-4">
+          Phòng khách là không gian chính của ngôi nhà, là nơi sum họp gia đình.
+        </p>
+        <a
+          href="#"
+          className="text-gray-500 hover:text-gray-700 font-semibold"
+        >
+          Mẫu thiết kế &rarr;
+        </a>
+      </div>
+    </div>
+
+    {/* Phòng ngủ */}
+    <div className="text-center">
+      <img
+        src={phongngu}
+        alt="Phòng ngủ"
+        className="w-full h-[300px] object-cover border border-gray-300 rounded-lg"
+      />
+      <div className="mt-4">
+        <h2 className="text-xl font-bold">Không gian phòng ngủ</h2>
+        <p className="text-gray-600 mb-4">
+          Những mẫu phòng ngủ của Nhà Xinh mang đến cảm giác ấm cúng, gần gũi và thoải mái.
+        </p>
+        <a
+          href="#"
+          className="text-gray-500 hover:text-gray-700 font-semibold"
+        >
+          Mẫu phòng ngủ &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div className="flex flex-col items-center gap-6">
+    {/* Đồ trang trí */}
+    <div className="text-center">
+      <img
+        src={trangtri}
+        alt="Đồ trang trí"
+        className="w-full h-[300px] object-cover border border-gray-300 rounded-lg"
+      />
+      <div className="mt-4">
+        <h2 className="text-xl font-bold">Đồ trang trí</h2>
+        <p className="text-gray-600 mb-4">
+          Mang lại những nguồn cảm hứng và nét sinh động cho không gian.
+        </p>
+        <a
+          href="#"
+          className="text-gray-500 hover:text-gray-700 font-semibold"
+        >
+          Khám phá &rarr;
+        </a>
+      </div>
+    </div>
+
+    {/* Phòng ăn */}
+    <div className="text-center">
+      <img
+        src={phongan}
+        alt="Phòng ăn"
+        className="w-full h-[300px] object-cover border border-gray-300 rounded-lg"
+      />
+      <div className="mt-4">
+        <h2 className="text-xl font-bold">Không gian phòng ăn</h2>
+        <p className="text-gray-600 mb-4">
+          Một bữa ăn ngon luôn là mong ước của mỗi gia đình. Không gian phòng ăn đóng vai trò rất quan trọng trong văn hóa Việt.
+        </p>
+        <a
+          href="#"
+          className="text-gray-500 hover:text-gray-700 font-semibold"
+        >
+          Mẫu phòng ăn &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       <div className="grid grid-cols-2 pt-[100px]">
         <div className="">
@@ -243,9 +259,7 @@ const Content = (props: Props) => {
             Nội thất tinh tế
           </h2>
           <p className="text-center text-[25px] mb-[40px]">
-            Với kinh nghiệm hơn 24 năm trong hoàn thiện nội thất, Nhà Xinh mang
-            đến giải pháp toàn diện trong bao gồm thiết kế, trang trí và cung
-            cấp nội thất trọn gói.
+            Với kinh nghiệm hơn 24 năm trong hoàn thiện nội thất, Nhà Xinh mang đến giải pháp toàn diện trong bao gồm thiết kế, trang trí và cung cấp nội thất trọn gói.
           </p>
           <a
             href="#"
@@ -255,7 +269,7 @@ const Content = (props: Props) => {
           </a>
         </div>
         <div className="">
-          <img src={noithattinhte} alt="" className="w-full h-auto" />
+          <img src={noithattinhte} alt="" className="w-full h-auto border border-gray-300 rounded-lg" />
         </div>
       </div>
     </>
