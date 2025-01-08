@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { axiosservice } from "../../config/API";
 import { IOrder } from "../../interface/order";
-import { Pagination, Modal, Input } from "antd";
+import { Pagination, Modal, Input, notification } from "antd";
 import { NavLink } from "react-router-dom";
 import { CheckCircleOutlined, CloseCircleOutlined, EyeOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -15,10 +15,10 @@ const Order = (props: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null); // Track selected order for details
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false); // Modal visibility
-  const [cancelReason, setCancelReason] = useState<string>(""); // Cancellation reason
-  const [orderIdToCancel, setOrderIdToCancel] = useState<string | null>(null); // Selected order ID for cancellation
+  const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [cancelReason, setCancelReason] = useState<string>("");
+  const [orderIdToCancel, setOrderIdToCancel] = useState<string | null>(null);
   const itemsPerPage = 5;
 
   const statusMapping: { [key: string]: string } = {
@@ -30,11 +30,10 @@ const Order = (props: Props) => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
-    confirmed: "Đã xác nhận", // Đã thêm trạng thái này
-    packaging: "Đóng gói", // Thêm trạng thái "đóng gói"
+    confirmed: "Đã xác nhận",
+    packaging: "Đóng gói",
   };
   
-
   const formatCurrency = (value: any) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -42,28 +41,45 @@ const Order = (props: Props) => {
     }).format(value);
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosservice.get("/orders");
-        const sortedOrders = response.data.sort((a: IOrder, b: IOrder) => {
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        });
-        setOrders(sortedOrders);
-        setFilteredOrders(sortedOrders);
-        setLoading(false);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách đơn hàng:", error);
-        setError("Không thể tải dữ liệu");
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosservice.get("/orders");
+      const sortedOrders = response.data.sort((a: IOrder, b: IOrder) => {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+      setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders);
+      setLoading(false);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+      setError("Không thể tải dữ liệu");
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
+
+    // Tạo interval để tự động cập nhật mỗi 15 giây
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 10000);
+
+    // Dọn dẹp interval khi component bị hủy
+    return () => clearInterval(interval);
   }, []);
+
+  const openNotification = (type: 'success' | 'error', description: string) => {
+    notification[type]({
+      message: type === 'success' ? 'Xác nhận đơn hàng thành công!' : 'Có lỗi xảy ra!',
+      description,
+      placement: 'topRight',
+      duration: 2,
+    });
+  };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
@@ -92,8 +108,8 @@ const Order = (props: Props) => {
       return;
     }
 
-    setOrderIdToCancel(orderId); // Set the order ID for cancellation
-    setIsModalVisible(true); // Show the modal
+    setOrderIdToCancel(orderId);
+    setIsModalVisible(true);
   };
 
   const handleOk = async () => {
@@ -106,7 +122,7 @@ const Order = (props: Props) => {
       const response = await axiosservice.post(
         `http://localhost:28017/api/orders/${orderIdToCancel}/cancel`,
         {
-          reason: cancelReason, // Gửi lý do hủy đơn hàng
+          reason: cancelReason,
         }
       );
   
@@ -114,7 +130,7 @@ const Order = (props: Props) => {
         throw new Error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
       }
   
-      const updatedOrder = response.data; // Lấy thông tin đơn hàng đã cập nhật từ phản hồi
+      const updatedOrder = response.data;
 
       // Cập nhật trạng thái trong danh sách đơn hàng mà không cần phải hiển thị lại modal confirm
       setOrders((prevOrders) =>
@@ -122,7 +138,7 @@ const Order = (props: Props) => {
           order._id === updatedOrder._id
             ? {
                 ...order,
-                status: updatedOrder.status, // Cập nhật trạng thái của đơn hàng
+                status: updatedOrder.status,
                 cancelReason: {
                   reason: updatedOrder.cancelReason.reason,
                   canceledAt: updatedOrder.cancelReason.canceledAt,
@@ -132,7 +148,7 @@ const Order = (props: Props) => {
             : order
         )
       );
-      setIsModalVisible(false); // Đóng modal
+      setIsModalVisible(false);
     } catch (error) {
       console.error("Error cancelling order:", error);
       alert(
@@ -142,55 +158,61 @@ const Order = (props: Props) => {
   };
 
   const handleConfirmOrder = async (orderId: string) => {
-    const confirm = window.confirm("Bạn có chắc chắn muốn xác nhận đơn hàng này?");
-    if (!confirm) return;
+    Modal.confirm({
+      title: "Xác nhận đơn hàng",
+      content: "Bạn có chắc chắn muốn xác nhận đơn hàng này?",
+      okText: "Có",
+      okType: "primary",
+      cancelText: "Không",
+      onOk: async () => {
+        setLoading(true);
   
-    setLoading(true); // Set loading state
+        try {
+          const response = await axiosservice.post(`/api/orders/${orderId}/confirm`, {
+            confirmedBy: 'YourUserID',
+          });
   
-    try {
-      const response = await axiosservice.post(`/api/orders/${orderId}/confirm`, {
-        confirmedBy: 'YourUserID' // Thay thế 'YourUserID' bằng ID người dùng thực tế
-      });
+          if (response.status !== 200) {
+            throw new Error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
+          }
   
-      if (response.status !== 200) {
-        throw new Error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
-      }
-  
-      const updatedOrder = response.data.order; // Lấy đơn hàng đã cập nhật từ phản hồi
-  
-      // Cập nhật trạng thái đơn hàng đã xác nhận
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === updatedOrder._id
-            ? {
-                ...order,
-                status: "confirmed", // Cập nhật trạng thái thành 'đóng gói'
-              }
-            : order
-        )
-      );
-  
-      // Cập nhật trạng thái trong OrdersShipper
-      await axios.put(`http://localhost:28017/orders-list/${orderId}`, {
-        status: "packaging",
-      });
-  
-      alert("Đơn hàng đã được xác nhận thành công!");
-    } catch (error) {
-      console.error("Error confirming order:", error);
-      alert("Rất tiếc, không thể xác nhận đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.");
-    } finally {
-      setLoading(false); // Reset loading state
-    }
+          const updatedOrder = response.data.order;
+
+          setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === updatedOrder._id
+                ? {
+                    ...order,
+                    status: "confirmed",
+                  }
+                : order
+            )
+          );
+
+          await axios.put(`http://localhost:28017/orders-list/${orderId}`, {
+            status: "packaging",
+          });
+
+          openNotification('success', 'Đơn hàng đã được xác nhận thành công!');
+          window.location.reload();
+        } catch (error) {
+          console.error("Error confirming order:", error);
+          openNotification('error', 'Rất tiếc, không thể xác nhận đơn hàng. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ khách hàng.');
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
+
   const handleCancel = () => {
-    setIsModalVisible(false); // Close the modal
-    setCancelReason(""); // Clear the reason
-    setOrderIdToCancel(null); // Clear the order ID
+    setIsModalVisible(false);
+    setCancelReason("");
+    setOrderIdToCancel(null);
   };
 
   const closeModal = () => {
-    setSelectedOrder(null); // Close the modal by clearing the selected order
+    setSelectedOrder(null);
   };
 
   return (
@@ -247,23 +269,23 @@ const Order = (props: Props) => {
                         {order.amount.toLocaleString()} VND
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
-  <span
-    className={`inline-block px-4 py-1 rounded text-white text-center whitespace-nowrap ${
-      order.status === "pending"
-        ? "bg-yellow-500"
-        : order.status === "confirmed" // Cập nhật trạng thái 'đóng gói'
-        ? "bg-orange-500"
-        : order.status === "delivered"
-        ? "bg-green-500"
-        : order.status === "cancelled"
-        ? "bg-red-500"
-        : "bg-gray-400"
-    }`}
-    style={{ minWidth: "120px" }}
-  >
-    {statusMapping[order.status]}
-  </span>
-</td>
+                        <span
+                          className={`inline-block px-4 py-1 rounded text-white text-center whitespace-nowrap ${
+                            order.status === "pending"
+                              ? "bg-yellow-500"
+                              : order.status === "confirmed"
+                              ? "bg-orange-500"
+                              : order.status === "delivered"
+                              ? "bg-green-500"
+                              : order.status === "cancelled"
+                              ? "bg-red-500"
+                              : "bg-gray-400"
+                          }`}
+                          style={{ minWidth: "120px" }}
+                        >
+                          {statusMapping[order.status]}
+                        </span>
+                      </td>
                       <td className="border border-gray-300 px-4 py-2">
                         <div className="flex gap-2">
                           {order.status === "pending" && (
@@ -276,7 +298,7 @@ const Order = (props: Props) => {
                                 Hủy
                               </button>
                               <button
-                                onClick={() => handleConfirmOrder(order._id)} // Add the confirm button
+                                onClick={() => handleConfirmOrder(order._id)}
                                 className="flex items-center px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                               >
                                 <CheckCircleOutlined className="mr-1" />
@@ -354,7 +376,6 @@ const Order = (props: Props) => {
 
             <p><strong>Tổng tiền: </strong>{selectedOrder.amount.toLocaleString()} VND</p>
 
-            {/* Display Customer Details */}
             <div className="mt-4">
               <h2 className="text-2xl font-semibold mb-4">Thông tin khách hàng</h2>
               <p><strong>Khách hàng: </strong>{selectedOrder.customerDetails.name}</p>
