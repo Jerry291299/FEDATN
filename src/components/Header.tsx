@@ -10,7 +10,7 @@ import iconarrow from "./icons/down-arrow_5082780.png";
 
 const Header = () => {
   const [user, setUser] = useState<{
-    info: { role: string; name:string; email: string; id: string };
+    info: { role: string; name: string; email: string; id: string };
     id: string;
   } | null>(null);
   const [categories, setCategories] = useState<Icategory[]>([]);
@@ -75,10 +75,20 @@ const Header = () => {
     <div className="container mx-auto w-full">
       <div className="up py-[15px] flex justify-between font-medium pr-[10px]">
         <div className="trái flex">
-          <p className="border-r-2 border-black px-[20px]">
-            Số điện thoại: 0344357227
-          </p>
-          <p className="px-[20px]">Email: Beautifullhouse@gmail.com</p>
+          <div className="flex items-center px-[20px]">
+            <span className="border-black h-full mr-[10px]"></span>
+            <p className="italic hover:scale-110 transition-transform duration-300">
+              Số điện thoại: 0344357227
+            </p>
+          </div>
+
+          <div className="flex items-center px-[20px]">
+            <span className=" border-black h-full mr-[10px]"></span>
+            <p className="italic hover:scale-110 transition-transform duration-300">
+              Email: Beautifullhouse@gmail.com
+            </p>
+          </div>
+
         </div>
         <div className="phải flex gap-3">
           {user ? (
@@ -95,7 +105,7 @@ const Header = () => {
               </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
-                  {(user.info.role === "admin" ||user.info.role === "shipper") && (
+                  {(user.info.role === "admin" || user.info.role === "shipper") && (
                     <li className="hover:bg-gray-100">
                       <Link
                         to={user?.info?.role === "admin" ? "/admin/thongke" : "/shipper"}
@@ -107,28 +117,28 @@ const Header = () => {
                     </li>
                   )}
                   {(user.info.role === "user" ||
-                    user.info.role === "admin" ||user.info.role === "shipper") && (
-                    <>
-                      <li className="hover:bg-gray-100">
-                        <Link
-                          to={`/Cart/${user.id}`}
-                          className="block px-4 py-2"
-                          onClick={() => setIsSubMenuOpen(false)}
-                        >
-                          Xem Giỏ hàng
-                        </Link>
-                      </li>
-                      <li className="hover:bg-gray-100">
-                        <Link
-                          to="/donhang"
-                          className="block px-4 py-2"
-                          onClick={() => setIsSubMenuOpen(false)}
-                        >
-                          Xem Đơn hàng
-                        </Link>
-                      </li>
-                    </>
-                  )}
+                    user.info.role === "admin" || user.info.role === "shipper") && (
+                      <>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to={`/Cart/${user.id}`}
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Giỏ hàng
+                          </Link>
+                        </li>
+                        <li className="hover:bg-gray-100">
+                          <Link
+                            to="/donhang"
+                            className="block px-4 py-2"
+                            onClick={() => setIsSubMenuOpen(false)}
+                          >
+                            Xem Đơn hàng
+                          </Link>
+                        </li>
+                      </>
+                    )}
                   <li className="hover:bg-gray-100">
                     <button
                       onClick={() => {
@@ -174,22 +184,34 @@ const Header = () => {
         <img className="h-24 pl-[40px]" src={logo} alt="" />
         <div className="right flex pl-[30px]">
           <div className="text flex gap-14 pt-[25px] pr-[100px] text-lg">
-            <Link to="/" className="hover:border-b-2 border-black">
+            <Link
+              to="/"
+              className="hover:scale-110 transition-transform duration-300 border-black hover:border-b-2 uppercase inline-block"
+            >
               Trang chủ
             </Link>
-            
-            <NavLink to={"/products"} className="hover:border-b-2 border-black">
+
+            <NavLink
+              to="/products"
+              className="hover:scale-110 transition-transform duration-300 border-black hover:border-b-2 uppercase inline-block"
+            >
               Sản phẩm
             </NavLink>
-            <NavLink to={"/tintuc"} className="hover:border-b-2 border-black">
+
+            <NavLink
+              to="/tintuc"
+              className="hover:scale-110 transition-transform duration-300 border-black hover:border-b-2 uppercase inline-block"
+            >
               Tin tức
             </NavLink>
+
             <NavLink
-              to={"/gioithieu"}
-              className="hover:border-b-2 border-black"
+              to="/gioithieu"
+              className="hover:scale-110 transition-transform duration-300 border-black hover:border-b-2 uppercase inline-block"
             >
               Giới thiệu
             </NavLink>
+
           </div>
 
           <div className="search px-[30px] pt-[23px]">
