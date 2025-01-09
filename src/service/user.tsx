@@ -55,7 +55,16 @@ export const deactivateUser = async (_id: string, reason: string) => {
     throw new Error("Không thể vô hiệu hóa người dùng. Vui lòng thử lại sau.");
   }
 };
-
+export const getDeactivationHistory = async () => {
+  try {
+    const response = await fetch('/api/user/deactivation-history');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching deactivation history:", error);
+    throw error;
+  }
+};
 
 export const activateUser = async (_id: string) => {
   try {

@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Popconfirm, message, Pagination, Input, Modal,Select } from "antd";
-import {
-  getAllusersAccount,
-  activateUser,
-  deactivateUser,
-} from "../../service/user";
+import { Popconfirm, message, Pagination, Input, Modal, Select, Table, Button } from "antd";
+import { getAllusersAccount, activateUser, deactivateUser, getDeactivationHistory } from "../../service/user";
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +13,9 @@ const Users = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [deactivationHistory, setDeactivationHistory] = useState<any[]>([]);
   const [reason, setReason] = useState<string>("");
+  const [showHistory, setShowHistory] = useState<boolean>(false);
   const navigate = useNavigate();
   const { TextArea } = Input;
   const { Option } = Select;
@@ -35,13 +33,23 @@ const Users = (props: Props) => {
       }
     };
 
+    const fetchDeactivationHistory = async () => {
+      try {
+        const data = await getDeactivationHistory();
+        setDeactivationHistory(data);
+      } catch (error) {
+        console.error("Error fetching deactivation history:", error);
+      }
+    };
+
     fetchUsers();
+    fetchDeactivationHistory();
   }, []);
 
   const deactivateUserById = async (id: string) => {
     let selectedReasonLocal = "";
     let tempReason = "";
-  
+
     Modal.confirm({
       title: "Vô hiệu hóa người dùng",
       content: (
@@ -70,18 +78,29 @@ const Users = (props: Props) => {
         const finalReason = selectedReasonLocal || tempReason.trim();
         if (!finalReason) {
           message.error("Vui lòng chọn hoặc nhập lý do.");
-          return Promise.reject(); // Ngăn modal đóng
+          return Promise.reject();
         }
-  
+
         try {
+          const _id = 'admin';
           await deactivateUser(id, finalReason);
           message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
-  
+
           setUsers((prevUsers) =>
             prevUsers.map((user) =>
               user._id === id ? { ...user, active: false, reason: finalReason } : user
             )
           );
+          setDeactivationHistory((prevHistory) => [
+            ...prevHistory,
+            {
+              userId: id,
+              reason: finalReason,
+              date: new Date().toLocaleString(),
+              adminId: _id
+            }
+          ]);
+
         } catch (error) {
           console.error("Error deactivating user:", error);
           message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
@@ -89,7 +108,6 @@ const Users = (props: Props) => {
       },
     });
   };
-  
 
   const activateUserById = async (_id: string) => {
     try {
@@ -120,6 +138,29 @@ const Users = (props: Props) => {
     if (pageSize) setPageSize(pageSize);
   };
 
+  const historyColumns = [
+    {
+      title: 'ID Người Dùng',
+      dataIndex: 'userId',
+      key: 'userId',
+    },
+    {
+      title: 'Lý Do',
+      dataIndex: 'reason',
+      key: 'reason',
+    },
+    {
+      title: 'Ngày',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'Người thực hiện',
+      dataIndex: 'adminId',
+      key: 'adminId',
+    },
+  ];
+
   return (
     <>
       {loading && <LoadingComponent />}
@@ -134,33 +175,41 @@ const Users = (props: Props) => {
           style={{ maxWidth: "400px" }}
         />
 
+        <Button
+          type="primary"
+          onClick={() => setShowHistory(true)}
+          className="mb-6 absolute right-6 top-6"
+        >
+          Lịch Sử Vô Hiệu Hóa
+        </Button>
+
+        <Modal
+          title="Lịch Sử Vô Hiệu Hóa"
+          visible={showHistory}
+          onCancel={() => setShowHistory(false)}
+          footer={null}
+          width={800}
+        >
+          <Table
+            columns={historyColumns}
+            dataSource={deactivationHistory}
+            rowKey="userId"
+          />
+        </Modal>
+
         <div className="overflow-x-auto shadow-lg rounded-lg">
           <div className="py-2 inline-block w-full px-0">
             <div className="overflow-hidden bg-white rounded-lg">
               <table className="min-w-full table-auto">
                 <thead className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
                   <tr>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Stt
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Họ và Tên
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Email
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Vai trò
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Trạng thái
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Lý do vô hiệu hóa
-                    </th>
-                    <th className="text-sm font-medium text-white px-6 py-4 text-left">
-                      Thao tác
-                    </th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Stt</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Họ và Tên</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Email</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Vai trò</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Trạng thái</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Lý do vô hiệu hóa</th>
+                    <th className="text-sm font-medium text-white px-6 py-4 text-left">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
