@@ -49,7 +49,7 @@ const Users = (props: Props) => {
   const deactivateUserById = async (id: string) => {
     let selectedReasonLocal = "";
     let tempReason = "";
-
+  
     Modal.confirm({
       title: "Vô hiệu hóa người dùng",
       content: (
@@ -80,12 +80,12 @@ const Users = (props: Props) => {
           message.error("Vui lòng chọn hoặc nhập lý do.");
           return Promise.reject();
         }
-
+  
         try {
-          const _id = 'admin';
+          const _id = 'admin'; // Assuming you are using the admin ID
           await deactivateUser(id, finalReason);
           message.success(`Người dùng với ID ${id} đã được vô hiệu hóa.`);
-
+  
           setUsers((prevUsers) =>
             prevUsers.map((user) =>
               user._id === id ? { ...user, active: false, reason: finalReason } : user
@@ -100,7 +100,13 @@ const Users = (props: Props) => {
               adminId: _id
             }
           ]);
-
+  
+          // Log out the deactivated user by clearing session storage
+          sessionStorage.removeItem("userToken");
+          sessionStorage.removeItem("userData");
+  
+        
+  
         } catch (error) {
           console.error("Error deactivating user:", error);
           message.error("Có lỗi xảy ra khi vô hiệu hóa người dùng.");
@@ -108,6 +114,7 @@ const Users = (props: Props) => {
       },
     });
   };
+  
 
   const activateUserById = async (_id: string) => {
     try {
