@@ -105,6 +105,14 @@ const Header = () => {
               </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
+                  <li className="hover:bg-gray-100">
+                    <Link
+                      to={`/profileinfo/${user.id}`}
+                      className="block w-full text-left px-4 py-2"
+                    >
+                      Cá nhân
+                    </Link>
+                  </li>
                   {(user.info.role === "admin" || user.info.role === "shipper") && (
                     <li className="hover:bg-gray-100">
                       <Link
