@@ -148,10 +148,11 @@ const Add = () => {
         ...values,
         moTa: values.moTa,
         soLuong: values.soLuong,
+        brand: values.brand,
         img: imageUrls,
         categoryID: values.category,
         materialID: values.material,
-        variants: validVariants, // Gửi các biến thể hợp lệ
+        variants: validVariants, 
         status: true,
       };
 
@@ -380,6 +381,22 @@ const Add = () => {
                       </Select.Option>
                     ))}
                   </Select>
+                </Form.Item>
+              </div>
+              <div>
+                <label className="text-lg font-semibold text-gray-800">
+                  Tên thương hiệu
+                </label>
+                <Form.Item
+                  name="brand"
+                  rules={[
+                    { required: true, message: "Bắt buộc nhập tên thương hiệu!" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Nhập tên thương hiệu"
+                    className="text-gray-700 p-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                  />
                 </Form.Item>
               </div>
             </div>

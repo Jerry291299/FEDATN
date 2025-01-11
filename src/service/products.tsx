@@ -38,10 +38,10 @@ export const getProductByID = async (id?: string) => {
 export const addProduct = async (payload: any) => {
   try {
     const response = await axios.post("http://localhost:28017/product/add", payload);
-    return response.data; // Chắc chắn trả về data để xử lý ở client
+    return response.data; 
   } catch (error) {
     console.error("Error adding product:", error);
-    throw error; // Ném lỗi ra ngoài để xử lý trong component
+    throw error; 
   }
 };
 
