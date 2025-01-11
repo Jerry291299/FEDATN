@@ -115,7 +115,7 @@ function OrderPayment() {
             return;
           }
 
-          console.log(item, "dddddddddddddddddddddddddddddddddddddddddddddddddđ");
+          
           
           // Tính số lượng mới của sản phẩm sau khi giảm
           const updatedQuantity = product.soLuong - item.quantity;
