@@ -8,20 +8,9 @@ type Props = {};
 
 const Profileinfo = (props: Props) => {
   const [userId, setUserId] = useState<string | null>(null);
-    const [files, setFiles] = useState<File[]>([]);
-    const [existingImages, setExistingImages] = useState<string[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const showNotification = (
-        type: "success" | "error",
-        title: string,
-        description: string
-      ) => {
-        notification[type]({
-          message: title,
-          description,
-          placement: "topRight",
-        });
-      };
+  const [files, setFiles] = useState<File[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  
   const [profileData, setProfileData] = useState({
     img: "",
     name: "",
@@ -30,6 +19,22 @@ const Profileinfo = (props: Props) => {
     address: "",
     phone: "",
   });
+
+  const [oldPassword, setOldPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
+
+  const showNotification = (
+    type: "success" | "error",
+    title: string,
+    description: string
+  ) => {
+    notification[type]({
+      message: title,
+      description,
+      placement: "topRight",
+    });
+  };
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
@@ -46,8 +51,6 @@ const Profileinfo = (props: Props) => {
   const fetchUserProfile = async (id: string) => {
     try {
       const response = await axios.get(`http://localhost:28017/user/${id}`);
-    //   setExistingImages(response.img || []);
-
       if (response.data) {
         setProfileData({
           img: response.data.img || "",
@@ -73,100 +76,114 @@ const Profileinfo = (props: Props) => {
     const newFiles = Array.from(e.target.files);
     setFiles(newFiles); // Replace existing files for single profile picture
   };
-  
-    const handleRemoveImage = (url: string) => {
-      setExistingImages((prev) => prev.filter((img) => img !== url));
-    };
 
-    const uploadImages = async (files: File[]): Promise<string[]> => {
-        const urls: string[] = [];
-        for (const file of files) {
-          const formData = new FormData();
-          formData.append("images", file);
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    const urls: string[] = [];
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("images", file);
     
-          try {
-            const response = await upload(formData);
-            const imageUrl = response.payload[0].url;
-            urls.push(imageUrl);
-          } catch (error) {
-            console.error("Error uploading image:", error);
-            showNotification(
-              "error",
-              "Lỗi tải ảnh",
-              "Không thể tải ảnh lên, vui lòng thử lại!"
-            );
-          }
-        }
-        return urls;
-      };
+      try {
+        const response = await upload(formData);
+        const imageUrl = response.payload[0].url;
+        urls.push(imageUrl);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        showNotification("error", "Lỗi tải ảnh", "Không thể tải ảnh lên, vui lòng thử lại!");
+      }
+    }
+    return urls;
+  };
 
-      const handleSave = async () => {
-        setLoading(true);
-        if (!userId) {
-          alert("User ID not found");
-          return;
+  const handleSave = async () => {
+    setLoading(true);
+    if (!userId) {
+      alert("User ID not found");
+      return;
+    }
+  
+    try {
+      // Upload images if there are new files
+      let uploadedImageUrl = profileData.img;
+      if (files.length > 0) {
+        const uploadedUrls = await uploadImages(files);
+        if (uploadedUrls.length > 0) {
+          uploadedImageUrl = uploadedUrls[0]; // Assuming only one profile image
         }
-      
-        try {
-          setLoading(true);
-      
-          // Upload images if there are new files
-          let uploadedImageUrl = profileData.img;
-          if (files.length > 0) {
-            const uploadedUrls = await uploadImages(files);
-            if (uploadedUrls.length > 0) {
-              uploadedImageUrl = uploadedUrls[0]; // Assuming only one profile image
-            }
-          }
-      
-          // Update the profileData with the new image URL
-          const updatedProfileData = { ...profileData, img: uploadedImageUrl };
-      
-          // Send the updated profile data to the server
-          const response = await axios.put(
-            `http://localhost:28017/updateProfile/${userId}`,
-            updatedProfileData
-          );
-      
-          showNotification(
-            "success",
-            "Thành công",
-            "Cập nhật thông tin thành công!"
-          );
-          setProfileData(updatedProfileData);
-          console.log("Updated profile:", response.data);
-        } catch (error) {
-          console.error("Error updating profile:", error);
-          alert("Failed to update profile.");
-        } finally {
-          setLoading(false);
-        }
-      };
+      }
+  
+      // Update the profileData with the new image URL
+      const updatedProfileData = { ...profileData, img: uploadedImageUrl };
+  
+      // Send the updated profile data to the server
+      const response = await axios.put(`http://localhost:28017/updateProfile/${userId}`, updatedProfileData);
+  
+      showNotification("success", "Thành công", "Cập nhật thông tin thành công!");
+      setProfileData(updatedProfileData);
+      console.log("Updated profile:", response.data);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleChangePassword = async () => {
+    setLoading(true);
+    if (!userId) {
+      alert("User ID not found");
+      return;
+    }
+  
+    if (newPassword !== confirmNewPassword) {
+      showNotification("error", "Lỗi", "Mật khẩu mới và xác nhận mật khẩu không khớp!");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const response = await axios.put(`http://localhost:28017/change-password/${userId}`, {
+        oldPassword,
+        newPassword,
+        changedBy: userId, // Bạn có thể thêm thông tin về người thay đổi nếu cần
+      });
+  
+      if (response.status === 200) {
+        showNotification("success", "Thành công", "Mật khẩu đã được thay đổi thành công!");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      } else {
+        showNotification("error", "Lỗi", "Không thể thay đổi mật khẩu.");
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      showNotification("error", "Lỗi", "Mật khẩu cũ không chính xác hoặc có lỗi khác.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
-    {loading && <LoadingComponent />}
-    <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
-      <div className="flex items-center space-x-6">
-        <div>
-          <img
-            className="w-24 h-24 rounded-full"
-            src={profileData.img}
-            alt="Profile Picture"
-          />
+      {loading && <LoadingComponent />}
+      <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div className="flex items-center space-x-6">
+          <div>
+            <img
+              className="w-24 h-24 rounded-full"
+              src={profileData.img}
+              alt="Profile Picture"
+            />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">{profileData.name}</h1>
+            <p className="text-sm text-gray-600">Web Developer</p>
+          </div>
         </div>
-        
 
         <div>
-          <h1 className="text-xl font-bold text-gray-800">{profileData.name}</h1>
-          <p className="text-sm text-gray-600">Web Developer</p>
-        </div>
-      </div>
-
-      <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Profile Image
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Profile Image</label>
           <input
             type="file"
             onChange={handleFileChange}
@@ -174,70 +191,108 @@ const Profileinfo = (props: Props) => {
           />
         </div>
 
-      <div className="grid grid-cols-2 gap-6 mt-8">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            name="name"
-            value={profileData.name}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+        <div className="grid grid-cols-2 gap-6 mt-8">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={profileData.name}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <input
+              type="date"
+              name="dob"
+              value={profileData.dob}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Gender</label>
+            <select
+              name="gender"
+              value={profileData.gender}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Choose your gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={profileData.address}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <input
+              type="text"
+              name="phone"
+              value={profileData.phone}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-          <input
-            type="date"
-            name="dob"
-            value={profileData.dob}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Gender</label>
-          <select
-            name="gender"
-            value={profileData.gender}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+
+        <button
+          onClick={handleSave}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg"
+        >
+          Save
+        </button>
+
+        {/* Phần thay đổi mật khẩu */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-800">Thay đổi mật khẩu</h2>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700">Mật khẩu cũ</label>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700">Mật khẩu mới</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu mới</label>
+            <input
+              type="password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <button
+            onClick={handleChangePassword}
+            className="mt-4 px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg"
           >
-            <option value="">Choose your gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Address</label>
-          <input
-            type="text"
-            name="address"
-            value={profileData.address}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Phone</label>
-          <input
-            type="text"
-            name="phone"
-            value={profileData.phone}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+            Thay đổi mật khẩu
+          </button>
         </div>
       </div>
-
-      <button
-        onClick={handleSave}
-        className="mt-4 px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg"
-      >
-        Save
-      </button>
-    </div>
     </>
   );
 };
