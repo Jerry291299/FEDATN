@@ -115,6 +115,8 @@ function OrderPayment() {
             return;
           }
 
+          console.log(item, "dddddddddddddddddddddddddddddddddddddddddddddddddđ");
+          
           // Tính số lượng mới của sản phẩm sau khi giảm
           const updatedQuantity = product.soLuong - item.quantity;
 
@@ -128,9 +130,14 @@ function OrderPayment() {
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ quantity: item.quantity }), // Gửi số lượng đặt
+              body: JSON.stringify({
+                 quantity: item.quantity,
+                 size: item.size,
+                }), // Gửi số lượng đặt
             }
           );
+
+          
 
           if (!updateResponse.ok) {
             const error = await updateResponse.json();

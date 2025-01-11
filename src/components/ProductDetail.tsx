@@ -289,9 +289,15 @@ const ProductDetail = () => {
                             : 0,
                         img: product.img[0],
                         quantity: 1,
+                        size:
+                          product.variants && selectedVariant !== null
+                            ? product.variants[selectedVariant].size
+                            : "N/A",
                       },
                     ],
                   };
+
+       
 
                   try {
                     const response = await addtoCart(cartItem);
