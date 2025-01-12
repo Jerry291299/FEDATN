@@ -28,3 +28,25 @@ export interface IOrder {
       
     }
   }
+
+  export interface Order {
+    _id: string;
+    createdAt: string;
+    amount: number;
+    paymentMethod: string;
+    paymentstatus: string;
+    status: string;
+    items: Array<{
+      productId: string;
+      productName: string;
+      quantity: number;
+      price: number;
+    }>;
+    cancelReason?: {
+      reason: string;
+      canceledAt: string; 
+      canceledBy?: string; 
+    };
+    confirmedAt?: string; 
+    confirmedBy?: string; 
+  }

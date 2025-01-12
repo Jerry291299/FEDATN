@@ -106,6 +106,20 @@ export const getOrdersByUserId = async (userId: string) => {
   }
 };
 
+export const getOrderById = async (orderId: string) => {
+  try {
+    const response = await fetch(`http://localhost:28017/api/orders/${orderId}`);
+    if (!response.ok) {
+      throw new Error("Could not fetch the order. Please try again later.");
+    }
+    const orderData = await response.json();
+    return orderData; // Return the order data
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    throw new Error("Could not fetch the order. Please try again later.");
+  }
+};
+
 // Hàm lấy chi tiết đơn hàng theo ID
 // export const getOrderById = async (orderId: string): Promise<Order> => {
 //   const response = await fetch(`http://localhost:28017/api/orders/${orderId}`);

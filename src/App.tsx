@@ -44,6 +44,7 @@ import DashboardNews from "./components/admin/tintuc";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Profileinfo from "./components/user/profile/profileinfo";
 import Profile from "./layout/profile";
+import OrderDetail from "./components/OrderDetail";
 function App() {
   return (
     <>
@@ -72,6 +73,7 @@ function App() {
           <Route path="/donhang" element={<Orderlisthistory />} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
+          <Route path="/Orders/:id" element={<OrderDetail />} />
 
           <Route
             path="/admin"
