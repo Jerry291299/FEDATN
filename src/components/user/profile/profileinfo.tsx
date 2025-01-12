@@ -18,6 +18,7 @@ const Profileinfo = (props: Props) => {
     gender: "",
     address: "",
     phone: "",
+    role: "", // Default role
   });
 
   const [oldPassword, setOldPassword] = useState<string>("");
@@ -52,13 +53,17 @@ const Profileinfo = (props: Props) => {
     try {
       const response = await axios.get(`http://localhost:28017/user/${id}`);
       if (response.data) {
+        const formattedDob = response.data.dob
+          ? new Date(response.data.dob).toISOString().split("T")[0]
+          : "";
         setProfileData({
           img: response.data.img || "",
           name: response.data.name || "",
-          dob: response.data.dob || "",
+          dob: formattedDob,
           gender: response.data.gender || "",
           address: response.data.address || "",
           phone: response.data.phone || "",
+          role: response.data.role || "",
         });
       }
     } catch (error) {
@@ -173,17 +178,17 @@ const Profileinfo = (props: Props) => {
             <img
               className="w-24 h-24 rounded-full"
               src={profileData.img}
-              alt="Profile Picture"
+              alt="Ảnh đại diện"
             />
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-800">{profileData.name}</h1>
-            <p className="text-sm text-gray-600">Web Developer</p>
+            <p className="text-sm text-gray-600">{profileData.role}</p>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Profile Image</label>
+          <label className="block text-sm font-medium text-gray-700">Ảnh đại diện</label>
           <input
             type="file"
             onChange={handleFileChange}
@@ -193,7 +198,7 @@ const Profileinfo = (props: Props) => {
 
         <div className="grid grid-cols-2 gap-6 mt-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">Tên đầy đủ</label>
             <input
               type="text"
               name="name"
@@ -203,7 +208,7 @@ const Profileinfo = (props: Props) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <label className="block text-sm font-medium text-gray-700">Ngày Sinh</label>
             <input
               type="date"
               name="dob"
@@ -213,21 +218,20 @@ const Profileinfo = (props: Props) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Gender</label>
+            <label className="block text-sm font-medium text-gray-700">Giới tính</label>
             <select
               name="gender"
               value={profileData.gender}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             >
-              <option value="">Choose your gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="">Vui lòng chọn giới tính</option>
+              <option value="Male">Nam</option>
+              <option value="Female">Nữ</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Address</label>
+            <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
             <input
               type="text"
               name="address"
@@ -237,7 +241,7 @@ const Profileinfo = (props: Props) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
             <input
               type="text"
               name="phone"

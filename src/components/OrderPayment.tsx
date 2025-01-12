@@ -8,6 +8,7 @@ import { IOrderData, placeOrder } from "../service/order";
 import { createVNPayPayment } from "../service/payment";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 function OrderPayment() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -22,6 +23,15 @@ function OrderPayment() {
     address: "",
     notes: "",
   });
+
+  const [profileData, setProfileData] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+  });
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,8 +40,39 @@ function OrderPayment() {
       const { id } = JSON.parse(userData);
       setUser(id);
       fetchCartData(id);
+      fetchUserProfile(id);
     }
   }, []);
+
+  const fetchUserProfile = async (id: string) => {
+    try {
+      const response = await axios.get(`http://localhost:28017/user/${id}`);
+      if (response.data) {
+        const formattedDob = response.data.dob
+          ? new Date(response.data.dob).toISOString().split("T")[0]
+          : "";
+        setProfileData({
+          name: response.data.name || "",
+          address: response.data.address || "",
+          phone: response.data.phone || "",
+          email: response.data.email || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+  };
+  useEffect(() => {
+    if (profileData.name || profileData.phone || profileData.email || profileData.address) {
+      setCustomerDetails((prevDetails) => ({
+        ...prevDetails,
+        name: profileData.name || prevDetails.name,
+        phone: profileData.phone || prevDetails.phone,
+        email: profileData.email || prevDetails.email,
+        address: profileData.address || prevDetails.address,
+      }));
+    }
+  }, [profileData]);
 
   const fetchCartData = async (userId: string) => {
     try {
@@ -311,6 +352,7 @@ function OrderPayment() {
                 />
                 <span>{item.name}</span>
               </div>
+              <div className="px-[10px]">{item.size}</div>
               <span className="font-semibold">
                 {new Intl.NumberFormat("vi-VN", {
                   style: "currency",
