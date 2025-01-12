@@ -7,12 +7,21 @@ export interface Order {
   paymentMethod: string;
   paymentstatus: string;
   status: string;
+  cancelReason:{
+    reason: String , // Lý do hủy đơn
+    canceledAt:  Date , // Thời điểm hủy
+    canceledBy: String , // Người thực hiện hủy
+    }
+    confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
+    confirmedBy?: string; // Người xác nhận đơn hàng
 }
 export interface IOrderData {
     userId: string;
     items: CartItem[];
     amount: number;
     paymentMethod: string;
+    confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
+    confirmedBy?: string; // Người xác nhận đơn hàng
     customerDetails: {   // Add customer details to the interface
       name: string;
       phone: string;
@@ -33,6 +42,11 @@ export interface IOrderData {
     amount: number;
     status: string;
     createdAt: string;
+    cancelReason:{
+      reason: String , // Lý do hủy đơn
+      canceledAt:  Date , // Thời điểm hủy
+      canceledBy: String , // Người thực hiện hủy
+      }
     customerDetails: {
       name: string;
       phone: string;
@@ -54,6 +68,9 @@ export interface IOrderData {
     amount: number;
     status: string;
     createdAt: string;
+    cancelReason:{
+
+    }
     customerDetails: {
       name: string;
       phone: string;
@@ -88,3 +105,16 @@ export const getOrdersByUserId = async (userId: string) => {
     throw error;
   }
 };
+
+// Hàm lấy chi tiết đơn hàng theo ID
+// export const getOrderById = async (orderId: string): Promise<Order> => {
+//   const response = await fetch(`http://localhost:28017/api/orders/${orderId}`);
+//   if (!response.ok) {
+//     throw new Error('Không thể lấy thông tin đơn hàng.');
+//   }
+//   return response.json();
+// };
+
+
+// Nếu bạn có thêm các API khác, bạn có thể định nghĩa thêm các hàm ở đây
+

@@ -18,7 +18,7 @@ const DashboardNews = (props: Props) => {
     try {
       setLoading(true);
       const data = await getAllPosts();
-      setNews(data || []);
+      setNews((data || []).reverse());
     } catch (error) {
       console.error("Error fetching news:", error);
       message.error("Lỗi khi tải danh sách tin tức.");
@@ -52,6 +52,7 @@ const DashboardNews = (props: Props) => {
     <>
       {loading && <LoadingComponent />}
       {contextHolder}
+      <div className="flex items-center justify-between px-6 h-[96px] bg-white-600 text-white"></div>
 
       <NavLink to={"/admin/addNews"}>
         <button className="focus:outline-none text-white bg-indigo-600 hover:bg-indigo-700 transition duration-300 ease-in-out font-medium rounded-lg text-sm px-5 py-2.5 mb-6 shadow-md transform hover:scale-105">

@@ -42,7 +42,8 @@ import AddNews from "./components/admin/modaladd/addtintuc";
 import UpdateNews from "./components/admin/modaladd/updatetintuc";
 import DashboardNews from "./components/admin/tintuc";
 import AdminDashboard from "./components/admin/AdminDashboard";
-
+import Profileinfo from "./components/user/profile/profileinfo";
+import Profile from "./layout/profile";
 function App() {
   return (
     <>
@@ -91,6 +92,7 @@ function App() {
             <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
+            
             <Route path="tintuc" element={<DashboardNews />} />
             {/* <Route path="dashboard/update/:id" Component={Update}></Route> */}
             <Route path="dashboard/update/:id" Component={Update}></Route>
@@ -105,6 +107,17 @@ function App() {
               path="Material/updateMaterial/:id"
               Component={UpdateMaterial}
             ></Route>
+          </Route>
+
+          <Route
+            path="/profileinfo/:id"
+            element={
+              <Privaterouter>
+                <Profile />
+              </Privaterouter>
+            }
+          >
+
           </Route>
           <Route
             path="/shipper"

@@ -138,7 +138,7 @@ const Cart = () => {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 bg-gray-50 p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Shopping Cart
+              Giỏ hàng của bạn
             </h2>
             <hr className="border-gray-300 mb-6" />
 
@@ -149,20 +149,23 @@ const Cart = () => {
                     <th className="p-4 font-semibold text-gray-700"></th>
                     <th className="p-4 font-semibold text-gray-700"></th>
                     <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Product
+                      Sản phẩm
                     </th>
                     <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Quantity
+                      Kích cỡ
                     </th>
                     <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Total Price
+                      Số lượng
+                    </th>
+                    <th className="p-4 font-semibold text-gray-700 uppercase">
+                      Giá
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {cartItems.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-4 text-center">Your cart is empty</td>
+                      <td colSpan={5} className="p-4 text-center">Giỏ hàng đang trống</td>
                     </tr>
                   ) : (
                     cartItems.map((item, index) => (
@@ -186,6 +189,7 @@ const Cart = () => {
                           </div>
                         </td>
                         <td className="p-4 text-gray-700 font-medium">{item.name}</td>
+                        <td className="p-4 text-gray-700 font-medium">{item.size}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <button
@@ -219,20 +223,30 @@ const Cart = () => {
           </div>
           <div className="bg-gray-50 p-6 rounded-lg shadow-md md:sticky top-0">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Cart Totals
+              Tổng cộng
             </h2>
             <hr className="border-gray-300 mb-6" />
             <ul className="space-y-3 text-gray-700 mb-8">
-              <li className="flex justify-between text-base">
-                <span>Discount</span>
+              {/* <li className="flex justify-between text-base">
+                <span>Giảm giá</span>
                 <span className="font-bold">
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   }).format(0)}
                 </span>
+              </li> */}
+<li className="flex justify-between text-lg font-semibold border-gray-300 pt-3 mt-2">
+                <span>Tổng tiền</span>
+                <span>
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(total)}
+                </span>
               </li>
-              <li className="flex justify-between text-base">
+
+              {/* <li className="flex justify-between text-base">
                 <span>Shipping</span>
                 <span className="font-bold">
                   {new Intl.NumberFormat("vi-VN", {
@@ -249,16 +263,8 @@ const Cart = () => {
                     currency: "VND",
                   }).format(4000)}
                 </span>
-              </li>
-              <li className="flex justify-between text-lg font-semibold border-t border-gray-300 pt-3 mt-2">
-                <span>Total</span>
-                <span>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(total)}
-                </span>
-              </li>
+              </li> */}
+              
             </ul>
 
             <div className="space-y-4">
@@ -266,14 +272,14 @@ const Cart = () => {
                 to={"/order"}
                 className="block w-full py-3 font-semibold text-center text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-1"
               >
-                Checkout
+                Thanh toán
               </NavLink>
 
               <NavLink
                 to={"/products"}
                 className="block w-full py-3 font-semibold text-center text-gray-700 border border-gray-300 rounded-lg bg-white shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1"
               >
-                Continue Shopping
+                Tiếp tục mua hàng
               </NavLink>
             </div>
           </div>

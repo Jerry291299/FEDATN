@@ -11,25 +11,33 @@ const OrdersShipper = (props: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(7);
 
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.get<IOrderShipper[]>(
+        "http://localhost:28017/orders-list"
+      );
+      setOrders(response.data.reverse());
+    } catch (err) {
+      setError("Không thể tải danh sách đơn hàng");
+      console.error("Error fetching orders:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await axios.get<IOrderShipper[]>(
-          "http://localhost:28017/orders-list"
-        );
-        setOrders(response.data);
-      } catch (err) {
-        setError("Không thể tải danh sách đơn hàng");
-        console.error("Error fetching orders:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchOrders();
+
+    // Tạo interval để tự động cập nhật mỗi 10 giây
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 10000);
+
+    // Dọn dẹp interval khi component bị hủy
+    return () => clearInterval(interval);
   }, []);
 
   const handleInProgressOrder = async (orderId: string) => {
@@ -239,6 +247,8 @@ const OrdersShipper = (props: Props) => {
                         className={`px-4 py-2 text-sm font-semibold rounded-lg text-white ${
                           order.status === "pending"
                             ? "bg-yellow-500"
+                            : order.status === "packaging"
+                            ? "bg-orange-500"
                             : order.status === "in_progress"
                             ? "bg-blue-500"
                             : order.status === "delivered"
@@ -252,6 +262,8 @@ const OrdersShipper = (props: Props) => {
                       >
                         {order.status === "pending"
                           ? "Đang xử lý"
+                          : order.status === "packaging"
+                          ? "Đóng gói"
                           : order.status === "in_progress"
                           ? "Đang giao"
                           : order.status === "delivered"
@@ -270,7 +282,7 @@ const OrdersShipper = (props: Props) => {
                       : "Đã thanh toán"}
                   </td>
                   <td className="border-b px-6 py-4 text-sm text-gray-600">
-                    {order.status === "pending" && (
+                    {order.status === "packaging" && (
                       <button
                         onClick={() => handleInProgressOrder(order._id)}
                         className="bg-blue-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-blue-600 hover:shadow-lg"

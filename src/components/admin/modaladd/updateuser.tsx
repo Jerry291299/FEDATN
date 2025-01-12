@@ -74,7 +74,7 @@ const UpdateUser = (props: Props) => {
           <div>
             <h2 className="text-xl font-bold">User Information</h2>
             <p>
-              <strong>User ID:</strong> {user.id}
+              <strong>User ID:</strong> {user._id}
             </p>
             <p>
               <strong>User Name:</strong> {user.name}

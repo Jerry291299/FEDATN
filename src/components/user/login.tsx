@@ -119,11 +119,11 @@ const Login = (props: Props) => {
                     Ghi nhớ đăng nhập
                   </label>
                 </div>
-                <div>
+                {/* <div>
                   <button className="text-blue-600 font-semibold text-sm hover:underline">
                     Quên mật khẩu
                   </button>
-                </div>
+                </div> */}
               </div>
               <div className="mt-12">
                 <button

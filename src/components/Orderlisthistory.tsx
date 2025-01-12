@@ -12,7 +12,8 @@ const Orderlisthistory = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 5;  // Số đơn hàng hiển thị trên mỗi trang
+  const [cancelReason, setCancelReason] = useState<string>(""); // State cho lý do hủy
+  const itemsPerPage = 5; // Số đơn hàng hiển thị trên mỗi trang
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
@@ -23,6 +24,7 @@ const Orderlisthistory = () => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
+    confirmed: "Đã xác nhận", // Add this line
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -70,7 +72,11 @@ const Orderlisthistory = () => {
   };
 
   const handleCancelOrder = async () => {
-    if (!selectedOrderId) return;
+    if (!selectedOrderId || !cancelReason) {
+      alert("Vui lòng chọn lý do hủy đơn hàng.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `http://localhost:28017/api/orders/${selectedOrderId}/cancel`,
@@ -79,6 +85,7 @@ const Orderlisthistory = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ reason: cancelReason }) // Gửi lý do hủy
         }
       );
 
@@ -91,7 +98,7 @@ const Orderlisthistory = () => {
         prevOrders
           .map((order) =>
             order._id === updatedOrder._id
-              ? { ...order, status: updatedOrder.status }
+              ? { ...order, status: updatedOrder.status, cancelReason: updatedOrder.cancelReason } // Lưu lý do hủy
               : order
           )
           .filter((order) => order.status !== "deleted")
@@ -147,7 +154,7 @@ const Orderlisthistory = () => {
   return (
     <>
       <Header />
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <div className="max-w-7xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-xl font-semibold mb-4">DANH SÁCH ĐƠN HÀNG MỚI NHẤT</h2>
         <div className="overflow-x-auto">
           <table className="w-full table-auto border-collapse border border-gray-200">
@@ -158,8 +165,9 @@ const Orderlisthistory = () => {
                 <th className="border border-gray-300 px-4 py-2 text-left">Thành tiền</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Phương thức thanh toán</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Trạng thái thanh toán</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Vận chuyển</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Tình trạng đơn hàng</th>
                 <th className="border border-gray-300 px-4 py-2 text-left">Hành động</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Lý do hủy</th>
               </tr>
             </thead>
             <tbody>
@@ -182,17 +190,35 @@ const Orderlisthistory = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {statusMapping[order.status] || order.status}
                   </td>
+
                   <td className="border border-gray-300 px-4 py-2">
-                    {order.status === "pending" && (
-                      <button
+                    <div className="flex space-x-2">
+                      {order.status === "pending" && (
+                        <button
                         onClick={() => confirmCancelOrder(order._id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                        className="bg-red-600 text-white py-1 px-4 rounded-lg hover:bg-red-700 whitespace-nowrap"
                       >
-                        Hủy
+                        Hủy đơn
                       </button>
-                    )}
-                    {order.status === "cancelled" && (
-                      <span className="text-gray-500">Đã hủy</span>
+                      )}
+                      <NavLink to={`/orders/${order._id}`}>
+                        <button
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+                        >
+                          Xem
+                        </button>
+                      </NavLink>
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {order.cancelReason ? (
+                      <div>
+                        <p>Lý do hủy: {order.cancelReason.reason}</p>
+                        <p>Thời điểm hủy: {new Date(order.cancelReason.canceledAt).toLocaleString()}</p>
+
+                      </div>
+                    ) : (
+                      ""
                     )}
                   </td>
                 </tr>
@@ -200,48 +226,63 @@ const Orderlisthistory = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Phân trang */}
-        <div className="flex justify-center mt-4">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-3 py-1 border ${
-                currentPage === index + 1
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-700"
-              } rounded hover:bg-blue-400`}
-            >
-              {index + 1}
-            </button>
-          ))}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-lg"
+            disabled={currentPage === 1}
+            onClick={() => paginate(currentPage - 1)}
+          >
+            Trang trước
+          </button>
+          <div className="flex space-x-2">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-4 py-2 rounded-lg ${currentPage === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+                  }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-lg"
+            disabled={currentPage === totalPages}
+            onClick={() => paginate(currentPage + 1)}
+          >
+            Trang sau
+          </button>
         </div>
       </div>
-
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold">Xác nhận hủy đơn hàng</h3>
-            <p className="mt-2">Bạn có chắc chắn muốn hủy đơn hàng này? Sau khi hủy, bạn sẽ không thể khôi phục lại.</p>
-            <div className="mt-4 flex justify-end space-x-2">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Lý do hủy đơn hàng</h3>
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              rows={4}
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Nhập lý do hủy đơn hàng"
+            />
+            <div className="flex justify-end">
               <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+                onClick={handleCancelOrder}
               >
-                Hủy bỏ
+                Xác nhận hủy
               </button>
               <button
-                onClick={handleCancelOrder}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="bg-gray-300 text-black px-4 py-2 rounded-lg"
+                onClick={() => setShowModal(false)}
               >
-                Đồng ý
+                Đóng
               </button>
             </div>
           </div>
         </div>
       )}
-
       <Footer />
     </>
   );

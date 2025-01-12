@@ -1,4 +1,7 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+// import { io } from "socket.io-client";
+
+// const socket = io("http://localhost:3000");
 
 type User = {
   email: string; // Change this to match your API response
@@ -27,6 +30,30 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     initialAppContext.isAuthenticated
   );
   const [user, setUser] = useState<User | null>(null); // Change to User or null
+  // const [messages, setMessages] = useState<string[]>([]);
+
+
+  // useEffect(() => {
+  //   socket.on("message", (data: string) => {
+  //     console.log(data);
+      
+  //     setMessages((prev) => [...prev, data]);
+  //   });
+
+
+  //   sendMessage()
+
+  //   return () => {
+  //     socket.off("message");
+  //   };
+  // }, []);
+
+
+  // const sendMessage = () => {
+  //     socket.emit("userLogin", "userrId10000");
+  // };
+
+
   return (
     <AppContext.Provider
       value={{ isAuthenticated, setIsAuthenticated, user, setUser }}

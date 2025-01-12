@@ -10,12 +10,21 @@ export interface IOrder {
     amount: number;
     status: string;
     paymentstatus: string;
+    
     createdAt: string;
+    confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
+    confirmedBy?: string; // Người xác nhận đơn hàng
+    cancelReason:{
+    reason: String , // Lý do hủy đơn
+    canceledAt:  Date , // Thời điểm hủy
+    canceledBy: String , // Người thực hiện hủy
+    }
     customerDetails: {
       name: string;
       phone: string;
       email: string;
       address: string;
       notes?: string;
+      
     }
-}
+  }
