@@ -69,7 +69,27 @@ const Add = () => {
       }
     };
     fetchMaterial();
-  }, []);
+
+    // Set initial product code
+    const initialProductCode = generateProductCode();
+    form.setFieldsValue({ masp: initialProductCode });
+  }, [form]);
+
+  const generateProductCode = () => {
+    const prefix = "SP";
+    const digits = new Set();
+    let suffix = "";
+
+    while (suffix.length < 5) {
+      const digit = Math.floor(Math.random() * 10).toString();
+      if (!digits.has(digit)) {
+        digits.add(digit);
+        suffix += digit;
+      }
+    }
+
+    return prefix + suffix;
+  };
 
   const activeCategories = category.filter((cat) => cat.status === "active");
   const activeMaterial = material.filter((met) => met.status === "active");
@@ -182,7 +202,7 @@ const Add = () => {
     } finally {
       setLoading(false);
     }
-};
+  };
 
 
   const removeImage = (index: number) => {
