@@ -189,7 +189,12 @@ const Header = () => {
       </div>
 
       <div className="down flex justify-between border-y-2 py-[12px] border-black pr-[10px]">
+      <Link
+              to="/"
+              className="hover:scale-110 transition-transform duration-300 uppercase inline-block"
+            >
         <img className="h-24 pl-[40px]" src={logo} alt="" />
+        </Link>
         <div className="right flex pl-[30px]">
           <div className="text flex gap-14 pt-[25px] pr-[100px] text-lg">
             <Link

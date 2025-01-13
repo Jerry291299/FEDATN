@@ -4,12 +4,14 @@ import { getAllusersAccount, activateUser, deactivateUser, getDeactivationHistor
 import { IUser } from "../../interface/user";
 import LoadingComponent from "../Loading";
 import { useNavigate } from "react-router-dom";
+import UpdateUser from "./modaladd/updateuser";
 
 type Props = {};
 
 const Users = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -19,20 +21,42 @@ const Users = (props: Props) => {
   const navigate = useNavigate();
   const { TextArea } = Input;
   const { Option } = Select;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllusersAccount();
-        setUsers(data.reverse());
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
+    const userData = sessionStorage.getItem("user");
+    if (userData) {
+      const { id } = JSON.parse(userData);
+      if (id) {
+        setUserId(id);
       }
-    };
+    }
+  }, []); 
 
+  const showModal = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = async () => {
+    setIsModalOpen(false);
+    setSelectedUserId(null);
+    await fetchUsers(); // Refetch users after the modal is closed
+  };
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllusersAccount();
+      setUsers(data.reverse());
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     const fetchDeactivationHistory = async () => {
       try {
         const data = await getDeactivationHistory();
@@ -41,9 +65,12 @@ const Users = (props: Props) => {
         console.error("Error fetching deactivation history:", error);
       }
     };
-
     fetchUsers();
     fetchDeactivationHistory();
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   const deactivateUserById = async (id: string) => {
@@ -253,38 +280,58 @@ const Users = (props: Props) => {
                           )}
                         </td>
                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                          {user.active ? (
-                            <Popconfirm
-                              title="Vô hiệu hóa người dùng"
-                              description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
-                              onConfirm={() => deactivateUserById(user._id)}
-                              okText="Có"
-                              cancelText="Không"
-                            >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 transition"
-                              >
-                                Deactivate
-                              </button>
-                            </Popconfirm>
-                          ) : (
-                            <Popconfirm
-                              title="Kích hoạt lại người dùng"
-                              description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
-                              onConfirm={() => activateUserById(user._id)}
-                              okText="Có"
-                              cancelText="Không"
-                            >
-                              <button
-                                type="button"
-                                className="focus:outline-none text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 transition"
-                              >
-                                Activate
-                              </button>
-                            </Popconfirm>
-                          )}
-                        </td>
+  <div>
+    <Button className="focus:outline-none text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-6 py-4 mb-[10px] transition" onClick={() => showModal(user._id)}>Edit User</Button>
+    <Modal
+  title="Update User Role"
+  open={isModalOpen}
+  onCancel={handleCancel}
+  footer={null}
+>
+  {selectedUserId && (
+    <UpdateUser
+      userId={selectedUserId}
+      onClose={async () => {
+        setIsModalOpen(false);
+        await fetchUsers(); // Refresh user list after modal closes
+      }}
+    />
+  )}
+</Modal>
+  </div>
+  {user.active ? (
+    <Popconfirm
+      title="Vô hiệu hóa người dùng"
+      description="Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?"
+      onConfirm={() => deactivateUserById(user._id)}
+      okText="Có"
+      cancelText="Không"
+    >
+      <button
+        type="button"
+        className="focus:outline-none text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 transition"
+      >
+        Deactivate
+      </button>
+    </Popconfirm>
+  ) : (
+    <Popconfirm
+      title="Kích hoạt lại người dùng"
+      description="Bạn có chắc chắn muốn kích hoạt lại người dùng này không?"
+      onConfirm={() => activateUserById(user._id)}
+      okText="Có"
+      cancelText="Không"
+    >
+      <button
+        type="button"
+        className="focus:outline-none text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 transition"
+      >
+        Activate
+      </button>
+    </Popconfirm>
+  )}
+</td>
+
                       </tr>
                     ))
                   ) : (
