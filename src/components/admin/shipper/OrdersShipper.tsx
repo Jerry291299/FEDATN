@@ -102,7 +102,7 @@ const OrdersShipper = (props: Props) => {
         );
   
         // Gọi API để cập nhật trạng thái đơn hàng trong Orderlisthistory
-        await axios.put(`http://localhost:28017/api/orders/${orderId}/received`, {
+        await axios.put(`http://localhost:28017/api/orders/${orderId}/confirm-receive`, {
           status: "Đã nhận hàng", // Cập nhật trạng thái đơn hàng
         });
       } 
