@@ -12,8 +12,8 @@ const Orderlisthistory = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [cancelReason, setCancelReason] = useState<string>(""); // State cho lý do hủy
-  const itemsPerPage = 5; // Số đơn hàng hiển thị trên mỗi trang
+  const [cancelReason, setCancelReason] = useState<string>("");
+  const itemsPerPage = 5; 
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
@@ -24,7 +24,7 @@ const Orderlisthistory = () => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
-    confirmed: "Đã xác nhận", // Add this line
+    confirmed: "Đã xác nhận", 
   };
 
   const paymentMethodMapping: { [key: string]: string } = {

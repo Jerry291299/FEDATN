@@ -103,6 +103,14 @@ const Navbar = (props: Props) => {
                   </li>
                   <li>
                     <NavLink
+                      to="/admin/vouchers"
+                      className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                    >
+                      Voucher
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
                       to="/admin/comments"
                       className="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
                     >
