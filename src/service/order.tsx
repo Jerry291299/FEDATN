@@ -14,6 +14,8 @@ export interface Order {
     }
     confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
     confirmedBy?: string; // Người xác nhận đơn hàng
+    receivedAt?: Date; // Thời điểm nhận hàng
+    receivedBy?: string; // Người xác nhận đã nhận
 }
 export interface IOrderData {
     userId: string;
@@ -22,6 +24,8 @@ export interface IOrderData {
     paymentMethod: string;
     confirmedAt?: Date; // Thời điểm xác nhận đơn hàng
     confirmedBy?: string; // Người xác nhận đơn hàng
+    receivedAt?: Date; // Thời điểm nhận hàng
+    receivedBy?: string; // Người xác nhận đã nhận
     customerDetails: {   // Add customer details to the interface
       name: string;
       phone: string;
