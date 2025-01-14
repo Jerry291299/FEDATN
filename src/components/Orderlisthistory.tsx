@@ -24,8 +24,8 @@ const Orderlisthistory = () => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
-    confirmed: "Đã xác nhận", // Add this line
-   
+    confirmed: "Đã xác nhận", 
+   "confirm-receive": "Hoàn thành", 
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -127,13 +127,13 @@ const Orderlisthistory = () => {
             throw new Error("Xác nhận nhận hàng không thành công.");
         }
 
-        // Notify the shipper that the order has been received
+       
         await fetch(`http://localhost:28017/orders-list/${orderId}/received`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ status: "confirm-receive" }), // Update status on shipper's side
+            body: JSON.stringify({ status: "confirm-receive" }), 
         });
 
         const updatedOrder = await response.json();

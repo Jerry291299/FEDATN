@@ -34,6 +34,7 @@ const Order = (props: Props) => {
     failed: "Đã hủy",
     confirmed: "Đã xác nhận",
     packaging: "Đóng gói",
+    "confirm-receive": "Hoàn thành", 
   };
   
   const formatCurrency = (value: any) => {
@@ -291,10 +292,13 @@ const Order = (props: Props) => {
                               ? "bg-orange-500"
                               : order.status === "delivered"
                               ? "bg-green-500"
+                              : order.status === "confirm-receive"
+                              ? "bg-green-800" // Add or verify this condition
                               : order.status === "cancelled"
                               ? "bg-red-500"
                               : "bg-gray-400"
                           }`}
+                          
                           style={{ minWidth: "120px" }}
                         >
                           {statusMapping[order.status]}
