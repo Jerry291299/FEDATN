@@ -1,87 +1,77 @@
+import React, { useEffect, useState } from "react";
+import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
+import face from "../anh/Facebook.png";
+import insta from "../anh/Instagram.png";
+import chim from "../anh/Twitter.png";
+import linkk from "../anh/LinkedIn.png";
+import { getAllCategories } from "../service/category"; // Điều chỉnh nhập khẩu dựa trên cấu trúc tệp của bạn
 
-import logo from './img/Black & White Minimalist Aesthetic Initials Font Logo.png'
-import face from '../anh/Facebook.png'
-import insta from '../anh/Instagram.png'
-import chim from '../anh/Twitter.png'
-import linkk from '../anh/LinkedIn.png'
-type Props = {}
+type Props = {};
 
 const Footer = (props: Props) => {
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const fetchedCategories = await getAllCategories();
+      if (fetchedCategories) {
+        setCategories(fetchedCategories);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
-    <>
-    <div className='w-full border-t-2 border-black pt-[100px] mt-[50px] '>
-  <div className='pl-[20px] px-[10px] pb-[70px] pl-[150px] w-full flex text-black'>
-    <div className="logo w-[100px]">
-      <img className='w-full' src={logo} alt="" />
-    </div>
-    <div className="category1 w-[100px] ml-[140px]">
-      <p className='pb-[10px] font-bold'>Categories</p>
-      <p className='pb-[10px]'>Wall art</p>
-      <p className='pb-[10px]'>Vase</p>
-      <p className='pb-[10px]'>Tea</p>
-      <p className='pb-[10px]'>Chair</p>
-      <p className='pb-[10px]'>Basket</p>
-    </div>
-    <div className="category2 w-[100px] ml-[140px] mt-[30px]">
-      <p className='pb-[10px]'>Bed table</p>
-      <p className='pb-[10px]'>Armchair</p>
-      <p className='pb-[10px]'>Ficus</p>
-      <p className='pb-[10px]'>Desk decor</p>
-      <p className='pb-[10px]'>Cactus</p>
-    </div>
-    <div className="About w-[100px] ml-[140px]">
-      <p className='pb-[10px] font-bold'>About</p>
-      <p className='pb-[10px]'>Contact Us</p>
-      <p className='pb-[10px]'>About US</p>
-      <p className='pb-[10px]'>Help</p>
-      <p className='pb-[10px]'>FAQ</p>
-      <p className='pb-[10px]'>Term</p>
-    </div>
-    <div className="Subcribe w-[500px] ml-[140px]">
-      <p className='font-bold pb-[10px]'>Subscribe</p>
-      <p className='py-[10px]'>Join our newsletter to stay up to date on features and releases..</p>
-      <div className="w-full text-center">
-        <form action="#">
-          <div className="max-w-s flex">
-            <input
-              type="email"
-              placeholder="yourmail@example.com"
-              className="flex px-[60px] mr-[20px] appearance-none rounded shadow text-grey-dark focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="border-2 border-black px-[30px] rounded-md shadow-md hover:bg-indigo-600 p-3"
-            >
-              Subscribe
-            </button>
-          </div>
-        </form>
+    <div className="w-full border-t-2 border-black pt-[100px] mt-[50px]">
+      <div className="pl-[20px] px-[10px] pb-[70px] pl-[150px] w-full flex text-black">
+        <div className="logo w-[100px]">
+          <img className="w-full" src={logo} alt="Logo" />
+        </div>
+        <div className="categories w-[200px] ml-[140px]">
+          <p className="pb-[10px] font-bold">Danh mục</p>
+          {categories.slice(0, 5).map((category) => ( // Hiển thị chỉ 5 danh mục đầu tiên
+            <p key={category._id} className="pb-[10px]">
+              {category.name}
+            </p>
+          ))}
+        </div>
+        <div className="About w-[100px] ml-[140px]">
+          <p className="pb-[10px] font-bold">Giới thiệu</p>
+          <p className="pb-[10px]">Liên hệ chúng tôi</p>
+          <p className="pb-[10px]">Về chúng tôi</p>
+          <p className="pb-[10px]">Giúp đỡ</p>
+          <p className="pb-[10px]">Câu hỏi thường gặp</p>
+          <p className="pb-[10px]">Điều khoản</p>
+        </div>
+        <div className="Subscribe w-[500px] ml-[140px]">
+          <p className="font-bold pb-[10px]">Đăng ký</p>
+          <p className="py-[10px]">
+            Tham gia bản tin của chúng tôi để cập nhật về các tính năng và bản phát hành.
+          </p>
+          
+          <p className="pt-[15px]">
+            Bằng cách đăng ký, bạn đồng ý với Chính sách quyền riêng tư của chúng tôi và cung cấp sự đồng ý để nhận cập nhật từ công ty của chúng tôi liên hệ tới Email :  Beautifullhouse@gmail.com.
+          </p>
+        </div>
       </div>
-      <p className='pt-[15px]'>By subscribing you agree to our Privacy Policy and <br/> provide consent to receive updates from our company.</p>
+
+      <div className="foot pt-[100px] pb-[50px] border-t-2 border-black w-full flex justify-between px-[20px]">
+        <div className="text flex gap-5">
+          <p>2024 Relume. Tất cả quyền được bảo lưu.</p>
+          <a href="#">Chính sách quyền riêng tư</a>
+          <a href="#">Điều khoản dịch vụ</a>
+          <a href="#">Cài đặt cookie</a>
+        </div>
+        <div className="icon flex gap-3">
+          <img src={face} alt="Facebook" />
+          <img src={insta} alt="Instagram" />
+          <img src={chim} alt="Twitter" />
+          <img src={linkk} alt="LinkedIn" />
+        </div>
+      </div>
     </div>
-  </div>
+  );
+};
 
-  <div className="foot pt-[100px] pb-[50px] border-t-2 border-black w-full flex justify-between px-[20px]">
-    <div className="text flex gap-5">
-      <p>2024 Relume. All right reserved.</p>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Term of Service</a>
-      <a href="#">Cookies Setting</a>
-    </div>
-    <div className="icon flex gap-3">
-      <img src={face} alt="" />
-      <img src={insta} alt="" />
-      <img src={chim} alt="" />
-      <img src={linkk} alt="" />
-    </div>
-  </div>
-</div>
-
-    
-    </>
-
-
-    )
-}
-
-export default Footer
+export default Footer;
