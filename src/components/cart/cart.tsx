@@ -4,14 +4,18 @@ import { CartItem } from "../../interface/cart";
 import { getCartByID, removeFromCart, updateCartQuantity } from "../../service/cart";
 import Header from "../Header";
 import Footer from "../Footer";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
   const Globalstate = useContext(Cartcontext);
   const [userId, setUserId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);  // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Fetch cart data based on user ID
   const fetchCartData = async (userId: string) => {
@@ -29,6 +33,28 @@ const Cart = () => {
     }
   };
 
+  // Check for price changes
+  const checkForPriceChanges = async () => {
+    try {
+      const response = await axios.post("http://localhost:28017/checkout", {
+        userId,
+      });
+      if (response.status === 400 && response.data.message) {
+        toast.error(response.data.message); 
+        setCartItems([]); 
+        return "priceChanged"; 
+      }
+    } catch (error: any) {
+      console.error("Error during price check:", error.response?.data || error);
+      if (error.response?.status === 400 && error.response.data?.message) {
+        // toast.error(error.response.data.message); 
+        setCartItems([]); 
+        return "priceChanged"; 
+      }
+    }
+    return "noChange"; 
+  };
+
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (userData) {
@@ -38,45 +64,47 @@ const Cart = () => {
         fetchCartData(id);
       }
     }
-  }, []);  // Run only once when the component is mounted
+  }, []); 
+
+  useEffect(() => {
+    if (userId) {
+      checkForPriceChanges();
+    }
+  }, [userId]); 
 
   const handleRemove = async (item: CartItem) => {
     try {
       const updatedCart = await removeFromCart(userId as string, item.productId);
       setCartItems(updatedCart.items);
+      toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
     } catch (error) {
       console.error("Failed to remove item:", error);
+      toast.error("Đã xảy ra lỗi khi xóa sản phẩm.");
     }
   };
+
   const handleIncrease = async (item: CartItem) => {
     try {
-      console.log("Increasing quantity for:", item);
-  
-      // Gọi API để lấy chi tiết sản phẩm
       const response = await fetch(`http://localhost:28017/api/products/${item.productId}`);
-      const text = await response.text(); // Đọc phản hồi dưới dạng text
-  
-      // Kiểm tra nếu phản hồi không phải JSON
+      const text = await response.text();
+
       if (response.ok && text.startsWith("{")) {
         let product;
         try {
-          product = JSON.parse(text); // Chuyển text thành JSON nếu có thể
-          console.log("Product details:", product);
-          
+          product = JSON.parse(text);
+
           if (item.quantity + 1 > product.soLuong) {
-            alert("Sản phẩm không đủ số lượng để thêm vào giỏ hàng.");
+            toast.error("Sản phẩm không đủ số lượng để thêm vào giỏ hàng.");
             return;
           }
-  
-          // Cập nhật giỏ hàng cục bộ
+
           const updatedItems = cartItems.map((cartItem) =>
             cartItem.productId === item.productId
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
               : cartItem
           );
           setCartItems(updatedItems);
-  
-          // Cập nhật số lượng trên server
+
           const updateResponse = await fetch(`http://localhost:28017/api/cart/${userId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -85,12 +113,12 @@ const Cart = () => {
               quantity: item.quantity + 1,
             }),
           });
-  
+
           if (!updateResponse.ok) {
             throw new Error(`Failed to update cart quantity: ${updateResponse.statusText}`);
           }
-  
-          console.log("Cart updated successfully");
+
+          toast.success("Số lượng sản phẩm đã được cập nhật.");
         } catch (parseError) {
           throw new Error("Failed to parse product details as JSON.");
         }
@@ -99,26 +127,27 @@ const Cart = () => {
       }
     } catch (error) {
       console.error("Failed to increase quantity:", error);
-      alert("Đã xảy ra lỗi, vui lòng thử lại sau.");
+      toast.error("Đã xảy ra lỗi, vui lòng thử lại sau.");
     }
   };
-  
 
   const handleDecrease = async (item: CartItem) => {
     try {
       if (item.quantity && item.quantity > 1) {
         const updatedItems = cartItems.map((cartItem) =>
           cartItem.productId === item.productId
-            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            ? { ...cartItem, quantity: item.quantity - 1 }
             : cartItem
         );
         setCartItems(updatedItems);
         await updateCartQuantity(userId as string, item.productId, item.quantity - 1);
+        toast.success("Số lượng sản phẩm đã được cập nhật.");
       } else {
         handleRemove(item);
       }
     } catch (error) {
       console.error("Failed to decrease quantity:", error);
+      toast.error("Đã xảy ra lỗi khi giảm số lượng.");
     }
   };
 
@@ -127,6 +156,24 @@ const Cart = () => {
     const price = item.price ?? 0;
     return total + price * quantity;
   }, 0);
+
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const priceCheckResult = await checkForPriceChanges();
+
+    if (priceCheckResult === "priceChanged") {
+      toast.error("Giá sản phẩm trong giỏ hàng đã thay đổi. Vui lòng kiểm tra lại.");
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      toast.error("Giỏ hàng của bạn đang trống.");
+      return;
+    }
+
+    navigate("/order");
+  };
 
   return (
     <>
@@ -137,9 +184,7 @@ const Cart = () => {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 bg-gray-50 p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Giỏ hàng của bạn
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Giỏ hàng của bạn</h2>
             <hr className="border-gray-300 mb-6" />
 
             <div className="overflow-x-auto">
@@ -148,18 +193,10 @@ const Cart = () => {
                   <tr className="text-left border-b">
                     <th className="p-4 font-semibold text-gray-700"></th>
                     <th className="p-4 font-semibold text-gray-700"></th>
-                    <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Sản phẩm
-                    </th>
-                    <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Kích cỡ
-                    </th>
-                    <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Số lượng
-                    </th>
-                    <th className="p-4 font-semibold text-gray-700 uppercase">
-                      Giá
-                    </th>
+                    <th className="p-4 font-semibold text-gray-700 uppercase">Sản phẩm</th>
+                    <th className="p-4 font-semibold text-gray-700 uppercase">Kích cỡ</th>
+                    <th className="p-4 font-semibold text-gray-700 uppercase">Số lượng</th>
+                    <th className="p-4 font-semibold text-gray-700 uppercase">Giá</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -222,70 +259,30 @@ const Cart = () => {
             </div>
           </div>
           <div className="bg-gray-50 p-6 rounded-lg shadow-md md:sticky top-0">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Tổng cộng
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tổng cộng</h2>
             <hr className="border-gray-300 mb-6" />
-            <ul className="space-y-3 text-gray-700 mb-8">
-              {/* <li className="flex justify-between text-base">
-                <span>Giảm giá</span>
-                <span className="font-bold">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(0)}
-                </span>
-              </li> */}
-<li className="flex justify-between text-lg font-semibold border-gray-300 pt-3 mt-2">
+            <ul className="divide-y">
+              <li className="flex justify-between py-2 text-gray-800 font-medium">
                 <span>Tổng tiền</span>
-                <span>
+                <span className="font-semibold text-lg">
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   }).format(total)}
                 </span>
               </li>
-
-              {/* <li className="flex justify-between text-base">
-                <span>Shipping</span>
-                <span className="font-bold">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(2000)}
-                </span>
-              </li>
-              <li className="flex justify-between text-base">
-                <span>Tax</span>
-                <span className="font-bold">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(4000)}
-                </span>
-              </li> */}
-              
             </ul>
-
-            <div className="space-y-4">
-              <NavLink
-                to={"/order"}
-                className="block w-full py-3 font-semibold text-center text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-1"
-              >
-                Thanh toán
-              </NavLink>
-
-              <NavLink
-                to={"/products"}
-                className="block w-full py-3 font-semibold text-center text-gray-700 border border-gray-300 rounded-lg bg-white shadow-md hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1"
-              >
-                Tiếp tục mua hàng
-              </NavLink>
-            </div>
+            <button
+              onClick={handleCheckout}
+              className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition duration-200"
+            >
+              Thanh toán
+            </button>
           </div>
         </div>
       </div>
       <Footer />
+      <ToastContainer />
     </>
   );
 };
