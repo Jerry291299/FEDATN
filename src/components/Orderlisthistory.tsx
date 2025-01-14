@@ -25,6 +25,7 @@ const Orderlisthistory = () => {
     deleted: "Đã hủy",
     failed: "Đã hủy",
     confirmed: "Đã xác nhận", // Add this line
+   
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -112,7 +113,42 @@ const Orderlisthistory = () => {
       setSelectedOrderId(null);
     }
   };
+  const handleUserConfirmReceipt = async (orderId: string) => {
+    try {
+        const response = await fetch(`http://localhost:28017/api/orders/${orderId}/confirm-receive`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: "Thành công" }),
+        });
 
+        if (!response.ok) {
+            throw new Error("Xác nhận nhận hàng không thành công.");
+        }
+
+        // Notify the shipper that the order has been received
+        await fetch(`http://localhost:28017/orders-list/${orderId}/received`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: "confirm-receive" }), // Update status on shipper's side
+        });
+
+        const updatedOrder = await response.json();
+        setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+                order._id === orderId
+                    ? { ...order, status: "Thành công" }
+                    : order
+            )
+        );
+        
+    } catch (error) {
+        alert("Không thể xác nhận nhận hàng. Vui lòng thử lại sau.");
+    }
+};
   if (loading) {
     return (
       <>
@@ -201,6 +237,22 @@ const Orderlisthistory = () => {
                         Hủy đơn
                       </button>
                       )}
+                      
+  <td key={order._id} className="hover:bg-gray-50">
+    {/* Other cells */}
+    
+      {/* Existing buttons */}
+      {order.status === "delivered" && (
+        <button
+          onClick={() => handleUserConfirmReceipt(order._id)}
+          className="bg-green-500 text-white px-6 py-2 rounded-lg transition-all duration-300 hover:bg-green-600"
+        >
+          Đã nhận hàng
+        </button>
+      )}
+    </td>
+  
+
                       <NavLink to={`/orders/${order._id}`}>
                         <button
                           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"

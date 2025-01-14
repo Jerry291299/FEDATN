@@ -50,6 +50,8 @@ export interface IOrderData {
       reason: String , // Lý do hủy đơn
       canceledAt:  Date , // Thời điểm hủy
       canceledBy: String , // Người thực hiện hủy
+      receivedAt?: Date; // Thời điểm nhận hàng
+      receivedBy?: string; // Người xác nhận đã nhận
       }
     customerDetails: {
       name: string;
