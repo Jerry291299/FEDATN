@@ -12,8 +12,8 @@ const Orderlisthistory = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [cancelReason, setCancelReason] = useState<string>("");
-  const itemsPerPage = 5; 
+  const [cancelReason, setCancelReason] = useState<string>(""); // State cho lý do hủy
+  const itemsPerPage = 5; // Số đơn hàng hiển thị trên mỗi trang
 
   const statusMapping: { [key: string]: string } = {
     pending: "Chờ xử lý",
@@ -24,7 +24,7 @@ const Orderlisthistory = () => {
     delivered: "Đã giao",
     deleted: "Đã hủy",
     failed: "Đã hủy",
-    confirmed: "Đã xác nhận", 
+    confirmed: "Đã xác nhận", // Add this line
   };
 
   const paymentMethodMapping: { [key: string]: string } = {
@@ -201,44 +201,6 @@ const Orderlisthistory = () => {
                         Hủy đơn
                       </button>
                       )}
-  {order.status === "delivered" && (
-  <button
-    onClick={async () => {
-      try {
-        const response = await fetch(`http://localhost:28017/api/orders/${order._id}/confirm-receive`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) throw new Error("Không thể cập nhật trạng thái đơn hàng.");
-        
-        // Update local state for OrdersHistory
-        const updatedOrder = await response.json();
-        setOrders((prevOrders) =>
-          prevOrders.map((o) =>
-            o._id === updatedOrder._id ? { ...o, status: "Thành công" } : o
-          )
-        );
-
-        // Update status in admin Orders component
-        await fetch(`http://localhost:28017/orders-list/${order._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "Thành công" }),
-        });
-      } catch (error) {
-        console.error("Error confirming order received:", error);
-      }
-    }}
-    className="bg-green-500 text-white py-1 px-4 rounded-lg hover:bg-green-600"
-  >
-    Đã Nhận Hàng
-  </button>
-)}
                       <NavLink to={`/orders/${order._id}`}>
                         <button
                           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
@@ -246,7 +208,6 @@ const Orderlisthistory = () => {
                           Xem
                         </button>
                       </NavLink>
-                      
                     </div>
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
