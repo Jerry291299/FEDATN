@@ -44,6 +44,10 @@ import DashboardNews from "./components/admin/tintuc";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Profileinfo from "./components/user/profile/profileinfo";
 import Profile from "./layout/profile";
+import OrderDetail from "./components/OrderDetail";
+import ListVouchers from "./components/admin/voucher/ListVoucher";
+import AddVoucher from "./components/admin/voucher/AddVoucher";
+import EditVoucher from "./components/admin/voucher/EditVoucher";
 function App() {
   return (
     <>
@@ -72,6 +76,7 @@ function App() {
           <Route path="/donhang" element={<Orderlisthistory />} />
           <Route path="/success" element={<Success />} />
           <Route path="/listdonhang" element={<Donhangpage />} />
+          <Route path="/Orders/:id" element={<OrderDetail />} />
 
           <Route
             path="/admin"
@@ -92,6 +97,9 @@ function App() {
             <Route path="addMaterial" element={<AddMaterial />} />
             <Route path="users" element={<Users />} />
             <Route path="order" element={<Order />} />
+            <Route path="vouchers" element={<ListVouchers />} />
+            <Route path="vouchers/:id" element={<EditVoucher />} />
+            <Route path="voucher/add" element={<AddVoucher />} />
             
             <Route path="tintuc" element={<DashboardNews />} />
             {/* <Route path="dashboard/update/:id" Component={Update}></Route> */}

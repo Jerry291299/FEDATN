@@ -16,6 +16,8 @@ function OrderPayment() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
   const [user, setUser] = useState<string>("");
+  const [voucherCode, setVoucherCode] = useState<string>("");
+const [discount, setDiscount] = useState<number>(0);
   const [customerDetails, setCustomerDetails] = useState({
     name: "",
     phone: "",
@@ -96,11 +98,29 @@ function OrderPayment() {
     setCustomerDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
   };
 
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) {
+      toast.error("Vui lòng nhập mã giảm giá.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post("http://localhost:28017/voucher/apply", { code: voucherCode });
+  
+      setDiscount(response.data.discountAmount);
+      toast.success(`Áp dụng mã giảm giá thành công! Giảm ${response.data.discountAmount} VND.`);
+    } catch (error) {
+      // toast.error(error.response?.data?.message || "Không thể áp dụng mã giảm giá.");
+    }
+  };
+
   const total = cartItems.reduce((total, item) => {
     const quantity = item.quantity ?? 0;
     const price = item.price ?? 0;
     return total + price * quantity;
   }, 0);
+
+  const discountedTotal = Math.max(0, total - discount);
 
   const handleOrderSubmit = async () => {
     console.log("Order ID being sent:", user); // Kiểm tra giá trị
@@ -122,7 +142,7 @@ function OrderPayment() {
     const orderData: IOrderData = {
       userId: user,
       items: cartItems,
-      amount: totalAmount,
+      amount: discountedTotal,
       paymentMethod: selectedPaymentMethod,
       customerDetails: customerDetails,
     };
@@ -215,7 +235,7 @@ function OrderPayment() {
         const paymentUrl = await createVNPayPayment({
           userId: user,
           paymentMethod: selectedPaymentMethod,
-          amount: totalAmount,
+          amount: discountedTotal,
         });
         setCartItems([]);
 
@@ -362,17 +382,62 @@ function OrderPayment() {
               </span>
             </div>
           ))}
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex justify-between font-bold text-lg">
-              <span>Tổng cộng</span>
-              <span>
-                {new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(total)}
-              </span>
-            </div>
-          </div>
+
+
+
+
+
+<div className="border-t pt-4 space-y-2">
+  <div className="flex justify-between">
+    <span>Tổng cộng</span>
+    <span>
+      {new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(total)}
+    </span>
+  </div>
+  {discount > 0 && (
+    <div className="flex justify-between text-green-500">
+      <span>Giảm giá</span>
+      <span>
+        - {new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(discount)}
+      </span>
+    </div>
+  )}
+
+<div className="mt-4">
+  <label className="block text-sm font-medium">Mã giảm giá</label>
+  <div className="flex gap-2 mt-2">
+    <input
+      type="text"
+      value={voucherCode}
+      onChange={(e) => setVoucherCode(e.target.value)}
+      className="w-full border border-gray-300 p-2 rounded-md"
+      placeholder="Nhập mã giảm giá"
+    />
+    <button
+      onClick={handleApplyVoucher}
+      className="bg-blue-500 text-white px-4 py-2 rounded-md"
+    >
+      Áp dụng
+    </button>
+  </div>
+</div>
+  <div className="flex justify-between font-bold text-lg">
+    <span>Thành tiền</span>
+    <span>
+      {new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(discountedTotal)}
+    </span>
+  </div>
+</div>
+
 
           {/* Order confirmation button */}
           <div className="mt-6 flex justify-between items-center">

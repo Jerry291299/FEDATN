@@ -78,7 +78,7 @@ export const activateUser = async (_id: string) => {
 
 export const updateUser = async (_id: string, newRole: string) => {
   try {
-    const response = await axiosservice.put(`/admin/users/updateuser/${_id}`, { role: newRole });
+    const response = await axiosservice.put(`/admin/user/${_id}`, { role: newRole });
     return response.data; // Ensure this returns the updated user data
   } catch (error) {
     // console.error("Error updating user in API:", error);
@@ -88,7 +88,7 @@ export const updateUser = async (_id: string, newRole: string) => {
 
 export const getUserById = async (_id?: string) => {
   try {
-    const { data } = await axiosservice.get(`/admin/users/${_id}`);
+    const { data } = await axiosservice.get(`/user/${_id}`);
     // console.log(_id);
     return data;
   } catch (error) {
