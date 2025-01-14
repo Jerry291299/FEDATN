@@ -79,40 +79,38 @@ const OrdersShipper = (props: Props) => {
     setError(null);
   
     try {
-      const response = await axios.put(
-        `http://localhost:28017/orders-list/${orderId}`,
-        {
-          status: "delivered",
-          paymentstatus: "Đã Thanh Toán",
-        }
-      );
-  
-      if (response.status === 200 && response.data) {
-        // Cập nhật trạng thái đơn hàng trong OrdersShipper
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === orderId
-              ? {
-                  ...order,
-                  status: "delivered",
-                  paymentstatus: "Đã Thanh Toán",
-                }
-              : order
-          )
+        const response = await axios.put(
+            `http://localhost:28017/orders-list/${orderId}`,
+            {
+                status: "delivered",
+                paymentstatus: "Đã Thanh Toán",
+            }
         );
   
-        // Gọi API để cập nhật trạng thái đơn hàng trong Orderlisthistory
-        await axios.put(`http://localhost:28017/api/orders/${orderId}/received`, {
-          status: "Đã nhận hàng", // Cập nhật trạng thái đơn hàng
-        });
-      } 
+        if (response.status === 200 && response.data) {
+            setOrders((prevOrders) =>
+                prevOrders.map((order) =>
+                    order._id === orderId
+                        ? {
+                            ...order,
+                            status: "delivered",
+                            paymentstatus: "Đã Thanh Toán",
+                        }
+                        : order
+                )
+            );
+
+            // Notify the user's order history that the order has been delivered
+            await axios.put(`http://localhost:28017/api/orders/${orderId}/received`, {
+                status: "Đã giao", // Update the status in the user's order history
+            });
+        } 
     } catch (err) {
-      
-      console.error("Error confirming delivery:", err);
+        console.error("Error confirming delivery:", err);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
   const handleFailedDelivery = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
@@ -255,6 +253,8 @@ const OrdersShipper = (props: Props) => {
                             ? "bg-orange-500"
                             : order.status === "in_progress"
                             ? "bg-blue-500"
+                            : order.status === "confirm-receive"
+                            ? "bg-blue-500"
                             : order.status === "delivered"
                             ? "bg-green-500"
                             : order.status === "cancelledOrder"
@@ -270,6 +270,8 @@ const OrdersShipper = (props: Props) => {
                           ? "Đóng gói"
                           : order.status === "in_progress"
                           ? "Đang giao"
+                           : order.status === "confirm-receive"
+                           ?"Thành công"
                           : order.status === "delivered"
                           ? "Đã giao"
                           : order.status === "cancelledOrder"
