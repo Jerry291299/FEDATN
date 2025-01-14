@@ -215,7 +215,9 @@ const Order = (props: Props) => {
         }
       },
     });
+    
   };
+
 
   const handleCancel = () => {
     setIsModalVisible(false);

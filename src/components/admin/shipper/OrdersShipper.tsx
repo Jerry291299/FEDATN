@@ -77,7 +77,7 @@ const OrdersShipper = (props: Props) => {
   const handleConfirmDelivery = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
-
+  
     try {
       const response = await axios.put(
         `http://localhost:28017/orders-list/${orderId}`,
@@ -86,8 +86,9 @@ const OrdersShipper = (props: Props) => {
           paymentstatus: "Đã Thanh Toán",
         }
       );
-
+  
       if (response.status === 200 && response.data) {
+        // Cập nhật trạng thái đơn hàng trong OrdersShipper
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId
@@ -99,17 +100,19 @@ const OrdersShipper = (props: Props) => {
               : order
           )
         );
-      } else {
-        setError("Không thể xác nhận giao hàng");
-      }
+  
+        // Gọi API để cập nhật trạng thái đơn hàng trong Orderlisthistory
+        await axios.put(`http://localhost:28017/api/orders/${orderId}/received`, {
+          status: "Đã nhận hàng", // Cập nhật trạng thái đơn hàng
+        });
+      } 
     } catch (err) {
-      setError("Không thể xác nhận giao hàng");
+      
       console.error("Error confirming delivery:", err);
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleFailedDelivery = async (orderId: string) => {
     setIsLoading(true);
     setError(null);
@@ -159,6 +162,7 @@ const OrdersShipper = (props: Props) => {
     } finally {
       setIsLoading(false);
     }
+    
   };
 
   const indexOfLastOrder = currentPage * itemsPerPage;
