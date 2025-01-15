@@ -158,22 +158,42 @@ const Cart = () => {
   }, 0);
 
   const handleCheckout = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const priceCheckResult = await checkForPriceChanges();
-
-    if (priceCheckResult === "priceChanged") {
-      toast.error("Giá sản phẩm trong giỏ hàng đã thay đổi. Vui lòng kiểm tra lại.");
-      return;
+    e.preventDefault(); // Prevent default form submission
+  
+    try {
+      // Check user status
+      const userStatusResponse = await axios.get(
+        `http://localhost:28017/user/${userId}/status`
+      );
+  
+      const { active, reason } = userStatusResponse.data;
+  
+      if (!active) {
+        toast.error(
+          `Your account is deactivated. Reason: ${reason || "Not specified"}`
+        );
+        return;
+      }
+  
+      const priceCheckResult = await checkForPriceChanges();
+  
+      if (priceCheckResult === "priceChanged") {
+        toast.warning("The price of items in your cart has changed. Please review your cart.");
+        return;
+      }
+  
+      if (cartItems.length === 0) {
+        toast.info("Your cart is empty.");
+        return;
+      }
+  
+      navigate("/order");
+    } catch (error) {
+      console.error("Failed to check user status:", error);
+      toast.error("An error occurred while checking user status.");
     }
-
-    if (cartItems.length === 0) {
-      toast.error("Giỏ hàng của bạn đang trống.");
-      return;
-    }
-
-    navigate("/order");
   };
+  
 
   return (
     <>
