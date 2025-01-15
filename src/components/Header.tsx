@@ -7,6 +7,7 @@ import Facebook from "../anh/Facebook.png";
 import nguoi from "../anh/user.png";
 import logo from "./img/Black & White Minimalist Aesthetic Initials Font Logo.png";
 import iconarrow from "./icons/down-arrow_5082780.png";
+import axios from "axios";
 
 const Header = () => {
   const [user, setUser] = useState<{
@@ -24,21 +25,47 @@ const Header = () => {
     string | null
   >(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [profileData, setProfileData] = useState({
+    img: "",
+  });
+  
   const navigate = useNavigate();
+
+
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+  
+      fetchUserProfile(parsedUser.id);
     }
-
+  
     const fetchCategories = async () => {
       const data = await getAllCategories();
       setCategories(data);
     };
-
+  
     fetchCategories();
   }, []);
+
+  const fetchUserProfile = async (id: string) => {
+    try {
+      const response = await axios.get(`http://localhost:28017/user/${id}`);
+      if (response.data) {
+        const formattedDob = response.data.dob
+          ? new Date(response.data.dob).toISOString().split("T")[0]
+          : "";
+        setProfileData({
+          img: response.data.img || ""
+          
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+  };
 
   const toggleSubMenu = () => {
     setIsSubMenuOpen(!isSubMenuOpen);
@@ -94,15 +121,19 @@ const Header = () => {
           {user ? (
             <div className="relative">
               <div
-                className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
-                onClick={toggleSubMenu}
-              >
-                <img src={nguoi} alt="Hồ sơ" className="w-5 h-5" />
-                <p className="ml-2 flex gap-2">
-                  {user.info.name}
-                  <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
-                </p>
-              </div>
+      className="flex items-center cursor-pointer border-2 border-black rounded-xl px-[10px] py-[5px]"
+      onClick={toggleSubMenu}
+    >
+      <img
+        src={profileData.img || nguoi}
+        alt="Hồ sơ"
+        className="w-8 h-8 rounded-full"
+      />
+      <p className="ml-2 flex gap-2">
+        {user.info.name}
+        <img className="w-4 h-4 mt-[5px]" src={iconarrow} alt="" />
+      </p>
+    </div>
               {isSubMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
                   <li className="hover:bg-gray-100">
